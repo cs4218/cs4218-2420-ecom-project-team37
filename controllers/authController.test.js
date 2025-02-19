@@ -1,4 +1,4 @@
-import jest from "jest-mock";
+import { jest } from "@jest/globals";
 import { registerController } from "./authController";
 import userModel from "../models/userModel";
 
