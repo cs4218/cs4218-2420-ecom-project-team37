@@ -28,6 +28,13 @@ export const registerController = async (req, res) => {
     }
     //check user
     const exisitingUser = await userModel.findOne({ email });
+    //invalid email
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      return res.status(200).send({
+        success: false,
+        message: "Invalid email format",
+      });
+    }
     //exisiting user
     if (exisitingUser) {
       return res.status(200).send({
