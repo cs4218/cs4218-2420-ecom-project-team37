@@ -21,7 +21,7 @@ describe("Auth Helper Test", () => {
                 bcrypt.hash.mockResolvedValue(expectedHashedPassword);
 
                 const hashedPassword = await hashPassword(password);
-                
+
                 expect(hashedPassword).toEqual(expectedHashedPassword);
             })
 
@@ -62,34 +62,49 @@ describe("Auth Helper Test", () => {
     })
 
     // describe("Integration tests", () => {
-        // describe("hashPassword Tests", () => {
-        //     pw is non-empty string
+    //     describe("hashPassword bcrypt Tests", () => {
+    //         it ("Should return a valid hashed password for non empty string", async () => {
+    //             const password = "password123";
+    //             const hashedPassword = await hashPassword(password);
+                
+    //             expect(hashedPassword).toBeDefined();
+    //             expect(hashedPassword).not.toBe(password); 
+    //         }) 
+
+    //         // pw is non-empty string
+           
+    //         // pw is empty string
     
-        //     pw is empty string
+    //         // pw is int?
     
-        //     pw is int?
+    //         // pw is object 
     
-        //     pw is object 
+    //         // pw is null
+    //     });
     
-        //     pw is null
-        // });
+    //     describe("comparePassword Tests", () => {
+    //         // pw match hashed pw
     
-        // describe("comparePassword Tests", () => {
-        //     pw match hashed pw
+    //         // pw doesnt match hashed pw
     
-        //     pw doesnt match hashed pw
+    //         // pw is empty string, hashed pw isnt empty
     
-        //     pw is empty string, hashed pw isnt empty
+    //         // pw is empty string, hashed pw is empty string
     
-        //     pw is empty string, hashed pw is empty string
+    //         // pw is null, hashed pw is null 
     
-        //     pw is null, hashed pw is null 
+    //         // pw is null, hashed pw is not null
     
-        //     pw is null, hashed pw is not null
-    
-        //     pw is not null, hashed pw is null
+    //         // pw is not null, hashed pw is null
     
             
-        // });
+    //     });
+        
+    //     it("Should return true when hash password and check if match", async() => {
+    //         const password = "password123";
+    //         const hashedPassword = await hashPassword(password);
+    //         const result = await comparePassword(password, hashedPassword);
+    //         expect(result).toEqual(true);
+    //     })
     // })
 })
