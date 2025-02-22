@@ -24,7 +24,7 @@ describe("Auth middleware Tests", () => {
     });
 
     describe("requireSignIn Tests", () => {
-      it("Assign user when token is valid, and call next()", async () => {
+      it("Should assign user when token is valid, and call next()", async () => {
         const mockUser = { _id: "123" };
         JWT.verify.mockReturnValueOnce(mockUser);
 
@@ -37,7 +37,7 @@ describe("Auth middleware Tests", () => {
         expect(next).toHaveBeenCalled(); 
       });
 
-      it("Expect error to be logged when token is invalid, and next() shouldnt be called", async () => {
+      it("Should log error when token is invalid, and next() shouldnt be called", async () => {
         JWT.verify.mockImplementation(() => {
           throw new Error("Invalid token");
         });
@@ -54,7 +54,7 @@ describe("Auth middleware Tests", () => {
 
     describe("isAdmin Tests", () => {
 
-      it("Expect function to call next() if user is an admin", async () => {
+      it("Should call next() if user is an admin", async () => {
         req.user = { _id: "123" }; 
         userModel.findById.mockResolvedValueOnce({ _id: "123", role: 1 }); 
 
@@ -64,7 +64,7 @@ describe("Auth middleware Tests", () => {
         expect(next).toHaveBeenCalled(); 
       });
 
-      it("Expect res to be 401 if user is not an admin, and next() shouldnt be called", async () => {
+      it("Should have 401 res if user is not an admin, and next() shouldnt be called", async () => {
         req.user = { _id: "123" };
         userModel.findById.mockResolvedValueOnce({ _id: "123", role: 0 });
 
@@ -79,7 +79,7 @@ describe("Auth middleware Tests", () => {
         expect(next).not.toHaveBeenCalled();
       });
 
-      it("should return 401 on database error", async () => {
+      it("Should have 401 res on database error", async () => {
         req.user = { _id: "123" };
         const dbError = new Error("DB error");
         userModel.findById.mockRejectedValue(dbError);
@@ -96,6 +96,10 @@ describe("Auth middleware Tests", () => {
         expect(next).not.toHaveBeenCalled();
       });
     });
-  }) 
+  });
+  
+  
+  // describe("Integration tests", () => {
+  // })
 });
 
