@@ -6,13 +6,13 @@ export default {
   testEnvironment: "node",
 
   // which test to run
-  testMatch: ["<rootDir>/controllers/*.test.js"],
+  testMatch: ["<rootDir>/controllers/*.test.js", "<rootDir>/middlewares/*.test.js"],
 
   transform: {},
 
   // jest code coverage
   collectCoverage: true,
-  collectCoverageFrom: ["controllers/**"],
+  collectCoverageFrom: ["controllers/**", "middlewares/**"],
   coverageThreshold: {
     global: {
       lines: 0,
