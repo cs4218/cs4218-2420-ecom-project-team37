@@ -3,8 +3,8 @@ name: Deploy MarkBind site to GitHub Pages
 on:
   push:
     branches:
-      - main
-
+      - '*'
+      
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -25,7 +25,7 @@ jobs:
       - name: Build MarkBind site
         run: |
           cd client
-          markbind build
+          markbind build -c
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
