@@ -25,7 +25,7 @@ jobs:
       - name: Build MarkBind site
         run: |
           cd client
-          markbind build -c
+          markbind build -c site.json
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
