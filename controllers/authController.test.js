@@ -35,3 +35,42 @@ describe("Register Controller Test", () => {
     expect(userModel.prototype.save).not.toHaveBeenCalled();
   });
 });
+
+describe("Update Profile Controller Test", () => {
+  // Unit tests
+  // mock userModel.findById
+  // mock req body
+
+  let req, res;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    req = {
+      body: {
+        name: "John Doe",
+        email: "invalid-email",
+        password: "password123",
+        phone: "12344000",
+        address: "123 Street",
+        answer: "Football",
+      },
+    };
+
+    res = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+    };
+  });
+
+  // Test 1 - no password in req body -> res shld have error
+  it("should return error if password is not provided", async () => {
+    req.body.password = undefined;
+
+  })
+
+  // Test 2 - password < 6 -> res shld have error
+
+  // Test 3 - has valid password -> mock findByIdAndUpdate and check res
+
+  // Test 4 - 
+})

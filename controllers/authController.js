@@ -171,10 +171,10 @@ export const testController = (req, res) => {
   }
 };
 
-//update prfole
+//update profile
 export const updateProfileController = async (req, res) => {
   try {
-    const { name, email, password, address, phone } = req.body;
+    const { name, password, address, phone } = req.body;
     const user = await userModel.findById(req.user._id);
     //password
     if (password && password.length < 6) {
@@ -193,14 +193,14 @@ export const updateProfileController = async (req, res) => {
     );
     res.status(200).send({
       success: true,
-      message: "Profile Updated SUccessfully",
+      message: "Profile Updated Successfully",
       updatedUser,
     });
   } catch (error) {
     console.log(error);
     res.status(400).send({
       success: false,
-      message: "Error WHile Update profile",
+      message: "Error While Update Profile",
       error,
     });
   }
