@@ -1,0 +1,57 @@
+{
+	"id": "832b919b-1e10-4c3a-a8be-3ea6c01b148f",
+	"name": "environment",
+	"values": [
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "orderID",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "categoryID",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "categoryName",
+			"value": "Updated-Electronics",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "productName",
+			"value": "NewLaptop",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "productID",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "keyword",
+			"value": "NewLaptop",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "clientToken",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2025-02-24T15:39:07.396Z",
+	"_postman_exported_using": "Postman/11.19.0"
+}
