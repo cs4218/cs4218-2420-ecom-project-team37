@@ -26,20 +26,20 @@ export const registerController = async (req, res) => {
     if (!answer) {
       return res.send({ message: "Answer is Required" });
     }
-    //check user
-    const exisitingUser = await userModel.findOne({ email });
     //invalid email
     if (!/\S+@\S+\.\S+/.test(email)) {
-      return res.status(200).send({
+      return res.status(400).send({
         success: false,
         message: "Invalid email format",
       });
     }
+    //check user
+    const exisitingUser = await userModel.findOne({ email });
     //exisiting user
     if (exisitingUser) {
-      return res.status(200).send({
+      return res.status(400).send({
         success: false,
-        message: "Already Register please login",
+        message: "Already registered please login",
       });
     }
     //register user
@@ -63,7 +63,7 @@ export const registerController = async (req, res) => {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Errro in Registeration",
+      message: "Error in Registration",
       error,
     });
   }
@@ -75,7 +75,7 @@ export const loginController = async (req, res) => {
     const { email, password } = req.body;
     //validation
     if (!email || !password) {
-      return res.status(404).send({
+      return res.status(400).send({
         success: false,
         message: "Invalid email or password",
       });
@@ -85,12 +85,13 @@ export const loginController = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "Email is not registerd",
+        message: "Email is not registered",
       });
     }
     const match = await comparePassword(password, user.password);
     if (!match) {
-      return res.status(200).send({
+      // Return status 401 unauthorized
+      return res.status(401).send({
         success: false,
         message: "Invalid Password",
       });
