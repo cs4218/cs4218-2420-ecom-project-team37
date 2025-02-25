@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from "./auth";
 
 jest.mock("axios");
 
+// Create an AuthComponent to be wrapped with AuthProvider
 const AuthComponent = () => {
   const [auth, setAuth] = useAuth();
 
@@ -77,10 +78,10 @@ describe("AuthProvider and useAuth", () => {
     });
   });
 
-  it("sets axios default authorization header", async () => {
+  it("sets axios default authorization header to token value", async () => {
     const mockAuthData = {
-      user: { name: "Jane Doe" },
-      token: "mock-token-456",
+      user: { name: "John Doe" },
+      token: "mock-token-123",
     };
 
     window.localStorage.getItem.mockReturnValueOnce(
@@ -95,7 +96,7 @@ describe("AuthProvider and useAuth", () => {
 
     await waitFor(() => {
       expect(axios.defaults.headers.common["Authorization"]).toBe(
-        "mock-token-456"
+        "mock-token-123"
       );
     });
   });

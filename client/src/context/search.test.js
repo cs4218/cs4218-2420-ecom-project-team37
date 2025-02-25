@@ -2,6 +2,7 @@ import React, { act } from "react";
 import { render, screen } from "@testing-library/react";
 import { useSearch, SearchProvider } from "./search";
 
+// Provide a SearchComponent to be wrapped with SearchProvideer
 const SearchComponent = () => {
   const [auth, setAuth] = useSearch();
 
