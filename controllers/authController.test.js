@@ -11,6 +11,8 @@ jest.mock("../helpers/authHelper", () => ({
 
 jest.mock("../models/userModel.js");
 
+jest.spyOn(console, "log").mockImplementation(() => {});
+
 describe("Register Controller Test", () => {
   let req, res;
 

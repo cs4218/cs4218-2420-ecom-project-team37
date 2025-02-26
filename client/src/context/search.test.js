@@ -1,5 +1,4 @@
-import React, { act } from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 import { useSearch, SearchProvider } from "./search";
 
 // Provide a SearchComponent to be wrapped with SearchProvideer

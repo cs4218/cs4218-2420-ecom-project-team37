@@ -1,4 +1,3 @@
-import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react";
 import axios from "axios";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
@@ -9,6 +8,7 @@ import Register from "./Register";
 // Mocking axios.post
 jest.mock("axios");
 jest.mock("react-hot-toast");
+jest.spyOn(console, "log").mockImplementation(() => {});
 
 jest.mock("../../context/auth", () => ({
   useAuth: jest.fn(() => [null, jest.fn()]), // Mock useAuth hook to return null state and a mock function for setAuth

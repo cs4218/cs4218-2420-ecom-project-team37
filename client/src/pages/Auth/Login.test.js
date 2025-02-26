@@ -1,4 +1,3 @@
-import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react";
 import axios from "axios";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
@@ -23,6 +22,7 @@ jest.mock("../../context/search", () => ({
 }));
 
 jest.mock("../../hooks/useCategory", () => jest.fn(() => []));
+jest.spyOn(console, "log").mockImplementation(() => {});
 
 Object.defineProperty(window, "localStorage", {
   value: {
