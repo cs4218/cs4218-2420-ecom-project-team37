@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
 import userModel from "../models/userModel";
-import { registerController, loginController } from "./authController";
+import { registerController, loginController, forgotPasswordController, testController } from "./authController";
 import { comparePassword, hashPassword } from "../helpers/authHelper";
 import JWT from "jsonwebtoken";
 
@@ -43,33 +43,38 @@ describe("Register Controller Test", () => {
     expect(userModel.prototype.save).not.toHaveBeenCalled();
   });
 
-  test("should return error if name is missing during registration", async () => {
+  test("should return 400 if name is missing during registration", async () => {
     req.body.name = "";
     await registerController(req, res);
-    expect(res.send).toHaveBeenCalledWith({ error: "Name is Required" });
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith({ message: "Name is Required" });
   });
 
-  test("should return error if email is missing during registration", async () => {
+  test("should return 400 if email is missing during registration", async () => {
     req.body.email = "";
     await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith({ message: "Email is Required" });
   });
 
-  test("should return error if password is missing during registration", async () => {
+  test("should return 400 if password is missing during registration", async () => {
     req.body.password = "";
     await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith({ message: "Password is Required" });
   });
 
-  test("should return error if phone number is missing during registration", async () => {
+  test("should return 400 if phone number is missing during registration", async () => {
     req.body.phone = "";
     await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith({ message: "Phone no is Required" });
   });
 
-  test("should return error if address is missing during registration", async () => {
+  test("should return 400 if address is missing during registration", async () => {
     req.body.address = "";
     await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith({ message: "Address is Required" });
   });
 
@@ -242,5 +247,137 @@ describe("Login Controller Test", () => {
       message: "Error in login",
       error: expect.any(Error),
     });
+  });
+});
+
+describe("Forgot Password Controller Test", () => {
+  let req, res;
+
+  beforeEach(() => {
+    req = {
+      body: {
+        email: "test@example.com",
+        answer: "sports",
+        newPassword: "newPassword",
+      },
+    };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+    };
+    jest.clearAllMocks();
+  });
+
+  test("should return 400 if email is missing", async () => {
+    req.body.email = "";
+
+    await forgotPasswordController(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith({ message: "Email is required" });
+  });
+
+  test("should return 400 if answer is missing", async () => {
+    req.body.answer = "";
+
+    await forgotPasswordController(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith({ message: "Answer is required" });
+  });
+
+  test("should return 400 if new password is missing", async () => {
+    req.body.newPassword = "";
+
+    await forgotPasswordController(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith({ message: "New Password is required" });
+  });
+
+  test("should return 404 if user is not found (wrong email)", async () => {
+    userModel.findOne.mockResolvedValue(null);
+
+    await forgotPasswordController(req, res);
+
+    expect(userModel.findOne).toHaveBeenCalledWith({ email: req.body.email });
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.send).toHaveBeenCalledWith({
+      success: false,
+      message: "Email is not registered",
+    });
+  });
+
+  test("should return 400 if user is found but wrong answer", async () => {
+    const mockUser = {
+      _id: "user123",
+      email: "test@example.com",
+      answer: "correctAnswer",
+    };
+  
+    userModel.findOne.mockResolvedValue(mockUser);
+    req.body.answer = "wrongAnswer";
+  
+    await forgotPasswordController(req, res);
+  
+    expect(userModel.findOne).toHaveBeenCalledWith({ email: req.body.email }); 
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith({
+      success: false,
+      message: "Incorrect security answer",
+    });
+  });
+  
+
+  test("should return 200 if password reset is successful", async () => {
+    const mockUser = { _id: "123", email: "test@example.com", answer: "sports" };
+  
+    userModel.findOne.mockResolvedValue(mockUser);
+    hashPassword.mockResolvedValue("hashedNewPassword"); 
+    userModel.findByIdAndUpdate.mockResolvedValue({});
+  
+    await forgotPasswordController(req, res);
+  
+    expect(userModel.findOne).toHaveBeenCalledWith({ email: req.body.email });
+    expect(hashPassword).toHaveBeenCalledWith(req.body.newPassword);
+    expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith(mockUser._id, { password: "hashedNewPassword" });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({
+      success: true,
+      message: "Password Reset Successfully",
+    });
+  });
+  
+
+});
+
+describe("Test Controller", () => {
+  let req, res;
+
+  beforeEach(() => {
+    req = {};
+    res = {
+      send: jest.fn(),
+    };
+    jest.clearAllMocks();
+  });
+
+  test("should return 'Protected Routes' on success", () => {
+    testController(req, res);
+    expect(res.send).toHaveBeenCalledWith("Protected Routes");
+  });
+
+  test("should return an error response if an exception occurs", () => {
+    const error = new Error("Server Error");
+    const failingController = () => {
+      throw error;
+    };
+
+    try {
+      failingController();
+    } catch (e) {
+      res.send({ error: e });
+    }
+    expect(res.send).toHaveBeenCalledWith({ error });
   });
 });
