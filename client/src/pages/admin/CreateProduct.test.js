@@ -390,7 +390,7 @@ describe("Product Component Unit Tests", () => {
     fireEvent.click(screen.getByText("CREATE PRODUCT"));
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Quantity must be positive");
+      expect(toast.error).toHaveBeenCalledWith("Quantity must be more than zero");
     });
   });
 
@@ -558,7 +558,7 @@ describe("Product Component Unit Tests", () => {
     fireEvent.click(screen.getByText("CREATE PRODUCT"));
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Quantity must be positive");
+      expect(toast.error).toHaveBeenCalledWith("Quantity must be more than zero");
     });
   });
 
