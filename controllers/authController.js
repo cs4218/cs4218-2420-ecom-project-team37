@@ -175,11 +175,28 @@ export const testController = (req, res) => {
 export const updateProfileController = async (req, res) => {
   try {
     const { name, password, address, phone } = req.body;
-    const user = await userModel.findById(req.user._id);
+    if (!name && !password && !address && !phone) {
+      return res.status(400).send({
+        success: false,
+        message: "No fields to update",
+      })
+    }
     //password
     if (password && password.length < 6) {
-      return res.json({ error: "Password is required and at least 6 characters long" });
+      return res.status(400).send({
+        success: false,
+        message: "Password is required and at least 6 characters long"  
+      });
     }
+
+    const user = await userModel.findById(req.user._id);
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      })
+    }
+
     const hashedPassword = password ? await hashPassword(password) : undefined;
     const updatedUser = await userModel.findByIdAndUpdate(
       req.user._id,
@@ -223,6 +240,7 @@ export const getOrdersController = async (req, res) => {
     });
   }
 };
+
 //orders
 export const getAllOrdersController = async (req, res) => {
   try {

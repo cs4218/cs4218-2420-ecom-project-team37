@@ -3,13 +3,10 @@ import bcrypt from "bcrypt";
 import { hashPassword, comparePassword } from "./authHelper";
 
 jest.mock("bcrypt");
-jest.mock("./authHelper.js");
 
 jest.spyOn(console, "log").mockImplementation(() => {});
 
 describe("Auth Helper Unit Tests", () => {
-    bcrypt.hash = jest.fn();
-    bcrypt.compare = jest.fn();
     beforeEach(() => {
         jest.clearAllMocks();
     })
@@ -22,8 +19,10 @@ describe("Auth Helper Unit Tests", () => {
 
             const hashedPassword = await hashPassword(password);
 
+            expect(bcrypt.hash).toHaveBeenCalledWith(password, expect.any(Number));
             expect(hashedPassword).toEqual(expectedHashedPassword);
         })
+        
 
         it("Should log error when bcrypt throws error", async() => {
             const password = "password123";
@@ -32,6 +31,7 @@ describe("Auth Helper Unit Tests", () => {
 
             await hashPassword(password);
 
+            expect(bcrypt.hash).toHaveBeenCalledWith(password, expect.any(Number));
             expect(console.log).toHaveBeenCalledWith(error);
         })
     });

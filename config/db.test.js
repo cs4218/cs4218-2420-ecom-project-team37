@@ -3,7 +3,6 @@ import { jest } from "@jest/globals";
 import connectDB from "./db.js";
 
 jest.mock("mongoose");
-mongoose.connect = jest.fn()
 jest.spyOn(console, "log").mockImplementation(() => {});
 
 describe("MongoDB Connection Unit Tests", () => {

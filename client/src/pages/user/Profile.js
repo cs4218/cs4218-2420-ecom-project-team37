@@ -34,8 +34,8 @@ const Profile = () => {
         phone,
         address,
       });
-      if (data?.errro) {
-        toast.error(data?.error);
+      if (data?.error) {
+        toast.error(data?.message);
       } else {
         setAuth({ ...auth, user: data?.updatedUser });
         let ls = localStorage.getItem("auth");
