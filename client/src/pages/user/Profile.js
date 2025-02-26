@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import UserMenu from "../../components/UserMenu";
-import Layout from "./../../components/Layout";
+import Layout from "../../components/Layout";
 import { useAuth } from "../../context/auth";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -34,8 +34,8 @@ const Profile = () => {
         phone,
         address,
       });
-      if (data?.errro) {
-        toast.error(data?.error);
+      if (data?.error) {
+        toast.error(data?.message);
       } else {
         setAuth({ ...auth, user: data?.updatedUser });
         let ls = localStorage.getItem("auth");
@@ -66,7 +66,7 @@ const Profile = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="form-control"
-                    id="exampleInputEmail1"
+                    id="exampleName1"
                     placeholder="Enter Your Name"
                     autoFocus
                   />
@@ -78,7 +78,7 @@ const Profile = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     className="form-control"
                     id="exampleInputEmail1"
-                    placeholder="Enter Your Email "
+                    placeholder="Enter Your Email"
                     disabled
                   />
                 </div>
