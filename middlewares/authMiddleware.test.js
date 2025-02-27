@@ -46,7 +46,7 @@ describe("Auth middleware Unit Tests", () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
-        message: expect.any(String),
+        message: "No Authorization in header",
       });
       expect(next).not.toHaveBeenCalled();
     })
@@ -60,7 +60,7 @@ describe("Auth middleware Unit Tests", () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
-        message: expect.any(String),
+        message: "No Authorization in header",
       });
       expect(next).not.toHaveBeenCalled();
     })
@@ -76,7 +76,6 @@ describe("Auth middleware Unit Tests", () => {
       await requireSignIn(req, res, next);
 
       expect(JWT.verify).toHaveBeenCalledWith(invalidToken, process.env.JWT_SECRET);
-      expect(console.log).toHaveBeenCalled(); 
       expect(next).not.toHaveBeenCalled();
     });
   })
@@ -115,7 +114,7 @@ describe("Auth middleware Unit Tests", () => {
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
-        message: expect.any(String),
+        message: "Unauthorized Access",
       });
       expect(next).not.toHaveBeenCalled();
     });
@@ -129,7 +128,7 @@ describe("Auth middleware Unit Tests", () => {
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
-        message: expect.any(String),
+        message: "Unauthorized Access",
       });
       expect(next).not.toHaveBeenCalled();
     });
@@ -144,7 +143,7 @@ describe("Auth middleware Unit Tests", () => {
       expect(res.send).toHaveBeenCalledWith({
         success: false,
         error: expect.any(Error),
-        message: expect.any(String),
+        message: "Error in admin middleware",
       });
       expect(next).not.toHaveBeenCalled();
     })
@@ -160,7 +159,7 @@ describe("Auth middleware Unit Tests", () => {
       expect(res.send).toHaveBeenCalledWith({
         success: false,
         error: dbError,
-        message: expect.any(String),
+        message: "Error in admin middleware",
       });
       expect(next).not.toHaveBeenCalled();
     });

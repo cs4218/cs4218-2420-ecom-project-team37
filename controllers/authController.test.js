@@ -450,7 +450,7 @@ describe("Update Profile Controller Test", () => {
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({
       success: true,
-      message: expect.any(String), 
+      message: "Profile Updated Successfully", 
       updatedUser: updatedUser 
     });
   });
@@ -481,7 +481,7 @@ describe("Update Profile Controller Test", () => {
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({
       success: true, 
-      message: expect.any(String), 
+      message: "Profile Updated Successfully", 
       updatedUser: updatedUser
     })
   })
@@ -516,11 +516,10 @@ describe("Update Profile Controller Test", () => {
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({
       success: true, 
-      message: expect.any(String), 
+      message: "Profile Updated Successfully", 
       updatedUser: updatedUser
     })
   })
-
 
   it("should not update profile if password is less than 6 characters", async () => {
     req.body.password = "123";
@@ -533,7 +532,7 @@ describe("Update Profile Controller Test", () => {
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith({
       success: false, 
-      message: expect.any(String) 
+      message: "Password is required and at least 6 characters long" 
     })
   })
 
@@ -548,7 +547,7 @@ describe("Update Profile Controller Test", () => {
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith({
       success: false,
-      message: expect.any(String)
+      message: "No fields to update"
     })
   })
 
@@ -560,7 +559,7 @@ describe("Update Profile Controller Test", () => {
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.send).toHaveBeenCalledWith({
       success: false, 
-      message: expect.any(String), 
+      message: "User not found", 
     })
   })
 
@@ -573,12 +572,11 @@ describe("Update Profile Controller Test", () => {
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith({
       success: false, 
-      message: expect.any(String), 
+      message: "Error While Update Profile", 
       error: error
     })
   })
 })
-
 
 describe("Get Orders Controller Test", () => {
   let req, res;
@@ -654,7 +652,7 @@ describe("Get Orders Controller Test", () => {
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith({
       success: false, 
-      message: expect.any(String),
+      message: "Error While Getting Orders",
       error: error 
     })
   })
@@ -740,7 +738,7 @@ describe("Get All Orders Controller Test", () => {
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith({
       success: false, 
-      message: expect.any(String), 
+      message: "Error While Getting Orders", 
       error: error 
     })
   });
@@ -798,7 +796,7 @@ describe("Order Status Controller Test", () => {
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith({
       success: false,
-      message: expect.any(String),
+      message: "Error While Updating Order",
       error: mockError,
     });
   });
