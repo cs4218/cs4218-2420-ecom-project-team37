@@ -93,7 +93,7 @@ export const loginController = async (req, res) => {
       // Return status 401 unauthorized
       return res.status(401).send({
         success: false,
-        message: "Invalid Password",
+        message: "Invalid email or password",
       });
     }
     //token
@@ -140,17 +140,10 @@ export const forgotPasswordController = async (req, res) => {
     //check
     const user = await userModel.findOne({ email });
     //validation
-    if (!user) {
+    if (!user || user.answer !== answer) {
       return res.status(404).send({
         success: false,
-        message: "Email is not registered",
-      });
-    }
-    // Validate answer separately
-    if (user.answer !== answer) {
-      return res.status(400).send({
-        success: false,
-        message: "Incorrect security answer",
+        message: "Invalid email or answer",
       });
     }
     const hashed = await hashPassword(newPassword);

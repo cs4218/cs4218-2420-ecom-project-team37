@@ -202,7 +202,7 @@ describe("Login Controller Test", () => {
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.send).toHaveBeenCalledWith({
       success: false,
-      message: "Invalid Password",
+      message: "Invalid email or password",
     });
   });
 
@@ -306,7 +306,7 @@ describe("Forgot Password Controller Test", () => {
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.send).toHaveBeenCalledWith({
       success: false,
-      message: "Email is not registered",
+      message: "Invalid email or answer",
     });
   });
 
@@ -323,10 +323,10 @@ describe("Forgot Password Controller Test", () => {
     await forgotPasswordController(req, res);
   
     expect(userModel.findOne).toHaveBeenCalledWith({ email: req.body.email }); 
-    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.status).toHaveBeenCalledWith(404);
     expect(res.send).toHaveBeenCalledWith({
       success: false,
-      message: "Incorrect security answer",
+      message: "Invalid email or answer",
     });
   });
   
