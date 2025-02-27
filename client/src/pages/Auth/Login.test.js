@@ -1,4 +1,3 @@
-import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react";
 import axios from "axios";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
@@ -23,6 +22,7 @@ jest.mock("../../context/search", () => ({
 }));
 
 jest.mock("../../hooks/useCategory", () => jest.fn(() => []));
+jest.spyOn(console, "log").mockImplementation(() => {});
 
 Object.defineProperty(window, "localStorage", {
   value: {
@@ -155,4 +155,54 @@ describe("Login Component", () => {
     await waitFor(() => expect(axios.post).toHaveBeenCalled());
     expect(toast.error).toHaveBeenCalledWith("Something went wrong");
   });
+
+  it("should display toast message when login fails with API response", async () => {
+    axios.post.mockResolvedValueOnce({
+      data: {
+        success: false,
+        message: "Invalid data",
+      },
+    });
+
+    const { getByPlaceholderText, getByText } = render(
+      <MemoryRouter initialEntries={["/login"]}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    fireEvent.change(getByPlaceholderText("Enter Your Email"), {
+      target: { value: "test@example.com" },
+    });
+    fireEvent.change(getByPlaceholderText("Enter Your Password"), {
+      target: { value: "password123" },
+    });
+    fireEvent.click(getByText("LOGIN"));
+
+    await waitFor(() => expect(axios.post).toHaveBeenCalled());
+
+    expect(toast.error).toHaveBeenCalledWith("Invalid data");
+  });
+
+  it("should navigate to the forgot password page on button click", async () => {
+    const { getByText } = render(
+      <MemoryRouter initialEntries={["/login"]}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/forgot-password"
+            element={<div>Forgot Password Page</div>}
+          />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    fireEvent.click(getByText("Forgot Password"));
+
+    await waitFor(() => {
+      expect(getByText("Forgot Password Page")).toBeInTheDocument();
+    });
+  });
+
 });
