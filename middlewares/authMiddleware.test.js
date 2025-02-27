@@ -4,9 +4,7 @@ import userModel from "../models/userModel.js";
 import { requireSignIn, isAdmin } from "./authMiddleware.js";
 
 jest.mock("jsonwebtoken");
-jest.mock("../models/userModel.js", () => ({
-  findById: jest.fn(),
-}));
+jest.mock("../models/userModel.js");
 
 jest.spyOn(console, "log").mockImplementation(() => {}); 
 

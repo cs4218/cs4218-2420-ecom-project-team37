@@ -9,19 +9,8 @@ jest.mock("../helpers/authHelper", () => ({
   hashPassword: jest.fn(),
   comparePassword: jest.fn(),
 }));
-jest.mock("../models/userModel.js", () => ({
-  findOne: jest.fn(),
-  findById: jest.fn(),
-  findByIdAndUpdate: jest.fn(),
-  prototype: {
-    save: jest.fn(),
-  },
-}));
-jest.mock("../models/orderModel.js", () => ({
-  find: jest.fn(),
-  findByIdAndUpdate: jest.fn(),
-}));
-
+jest.mock("../models/userModel.js");
+jest.mock("../models/orderModel.js");
 jest.spyOn(console, "log").mockImplementation(() => {});
 
 describe("Register Controller Test", () => {
@@ -51,7 +40,6 @@ describe("Register Controller Test", () => {
   test("user model is not saved for invalid email", async () => {
     // specify mock functionality
     userModel.findOne.mockResolvedValue(null);
-    userModel.prototype.save = jest.fn();
 
     await registerController(req, res);
     expect(userModel.prototype.save).not.toHaveBeenCalled();
@@ -105,7 +93,7 @@ describe("Register Controller Test", () => {
 
     // Make email valid first
     req.body.email = "test@example.com";
-    userModel.findOne = jest.fn().mockResolvedValue(existingUser);
+    userModel.findOne.mockResolvedValue(existingUser);
 
     await registerController(req, res);
 
@@ -120,7 +108,7 @@ describe("Register Controller Test", () => {
     userModel.findOne.mockResolvedValue(null);
     // Make email valid first
     req.body.email = "john@example.com";
-    userModel.prototype.save = jest.fn().mockResolvedValue({
+    userModel.prototype.save.mockResolvedValue({
       email: "john@example.com",
     });
 
@@ -193,7 +181,7 @@ describe("Login Controller Test", () => {
   });
 
   test("should return 404 if email is not registered", async () => {
-    userModel.findOne = jest.fn().mockResolvedValue(null);
+    userModel.findOne.mockResolvedValue(null);
 
     await loginController(req, res);
 
@@ -210,7 +198,9 @@ describe("Login Controller Test", () => {
       password: "hashedpassword",
     });
     comparePassword.mockResolvedValue(false);
+
     await loginController(req, res);
+    
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.send).toHaveBeenCalledWith({
       success: false,
@@ -254,7 +244,9 @@ describe("Login Controller Test", () => {
   test("should return login error when server has an error", async () => {
     // Mock a database error
     userModel.findOne.mockRejectedValue(new Error("Database error"));
+   
     await loginController(req, res);
+   
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith({
       success: false,
