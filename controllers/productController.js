@@ -328,17 +328,18 @@ export const productCategoryController = async (req, res) => {
 
 //payment gateway api
 //token
-export const braintreeTokenController = async (req, res) => {
+export const brainTreeTokenController = async (req, res) => {
   try {
     gateway.clientToken.generate({}, function (err, response) {
       if (err) {
         res.status(500).send(err);
       } else {
-        res.send(response);
+        res.status(200).send(response);
       }
     });
   } catch (error) {
     console.log(error);
+    res.status(500).send(error);
   }
 };
 
