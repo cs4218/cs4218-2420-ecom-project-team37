@@ -24,6 +24,7 @@ jest.mock("../../context/search", () => ({
 }));
 
 jest.mock("../../hooks/useCategory", () => jest.fn(() => []));
+jest.spyOn(console, "log").mockImplementation(() => {}); 
 
 describe("Product Component Unit Tests", () => {
   beforeEach(() => {
