@@ -43,7 +43,7 @@ const CreateProduct = () => {
 
     // Validate required fields
     if (quantity < 0) {
-      return toast.error("Quantity must be positive");
+      return toast.error("Quantity must be more than zero");
     }
     if (price < 0) {
       return toast.error("Price must be positive");
