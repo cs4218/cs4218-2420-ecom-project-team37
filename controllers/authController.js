@@ -172,18 +172,32 @@ export const testController = (req, res) => {
   }
 };
 
-//update prfole
+//update profile
 export const updateProfileController = async (req, res) => {
   try {
-    const { name, email, password, address, phone } = req.body;
-    const user = await userModel.findById(req.user._id);
+    const { name, password, address, phone } = req.body;
+    if (!name && !password && !address && !phone) {
+      return res.status(400).send({
+        success: false,
+        message: "No fields to update",
+      })
+    }
     //password
     if (password && password.length < 6) {
       return res.status(400).send({
         success: false,
-        message: "Password is required and at least 6 characters long",
+        message: "Password is required and at least 6 characters long"  
       });
     }
+
+    const user = await userModel.findById(req.user._id);
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      })
+    }
+
     const hashedPassword = password ? await hashPassword(password) : undefined;
     const updatedUser = await userModel.findByIdAndUpdate(
       req.user._id,
@@ -197,14 +211,14 @@ export const updateProfileController = async (req, res) => {
     );
     res.status(200).send({
       success: true,
-      message: "Profile Updated SUccessfully",
+      message: "Profile Updated Successfully",
       updatedUser,
     });
   } catch (error) {
     console.log(error);
-    res.status(400).send({
+    res.status(500).send({
       success: false,
-      message: "Error WHile Update profile",
+      message: "Error While Update Profile",
       error,
     });
   }
@@ -222,11 +236,12 @@ export const getOrdersController = async (req, res) => {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error WHile Geting Orders",
+      message: "Error While Getting Orders",
       error,
     });
   }
 };
+
 //orders
 export const getAllOrdersController = async (req, res) => {
   try {
@@ -240,7 +255,7 @@ export const getAllOrdersController = async (req, res) => {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error WHile Geting Orders",
+      message: "Error While Getting Orders",
       error,
     });
   }
@@ -261,7 +276,7 @@ export const orderStatusController = async (req, res) => {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error While Updateing Order",
+      message: "Error While Updating Order",
       error,
     });
   }

@@ -4,6 +4,13 @@ import userModel from "../models/userModel.js";
 // Protected routes token base
 export const requireSignIn = async (req, res, next) => {
     try {
+        if (!req?.headers?.authorization) {
+            return res.status(400).send({
+                success: false,
+                message: "No Authorization in header",
+            });
+        }
+
         const decode = JWT.verify(
             req.headers.authorization,
             process.env.JWT_SECRET
@@ -12,6 +19,11 @@ export const requireSignIn = async (req, res, next) => {
         next();
     } catch (error) {
         console.log(error);
+        res.status(500).send({
+            success: false,
+            error,
+            message: "Error in sign in middleware",
+        })
     }
 };
 
@@ -19,17 +31,17 @@ export const requireSignIn = async (req, res, next) => {
 export const isAdmin = async (req, res, next) => {
     try {
         const user = await userModel.findById(req.user._id);
-        if(user.role !== 1) {
+        if(!user || user.role !== 1) {
             return res.status(401).send({
                 success: false,
-                message: "UnAuthorized Access",
+                message: "Unauthorized Access",
             });
         } else {
             next();
         }
     } catch (error) {
         console.log(error);
-        res.status(401).send({
+        res.status(500).send({
             success: false,
             error,
             message: "Error in admin middleware",
