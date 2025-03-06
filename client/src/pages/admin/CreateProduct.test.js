@@ -6,7 +6,7 @@ import "@testing-library/jest-dom/extend-expect";
 import toast from "react-hot-toast";
 import CreateProduct from "./CreateProduct";
 import { expect } from "@jest/globals";
-import { act } from "react-dom/test-utils"; 
+import { act } from "react-dom/test-utils";
 
 jest.mock("axios");
 jest.mock("react-hot-toast");
@@ -24,7 +24,7 @@ jest.mock("../../context/search", () => ({
 }));
 
 jest.mock("../../hooks/useCategory", () => jest.fn(() => []));
-jest.spyOn(console, "log").mockImplementation(() => {}); 
+jest.spyOn(console, "log").mockImplementation(() => {});
 
 describe("Product Component Unit Tests", () => {
   beforeEach(() => {
@@ -32,8 +32,6 @@ describe("Product Component Unit Tests", () => {
     // Define image previews to work in tests
     global.URL.createObjectURL = jest.fn(() => "blob:mocked-url");
   });
-
-  
 
   // ================================================================
   // Section 1: Rendering Tests
@@ -46,15 +44,23 @@ describe("Product Component Unit Tests", () => {
         </Router>
       );
     });
-    expect(screen.getByRole("heading", { name: "Create Product" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Create Product" })
+    ).toBeInTheDocument();
     expect(screen.getByText(/Select a Category/i)).toBeInTheDocument();
     expect(screen.getByText(/Upload Photo/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Write a Name/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Write a Description/i)).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/Write a Description/i)
+    ).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Write a Price/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Write a Quantity/i)).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/Write a Quantity/i)
+    ).toBeInTheDocument();
     expect(screen.getByText(/Select Shipping/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /CREATE PRODUCT/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /CREATE PRODUCT/i })
+    ).toBeInTheDocument();
   });
 
   // ================================================================
@@ -66,7 +72,12 @@ describe("Product Component Unit Tests", () => {
         success: true,
         message: "All Categories List",
         category: [
-          { _id: "categoryID1", name: "Electronics", slug: "electronics", __v: 0 },
+          {
+            _id: "categoryID1",
+            name: "Electronics",
+            slug: "electronics",
+            __v: 0,
+          },
           { _id: "categoryID2", name: "Furniture", slug: "furniture", __v: 0 },
         ],
       },
@@ -104,7 +115,9 @@ describe("Product Component Unit Tests", () => {
 
     await waitFor(async () => {
       expect(axios.get).toHaveBeenCalledWith("/api/v1/category/get-category");
-      expect(toast.error).toHaveBeenCalledWith("Something went wrong in getting category");
+      expect(toast.error).toHaveBeenCalledWith(
+        "Something went wrong in getting category"
+      );
     });
   });
 
@@ -132,7 +145,6 @@ describe("Product Component Unit Tests", () => {
     expect(screen.getByText(/Select Shipping/i)).toBeInTheDocument();
   });
 
-
   test("Test 5: Input fields to be filled up: name, description, price, and quantity", async () => {
     await act(async () => {
       render(
@@ -141,12 +153,22 @@ describe("Product Component Unit Tests", () => {
         </Router>
       );
     });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), { target: { value: "name" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), { target: { value: "description" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), { target: { value: "1" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), { target: { value: "1" } });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), {
+      target: { value: "name" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), {
+      target: { value: "description" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), {
+      target: { value: "1" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), {
+      target: { value: "1" },
+    });
     expect(screen.getByPlaceholderText(/Write a Name/i).value).toBe("name");
-    expect(screen.getByPlaceholderText(/Write a Description/i).value).toBe("description");
+    expect(screen.getByPlaceholderText(/Write a Description/i).value).toBe(
+      "description"
+    );
     expect(screen.getByPlaceholderText(/Write a Price/i).value).toBe("1");
     expect(screen.getByPlaceholderText(/Write a Quantity/i).value).toBe("1");
   });
@@ -177,7 +199,12 @@ describe("Product Component Unit Tests", () => {
         success: true,
         message: "All Categories List",
         category: [
-          { _id: "categoryID1", name: "Electronics", slug: "electronics", __v: 0 },
+          {
+            _id: "categoryID1",
+            name: "Electronics",
+            slug: "electronics",
+            __v: 0,
+          },
           { _id: "categoryID2", name: "Furniture", slug: "furniture", __v: 0 },
         ],
       },
@@ -231,15 +258,25 @@ describe("Product Component Unit Tests", () => {
       expect(img).toHaveAttribute("src", expect.stringContaining("blob:"));
     });
     // Input Fields
-    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), { target: { value: "NewLaptop" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), { target: { value: "A powerful laptop" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), { target: { value: "1499.99" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), { target: { value: "10" } });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), {
+      target: { value: "NewLaptop" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), {
+      target: { value: "A powerful laptop" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), {
+      target: { value: "1499.99" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), {
+      target: { value: "10" },
+    });
 
     // Select shipping option
     const shippingDropdown = screen.getByText(/Select Shipping/i);
     fireEvent.mouseDown(shippingDropdown);
-    const shippingOption = await screen.getByText("Yes", { selector: ".ant-select-item-option-content" });
+    const shippingOption = await screen.getByText("Yes", {
+      selector: ".ant-select-item-option-content",
+    });
     fireEvent.click(shippingOption);
 
     // Create product
@@ -259,9 +296,15 @@ describe("Product Component Unit Tests", () => {
     });
 
     // Fill in all fields except Name
-    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), { target: { value: "a new product" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), { target: { value: "100" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), { target: { value: "10" } });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), {
+      target: { value: "a new product" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), {
+      target: { value: "100" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), {
+      target: { value: "10" },
+    });
 
     // Select category
     await waitFor(async () => {
@@ -273,7 +316,9 @@ describe("Product Component Unit Tests", () => {
 
     // Upload photo
     const file = new File(["photo"], "photo.jpg", { type: "image/jpeg" });
-    fireEvent.change(screen.getByLabelText(/Upload Photo/i), { target: { files: [file] } });
+    fireEvent.change(screen.getByLabelText(/Upload Photo/i), {
+      target: { files: [file] },
+    });
 
     // Select shipping option
     const shippingDropdown = screen.getByText(/Select Shipping/i);
@@ -282,7 +327,7 @@ describe("Product Component Unit Tests", () => {
     fireEvent.click(shippingOption);
 
     fireEvent.click(screen.getByText("CREATE PRODUCT"));
-    
+
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith("All fields are required");
     });
@@ -297,9 +342,15 @@ describe("Product Component Unit Tests", () => {
       );
     });
 
-    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), { target: { value: "James" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), { target: { value: "100" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), { target: { value: "10" } });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), {
+      target: { value: "James" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), {
+      target: { value: "100" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), {
+      target: { value: "10" },
+    });
 
     await waitFor(async () => {
       const categoryDropdown = screen.getByText(/Select a Category/i);
@@ -309,7 +360,9 @@ describe("Product Component Unit Tests", () => {
     });
 
     const file = new File(["photo"], "photo.jpg", { type: "image/jpeg" });
-    fireEvent.change(screen.getByLabelText(/Upload Photo/i), { target: { files: [file] } });
+    fireEvent.change(screen.getByLabelText(/Upload Photo/i), {
+      target: { files: [file] },
+    });
 
     const shippingDropdown = screen.getByText(/Select Shipping/i);
     fireEvent.mouseDown(shippingDropdown);
@@ -317,7 +370,7 @@ describe("Product Component Unit Tests", () => {
     fireEvent.click(shippingOption);
 
     fireEvent.click(screen.getByText("CREATE PRODUCT"));
-    
+
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith("All fields are required");
     });
@@ -332,10 +385,18 @@ describe("Product Component Unit Tests", () => {
       );
     });
 
-    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), { target: { value: "James" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), { target: { value: "a new product" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), { target: { value: "-100" } }); 
-    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), { target: { value: "10" } });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), {
+      target: { value: "James" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), {
+      target: { value: "a new product" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), {
+      target: { value: "-100" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), {
+      target: { value: "10" },
+    });
 
     await waitFor(async () => {
       const categoryDropdown = screen.getByText(/Select a Category/i);
@@ -345,7 +406,9 @@ describe("Product Component Unit Tests", () => {
     });
 
     const file = new File(["photo"], "photo.jpg", { type: "image/jpeg" });
-    fireEvent.change(screen.getByLabelText(/Upload Photo/i), { target: { files: [file] } });
+    fireEvent.change(screen.getByLabelText(/Upload Photo/i), {
+      target: { files: [file] },
+    });
 
     const shippingDropdown = screen.getByText(/Select Shipping/i);
     fireEvent.mouseDown(shippingDropdown);
@@ -368,10 +431,18 @@ describe("Product Component Unit Tests", () => {
       );
     });
 
-    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), { target: { value: "James" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), { target: { value: "a new product" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), { target: { value: "100" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), { target: { value: "-5" } }); 
+    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), {
+      target: { value: "James" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), {
+      target: { value: "a new product" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), {
+      target: { value: "100" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), {
+      target: { value: "-5" },
+    });
 
     await waitFor(async () => {
       const categoryDropdown = screen.getByText(/Select a Category/i);
@@ -381,7 +452,9 @@ describe("Product Component Unit Tests", () => {
     });
 
     const file = new File(["photo"], "photo.jpg", { type: "image/jpeg" });
-    fireEvent.change(screen.getByLabelText(/Upload Photo/i), { target: { files: [file] } });
+    fireEvent.change(screen.getByLabelText(/Upload Photo/i), {
+      target: { files: [file] },
+    });
 
     const shippingDropdown = screen.getByText(/Select Shipping/i);
     fireEvent.mouseDown(shippingDropdown);
@@ -391,7 +464,9 @@ describe("Product Component Unit Tests", () => {
     fireEvent.click(screen.getByText("CREATE PRODUCT"));
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Quantity must be more than zero");
+      expect(toast.error).toHaveBeenCalledWith(
+        "Quantity must be more than zero"
+      );
     });
   });
 
@@ -404,10 +479,18 @@ describe("Product Component Unit Tests", () => {
       );
     });
 
-    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), { target: { value: "James" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), { target: { value: "a new product" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), { target: { value: "100" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), { target: { value: "10" } });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), {
+      target: { value: "James" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), {
+      target: { value: "a new product" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), {
+      target: { value: "100" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), {
+      target: { value: "10" },
+    });
 
     await waitFor(async () => {
       const categoryDropdown = screen.getByText(/Select a Category/i);
@@ -417,7 +500,9 @@ describe("Product Component Unit Tests", () => {
     });
 
     const file = new File(["photo"], "photo.jpg", { type: "image/jpeg" });
-    fireEvent.change(screen.getByLabelText(/Upload Photo/i), { target: { files: [file] } });
+    fireEvent.change(screen.getByLabelText(/Upload Photo/i), {
+      target: { files: [file] },
+    });
 
     fireEvent.click(screen.getByText("CREATE PRODUCT"));
 
@@ -435,10 +520,18 @@ describe("Product Component Unit Tests", () => {
       );
     });
 
-    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), { target: { value: "James" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), { target: { value: "a new product" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), { target: { value: "100" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), { target: { value: "10" } });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), {
+      target: { value: "James" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), {
+      target: { value: "a new product" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), {
+      target: { value: "100" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), {
+      target: { value: "10" },
+    });
 
     await waitFor(async () => {
       const categoryDropdown = screen.getByText(/Select a Category/i);
@@ -463,14 +556,24 @@ describe("Product Component Unit Tests", () => {
       );
     });
 
-    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), { target: { value: "James" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), { target: { value: "a new product" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), { target: { value: "100" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), { target: { value: "10" } });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), {
+      target: { value: "James" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), {
+      target: { value: "a new product" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), {
+      target: { value: "100" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), {
+      target: { value: "10" },
+    });
 
     // Upload Photo
     const file = new File(["photo"], "photo.jpg", { type: "image/jpeg" });
-    fireEvent.change(screen.getByLabelText(/Upload Photo/i), { target: { files: [file] } });
+    fireEvent.change(screen.getByLabelText(/Upload Photo/i), {
+      target: { files: [file] },
+    });
 
     // Select shipping option
     const shippingDropdown = screen.getByText(/Select Shipping/i);
@@ -487,7 +590,7 @@ describe("Product Component Unit Tests", () => {
   });
 
   // ================================================================
-  // Section 5: Pairwise Testing 
+  // Section 5: Pairwise Testing
   // ================================================================
 
   test("Test 15: Product creation fails with invalid Name & Category ", async () => {
@@ -500,13 +603,21 @@ describe("Product Component Unit Tests", () => {
     });
 
     // Leave Name empty
-    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), { target: { value: "a new product" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), { target: { value: "100" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), { target: { value: "10" } });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), {
+      target: { value: "a new product" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), {
+      target: { value: "100" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), {
+      target: { value: "10" },
+    });
 
     // Upload Photo
     const file = new File(["photo"], "photo.jpg", { type: "image/jpeg" });
-    fireEvent.change(screen.getByLabelText(/Upload Photo/i), { target: { files: [file] } });
+    fireEvent.change(screen.getByLabelText(/Upload Photo/i), {
+      target: { files: [file] },
+    });
 
     // Select shipping
     const shippingDropdown = screen.getByText(/Select Shipping/i);
@@ -531,16 +642,24 @@ describe("Product Component Unit Tests", () => {
       );
     });
 
-    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), { target: { value: "James" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), { target: { value: "100" } });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), {
+      target: { value: "James" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), {
+      target: { value: "100" },
+    });
 
     // Leave Description empty
     // Invalid quantity
-    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), { target: { value: "-5" } }); 
+    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), {
+      target: { value: "-5" },
+    });
 
     // Upload Photo
     const file = new File(["photo"], "photo.jpg", { type: "image/jpeg" });
-    fireEvent.change(screen.getByLabelText(/Upload Photo/i), { target: { files: [file] } });
+    fireEvent.change(screen.getByLabelText(/Upload Photo/i), {
+      target: { files: [file] },
+    });
 
     // Select Category
     await waitFor(async () => {
@@ -559,7 +678,9 @@ describe("Product Component Unit Tests", () => {
     fireEvent.click(screen.getByText("CREATE PRODUCT"));
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Quantity must be more than zero");
+      expect(toast.error).toHaveBeenCalledWith(
+        "Quantity must be more than zero"
+      );
     });
   });
 
@@ -572,10 +693,18 @@ describe("Product Component Unit Tests", () => {
       );
     });
 
-    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), { target: { value: "James" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), { target: { value: "a new product" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), { target: { value: "-100" } }); 
-    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), { target: { value: "10" } });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), {
+      target: { value: "James" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), {
+      target: { value: "a new product" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), {
+      target: { value: "-100" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), {
+      target: { value: "10" },
+    });
 
     // No Photo Uploaded
 
@@ -609,16 +738,26 @@ describe("Product Component Unit Tests", () => {
       );
     });
 
-    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), { target: { value: "James" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), { target: { value: "a new product" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), { target: { value: "100" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), { target: { value: "10" } });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), {
+      target: { value: "James" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), {
+      target: { value: "a new product" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), {
+      target: { value: "100" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), {
+      target: { value: "10" },
+    });
 
     // Upload Photo
     const file = new File(["photo"], "photo.jpg", { type: "image/jpeg" });
-    fireEvent.change(screen.getByLabelText(/Upload Photo/i), { target: { files: [file] } });
+    fireEvent.change(screen.getByLabelText(/Upload Photo/i), {
+      target: { files: [file] },
+    });
 
-    // Select Category 
+    // Select Category
     // Leave Shipping empty
     await waitFor(async () => {
       const categoryDropdown = screen.getByText(/Select a Category/i);
@@ -644,12 +783,18 @@ describe("Product Component Unit Tests", () => {
     });
 
     // Leave Name & Description empty
-    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), { target: { value: "100" } });
-    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), { target: { value: "10" } });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), {
+      target: { value: "100" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), {
+      target: { value: "10" },
+    });
 
     // Upload Photo
     const file = new File(["photo"], "photo.jpg", { type: "image/jpeg" });
-    fireEvent.change(screen.getByLabelText(/Upload Photo/i), { target: { files: [file] } });
+    fireEvent.change(screen.getByLabelText(/Upload Photo/i), {
+      target: { files: [file] },
+    });
 
     // Select Category
     await waitFor(async () => {
@@ -676,15 +821,20 @@ describe("Product Component Unit Tests", () => {
     });
 
     // Create a large file (1.5MB)
-    const largeFile = new File(["a".repeat(1.5 * 1024 * 1024)], "large.jpg", { type: "image/jpeg" });
+    const largeFile = new File(["a".repeat(1.5 * 1024 * 1024)], "large.jpg", {
+      type: "image/jpeg",
+    });
 
-    fireEvent.change(screen.getByLabelText(/Upload Photo/i), { target: { files: [largeFile] } });
+    fireEvent.change(screen.getByLabelText(/Upload Photo/i), {
+      target: { files: [largeFile] },
+    });
 
     fireEvent.click(screen.getByText("CREATE PRODUCT"));
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Photo size must be less than 1MB.");
+      expect(toast.error).toHaveBeenCalledWith(
+        "Photo size must be less than 1MB."
+      );
     });
   });
-
 });
