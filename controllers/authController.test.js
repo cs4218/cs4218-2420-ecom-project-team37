@@ -375,16 +375,14 @@ describe("Test Controller", () => {
 
   test("should return an error response if an exception occurs", () => {
     const error = new Error("Server Error");
-    const failingController = () => {
+    
+    res.send.mockImplementationOnce(() => {
       throw error;
-    };
+    }).mockReturnThis();
+    testController(req, res);
 
-    try {
-      failingController();
-    } catch (e) {
-      res.send({ error: e });
-    }
     expect(res.send).toHaveBeenCalledWith({ error });
+    expect(console.log).toHaveBeenCalledWith(error);
   });
 });
 
