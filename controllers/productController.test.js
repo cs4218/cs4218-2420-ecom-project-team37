@@ -1,7 +1,9 @@
 import {
   createProductController,
+  getProductController,
   updateProductController,
   deleteProductController,
+  productCountController,
 } from "../controllers/productController.js";
 import productModel from "../models/productModel.js";
 import orderModel from "../models/orderModel";
@@ -119,6 +121,57 @@ describe("createProductController", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith({ error: "Name is required" });
+  });
+});
+
+describe("getProductController", () => {
+  it("should retrieve all products successfully", async () => {
+    const req = {};
+    const res = mockResponse();
+
+    const mockProducts = [
+      {
+        fields: {
+          name: "Test Product",
+          description: "Test description",
+          price: 100,
+          category: "Test Category",
+          quantity: 10,
+          shipping: true,
+        },
+        files: {
+          photo: {
+            path: "dummy/path/to/photo.jpg",
+            size: 500000,
+            type: "image/jpeg",
+          },
+        },
+      }
+    ];
+    const findMock = jest.fn().mockReturnThis();  // This will return 'this' so that we can chain methods
+    const populateMock = jest.fn().mockReturnThis();
+    const selectMock = jest.fn().mockReturnThis();
+    const limitMock = jest.fn().mockReturnThis();
+    const sortMock = jest.fn().mockResolvedValue(mockProducts); // Finally resolve the products
+    
+    // Mock the model's find method to return an object with all the chainable methods
+    productModel.find = findMock.mockReturnValue({
+      populate: populateMock,
+      select: selectMock,
+      limit: limitMock,
+      sort: sortMock,
+    });
+
+    await getProductController(req, res);
+
+    expect(findMock).toHaveBeenCalledWith({});
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({
+      success: true,
+      counTotal: mockProducts.length,
+      message: "ALlProducts ",
+      products: mockProducts,
+    });
   });
 });
 
@@ -250,6 +303,36 @@ describe("deleteProductController", () => {
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.send).toHaveBeenCalledWith({ error: "Product not found" });
   });
+});
+
+describe("productCountController", () => {
+  it("Returns the current count of products", async () => {
+    
+    const req = {};
+    const res = mockResponse();
+    
+    const mockValue = 10;
+
+    const findMock = jest.fn().mockReturnThis();  // This will return 'this' so that we can chain methods
+    const countMock = jest.fn().mockResolvedValue(mockValue); // Finally resolve the products
+    
+    // Mock the model's find method to return an object with all the chainable methods
+    productModel.find = findMock.mockReturnValue({
+      estimatedDocumentCount: countMock
+    });
+
+    await productCountController(req, res);
+    expect(findMock).toHaveBeenCalledWith({});
+    expect(res.status).toHaveBeenCalledWith(200); // Verify the status code
+    expect(res.send).toHaveBeenCalledWith({
+      success: true,
+      total: mockValue // Verify the total count
+    });
+    
+
+  });
+
+  
 });
 
 describe("brainTreeTokenController unit tests", () => {
