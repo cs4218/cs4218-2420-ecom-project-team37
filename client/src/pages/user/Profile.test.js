@@ -5,6 +5,8 @@ import axios from "axios";
 import { BrowserRouter } from "react-router-dom";
 import toast from "react-hot-toast";
 
+const mockString = "mockString";
+
 jest.mock("../../context/auth", () => ({
   useAuth: jest.fn(),
 }));
@@ -15,6 +17,12 @@ jest.mock("react-hot-toast", () => ({
   success: jest.fn(),
 }));
 jest.spyOn(console, "log").mockImplementation(() => {});
+jest.spyOn(JSON, "parse").mockImplementation(() => {
+  return { user: "mockUser" }; 
+});
+jest.spyOn(JSON, "stringify").mockImplementation(() => {
+  return mockString;
+})
 
 // Mock hooks because Profile is wrapped in Header
 jest.mock("../../context/cart", () => ({
@@ -28,6 +36,15 @@ jest.mock("../../context/search", () => ({
 jest.mock("../../components/Layout", () => ({ children }) => (
   <div>{children}</div>
 ));
+
+Object.defineProperty(window, "localStorage", {
+  value: {
+    setItem: jest.fn(),
+    getItem: jest.fn(),
+    removeItem: jest.fn(),
+  },
+  writable: true,
+});
 
 const mockUser = {
   name: "John Doe",
@@ -130,6 +147,9 @@ describe("Profile Component", () => {
           address: "123 Street Name",
           password: "123456"
         }));
+        expect(localStorage.getItem).toHaveBeenCalledWith("auth");
+        expect(localStorage.setItem).toHaveBeenCalledWith("auth", mockString);
+        expect(toast.success).toHaveBeenCalledWith("Profile Updated Successfully");
       });
   });
   
