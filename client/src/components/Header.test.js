@@ -16,7 +16,7 @@ jest.mock("../hooks/useCategory", () =>
   jest.fn(() => [
     { name: "Electronics", slug: "electronics" },
     { name: "Clothing", slug: "clothing" },
-  ])
+  ]),
 );
 
 jest.mock("../context/search", () => ({
@@ -51,7 +51,7 @@ describe("Header Component", () => {
     render(
       <MemoryRouter>
         <Header />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText("Register")).toBeInTheDocument();
@@ -65,7 +65,7 @@ describe("Header Component", () => {
     render(
       <MemoryRouter>
         <Header />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText("Electronics")).toBeInTheDocument();
@@ -73,11 +73,11 @@ describe("Header Component", () => {
 
     expect(screen.getByText("Electronics").closest("a")).toHaveAttribute(
       "href",
-      "/category/electronics"
+      "/category/electronics",
     );
     expect(screen.getByText("Clothing").closest("a")).toHaveAttribute(
       "href",
-      "/category/clothing"
+      "/category/clothing",
     );
   });
 
@@ -93,7 +93,7 @@ describe("Header Component", () => {
     render(
       <MemoryRouter>
         <Header />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const logoutButton = screen.getByText("Logout");
@@ -107,7 +107,7 @@ describe("Header Component", () => {
     expect(window.localStorage.removeItem).toHaveBeenCalledWith("auth");
 
     expect(require("react-hot-toast").success).toHaveBeenCalledWith(
-      "Logout Successfully"
+      "Logout Successfully",
     );
   });
 
@@ -122,14 +122,14 @@ describe("Header Component", () => {
     render(
       <MemoryRouter>
         <Header />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const dashboardLink = screen.getByText("Dashboard");
 
     expect(dashboardLink.closest("a")).toHaveAttribute(
       "href",
-      "/dashboard/admin"
+      "/dashboard/admin",
     );
   });
 
@@ -144,14 +144,14 @@ describe("Header Component", () => {
     render(
       <MemoryRouter>
         <Header />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const dashboardLink = screen.getByText("Dashboard");
 
     expect(dashboardLink.closest("a")).toHaveAttribute(
       "href",
-      "/dashboard/user"
+      "/dashboard/user",
     );
   });
 });

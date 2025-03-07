@@ -158,7 +158,7 @@ describe("updateProductController", () => {
     expect(productModel.findByIdAndUpdate).toHaveBeenCalledWith(
       req.params.pid,
       { ...req.fields, slug: "updated-product" },
-      { new: true }
+      { new: true },
     );
     expect(fs.readFileSync).toHaveBeenCalledWith(req.files.photo.path);
     expect(fakeSave).toHaveBeenCalled();
@@ -357,7 +357,7 @@ describe("brainTreePaymentController unit tests", () => {
     mockGateway.transaction.sale.mockImplementation(
       (transactionDetails, callback) => {
         callback(null, mockResult);
-      }
+      },
     );
     orderModel.prototype.save = jest.fn();
 
@@ -371,7 +371,7 @@ describe("brainTreePaymentController unit tests", () => {
           submitForSettlement: true,
         },
       },
-      expect.any(Function)
+      expect.any(Function),
     );
     expect(orderModel).toHaveBeenCalledWith({
       products: req.body.cart,
@@ -389,7 +389,7 @@ describe("brainTreePaymentController unit tests", () => {
     mockGateway.transaction.sale.mockImplementation(
       (transactionDetails, callback) => {
         callback(mockError, null);
-      }
+      },
     );
 
     await brainTreePaymentController(req, res);
@@ -416,7 +416,7 @@ describe("brainTreePaymentController unit tests", () => {
     mockGateway.transaction.sale.mockImplementation(
       (transactionDetails, callback) => {
         mockCallBack(null, mockResult);
-      }
+      },
     );
 
     await brainTreePaymentController(req, res);

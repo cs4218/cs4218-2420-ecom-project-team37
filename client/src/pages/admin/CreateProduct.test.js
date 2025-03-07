@@ -41,25 +41,25 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
     expect(
-      screen.getByRole("heading", { name: "Create Product" })
+      screen.getByRole("heading", { name: "Create Product" }),
     ).toBeInTheDocument();
     expect(screen.getByText(/Select a Category/i)).toBeInTheDocument();
     expect(screen.getByText(/Upload Photo/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Write a Name/i)).toBeInTheDocument();
     expect(
-      screen.getByPlaceholderText(/Write a Description/i)
+      screen.getByPlaceholderText(/Write a Description/i),
     ).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Write a Price/i)).toBeInTheDocument();
     expect(
-      screen.getByPlaceholderText(/Write a Quantity/i)
+      screen.getByPlaceholderText(/Write a Quantity/i),
     ).toBeInTheDocument();
     expect(screen.getByText(/Select Shipping/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /CREATE PRODUCT/i })
+      screen.getByRole("button", { name: /CREATE PRODUCT/i }),
     ).toBeInTheDocument();
   });
 
@@ -87,7 +87,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
 
@@ -109,14 +109,14 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
 
     await waitFor(async () => {
       expect(axios.get).toHaveBeenCalledWith("/api/v1/category/get-category");
       expect(toast.error).toHaveBeenCalledWith(
-        "Something went wrong in getting category"
+        "Something went wrong in getting category",
       );
     });
   });
@@ -129,7 +129,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
     // Check all fields to be in default state
@@ -150,7 +150,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
     fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), {
@@ -167,7 +167,7 @@ describe("Product Component Unit Tests", () => {
     });
     expect(screen.getByPlaceholderText(/Write a Name/i).value).toBe("name");
     expect(screen.getByPlaceholderText(/Write a Description/i).value).toBe(
-      "description"
+      "description",
     );
     expect(screen.getByPlaceholderText(/Write a Price/i).value).toBe("1");
     expect(screen.getByPlaceholderText(/Write a Quantity/i).value).toBe("1");
@@ -178,7 +178,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
     const shippingDropdown = screen.getByText(/Select Shipping/i);
@@ -233,7 +233,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
 
@@ -291,7 +291,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
 
@@ -338,7 +338,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
 
@@ -381,7 +381,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
 
@@ -427,7 +427,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
 
@@ -465,7 +465,7 @@ describe("Product Component Unit Tests", () => {
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith(
-        "Quantity must be more than zero"
+        "Quantity must be more than zero",
       );
     });
   });
@@ -475,7 +475,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
 
@@ -516,7 +516,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
 
@@ -552,7 +552,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
 
@@ -598,7 +598,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
 
@@ -638,7 +638,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
 
@@ -679,7 +679,7 @@ describe("Product Component Unit Tests", () => {
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith(
-        "Quantity must be more than zero"
+        "Quantity must be more than zero",
       );
     });
   });
@@ -689,7 +689,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
 
@@ -734,7 +734,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
 
@@ -778,7 +778,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
 
@@ -816,7 +816,7 @@ describe("Product Component Unit Tests", () => {
       render(
         <Router>
           <CreateProduct />
-        </Router>
+        </Router>,
       );
     });
 
@@ -833,7 +833,7 @@ describe("Product Component Unit Tests", () => {
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith(
-        "Photo size must be less than 1MB."
+        "Photo size must be less than 1MB.",
       );
     });
   });
