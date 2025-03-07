@@ -58,6 +58,29 @@ const CartPage = () => {
     getToken();
   }, [auth?.token]);
 
+  // Add these useEffect hooks after your existing useEffect
+  useEffect(() => {
+    console.log('Auth token changed:', auth?.token);
+  }, [auth?.token]);
+
+  useEffect(() => {
+    console.log('Cart length changed:', cart?.length);
+  }, [cart?.length]);
+
+  useEffect(() => {
+    console.log('Client token changed:', clientToken);
+  }, [clientToken]);
+
+  // For debugging the payment interface condition
+  useEffect(() => {
+    console.log('Payment interface conditions:', {
+      hasClientToken: !!clientToken,
+      hasAuthToken: !!auth?.token,
+      hasCartItems: !!cart?.length,
+      showPaymentInterface: !(!clientToken || !auth?.token || !cart?.length)
+    });
+  }, [clientToken, auth?.token, cart?.length]);
+
   //handle payments
   const handlePayment = async () => {
     try {

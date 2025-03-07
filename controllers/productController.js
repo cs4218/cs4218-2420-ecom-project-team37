@@ -80,7 +80,7 @@ export const getProductController = async (req, res) => {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Erorr in getting products",
+      message: "Err in getting products",
       error: error.message,
     });
   }
