@@ -25,14 +25,14 @@ const CreateProduct = () => {
       if (data?.success) {
         setCategories(data?.category);
       } else {
-        toast.error("Failed to fetch categories")
+        toast.error("Failed to fetch categories");
       }
     } catch (error) {
       console.log(error);
       toast.error("Something went wrong in getting category");
     }
   };
-  
+
   useEffect(() => {
     getAllCategory();
   }, []);
@@ -51,7 +51,15 @@ const CreateProduct = () => {
     if (photo && photo.size > 1000000) {
       return toast.error("Photo size must be less than 1MB.");
     }
-    if (!name || !description || !price || !quantity || !category || !photo || !shipping) {
+    if (
+      !name ||
+      !description ||
+      !price ||
+      !quantity ||
+      !category ||
+      !photo ||
+      !shipping
+    ) {
       return toast.error("All fields are required");
     }
     try {
@@ -66,7 +74,7 @@ const CreateProduct = () => {
 
       const { data } = await axios.post(
         "/api/v1/product/create-product",
-        productData
+        productData,
       );
       if (data?.success === false) {
         toast.error(data?.message);

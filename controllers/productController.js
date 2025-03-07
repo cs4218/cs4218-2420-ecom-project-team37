@@ -20,9 +20,10 @@ var gateway = new braintree.BraintreeGateway({
 // Create product
 export const createProductController = async (req, res) => {
   try {
-    const { name, description, price, category, quantity, shipping } = req.fields;
+    const { name, description, price, category, quantity, shipping } =
+      req.fields;
     const { photo } = req.files;
-    // Validation 
+    // Validation
     switch (true) {
       case !name:
         return res.status(400).send({ error: "Name is required" });
@@ -41,7 +42,7 @@ export const createProductController = async (req, res) => {
       case photo && photo.size > 1000000:
         return res
           .status(400)
-          .send({error: "Photo is required and should be less than 1MB"});
+          .send({ error: "Photo is required and should be less than 1MB" });
     }
 
     const products = new productModel({ ...req.fields, slug: slugify(name) });
@@ -154,8 +155,8 @@ export const deleteProductController = async (req, res) => {
 // Update product
 export const updateProductController = async (req, res) => {
   try {
-    const { name, description, price, category, quantity, shipping } = 
-    req.fields;
+    const { name, description, price, category, quantity, shipping } =
+      req.fields;
     const { photo } = req.files || {};
     // Validation
     switch (true) {
@@ -173,14 +174,14 @@ export const updateProductController = async (req, res) => {
         return res.status(400).send({ error: "Shipping option is required" });
       case photo && photo.size > 1000000:
         return res
-        .status(400)
-        .send({ error: "Photo is required and should be less than 1MB" });
+          .status(400)
+          .send({ error: "Photo is required and should be less than 1MB" });
     }
 
     const product = await productModel.findByIdAndUpdate(
       req.params.pid,
       { ...req.fields, slug: slugify(name) },
-      { new: true }
+      { new: true },
     );
 
     if (!product) {
@@ -386,7 +387,7 @@ export const brainTreePaymentController = async (req, res) => {
         } else {
           res.status(500).send(error);
         }
-      }
+      },
     );
   } catch (error) {
     console.log(error);

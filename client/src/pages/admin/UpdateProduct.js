@@ -24,7 +24,7 @@ const UpdateProduct = () => {
   const getSingleProduct = async () => {
     try {
       const { data } = await axios.get(
-        `/api/v1/product/get-product/${params.slug}`
+        `/api/v1/product/get-product/${params.slug}`,
       );
       setName(data.product.name);
       setId(data.product._id);
@@ -70,7 +70,14 @@ const UpdateProduct = () => {
     if (photo && photo.size > 1000000) {
       return toast.error("Photo size must be less than 1MB.");
     }
-    if (!name || !description || !price || !quantity || !category || !shipping) {
+    if (
+      !name ||
+      !description ||
+      !price ||
+      !quantity ||
+      !category ||
+      !shipping
+    ) {
       return toast.error("All fields are required");
     }
     try {
@@ -84,7 +91,7 @@ const UpdateProduct = () => {
       productData.append("shipping", shipping);
       const { data } = await axios.put(
         `/api/v1/product/update-product/${id}`,
-        productData
+        productData,
       );
       if (!data.success) {
         toast.error(data.message);
@@ -104,7 +111,7 @@ const UpdateProduct = () => {
       let answer = window.prompt("Are you sure want to delete this product?");
       if (!answer) return;
       const { data } = await axios.delete(
-        `/api/v1/product/delete-product/${id}`
+        `/api/v1/product/delete-product/${id}`,
       );
       toast.success("Product deleted Succfully");
       navigate("/dashboard/admin/products");
@@ -217,7 +224,9 @@ const UpdateProduct = () => {
                   size="large"
                   showSearch
                   className="form-select mb-3"
-                  onChange={(value) => {setShipping(value)}}
+                  onChange={(value) => {
+                    setShipping(value);
+                  }}
                   value={shipping}
                 >
                   <Option value="0">No</Option>

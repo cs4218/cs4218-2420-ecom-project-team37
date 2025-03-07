@@ -19,7 +19,6 @@ jest.mock("../../context/search", () => ({
   useSearch: jest.fn(() => [{ keyword: "" }, jest.fn()]),
 }));
 
-
 const mockOrders = [
   {
     _id: "123",
@@ -50,7 +49,7 @@ describe("Orders Component", () => {
     render(
       <BrowserRouter>
         <Orders />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     await waitFor(() => {
@@ -64,7 +63,7 @@ describe("Orders Component", () => {
     render(
       <BrowserRouter>
         <Orders />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByText("All Orders")).toBeInTheDocument();
@@ -83,7 +82,7 @@ describe("Orders Component", () => {
     render(
       <BrowserRouter>
         <Orders />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     await waitFor(() => {
@@ -108,7 +107,7 @@ describe("Orders Component", () => {
     render(
       <BrowserRouter>
         <Orders />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     await waitFor(() => {
@@ -124,7 +123,7 @@ describe("Orders Component", () => {
     render(
       <BrowserRouter>
         <Orders />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     await waitFor(() => {
@@ -138,7 +137,7 @@ describe("Orders Component", () => {
     render(
       <BrowserRouter>
         <Orders />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     await waitFor(() => {
@@ -146,7 +145,7 @@ describe("Orders Component", () => {
       expect(imgElement).toBeInTheDocument();
       expect(imgElement).toHaveAttribute(
         "src",
-        "/api/v1/product/product-photo/100"
+        "/api/v1/product/product-photo/100",
       );
     });
   });
