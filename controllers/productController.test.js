@@ -10,7 +10,7 @@ import {
   searchProductController,
   productListController,
   productCategoryController,
-  realtedProductController
+  realtedProductController,
 } from "../controllers/productController.js";
 import mongoose from "mongoose";
 import productModel from "../models/productModel.js";
@@ -133,23 +133,23 @@ describe("createProductController", () => {
     expect(res.send).toHaveBeenCalledWith({ error: "Name is required" });
   });
 
-  it('should reject negative price', async () => {
+  it("should reject negative price", async () => {
     const req = {
       fields: {
-        name: 'Test Product',
-        description: 'Test description',
-        price: -100,  
-        category: 'Test Category',
+        name: "Test Product",
+        description: "Test description",
+        price: -100,
+        category: "Test Category",
         quantity: 10,
-        shipping: true
+        shipping: true,
       },
       files: {
         photo: {
-          path: 'dummy/path.jpg',
+          path: "dummy/path.jpg",
           size: 500000,
-          type: 'image/jpeg'
-        }
-      }
+          type: "image/jpeg",
+        },
+      },
     };
     const res = mockResponse();
 
@@ -157,27 +157,27 @@ describe("createProductController", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith({
-      error: 'Price must be positive'
+      error: "Price must be positive",
     });
   });
 
-  it('should reject negative quantity', async () => {
+  it("should reject negative quantity", async () => {
     const req = {
       fields: {
-        name: 'Test Product',
-        description: 'Test description',
+        name: "Test Product",
+        description: "Test description",
         price: 100,
-        category: 'Test Category',
-        quantity: -10, 
-        shipping: true
+        category: "Test Category",
+        quantity: -10,
+        shipping: true,
       },
       files: {
         photo: {
-          path: 'dummy/path.jpg',
+          path: "dummy/path.jpg",
           size: 500000,
-          type: 'image/jpeg'
-        }
-      }
+          type: "image/jpeg",
+        },
+      },
     };
     const res = mockResponse();
 
@@ -185,27 +185,27 @@ describe("createProductController", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith({
-      error: 'Quantity must be more than zero'
+      error: "Quantity must be more than zero",
     });
   });
 
-  it('should reject large photo size', async () => {
+  it("should reject large photo size", async () => {
     const req = {
       fields: {
-        name: 'Test Product',
-        description: 'Test description',
+        name: "Test Product",
+        description: "Test description",
         price: 100,
-        category: 'Test Category',
+        category: "Test Category",
         quantity: 10,
-        shipping: true
+        shipping: true,
       },
       files: {
         photo: {
-          path: 'dummy/path.jpg',
-          size: 2000000, 
-          type: 'image/jpeg'
-        }
-      }
+          path: "dummy/path.jpg",
+          size: 2000000,
+          type: "image/jpeg",
+        },
+      },
     };
     const res = mockResponse();
 
@@ -213,7 +213,7 @@ describe("createProductController", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith({
-      error: 'Photo size must be less than 1MB.'
+      error: "Photo size must be less than 1MB.",
     });
   });
 });
@@ -240,14 +240,14 @@ describe("getProductController", () => {
             type: "image/jpeg",
           },
         },
-      }
+      },
     ];
-    const findMock = jest.fn().mockReturnThis();  // This will return 'this' so that we can chain methods
+    const findMock = jest.fn().mockReturnThis(); // This will return 'this' so that we can chain methods
     const populateMock = jest.fn().mockReturnThis();
     const selectMock = jest.fn().mockReturnThis();
     const limitMock = jest.fn().mockReturnThis();
     const sortMock = jest.fn().mockResolvedValue(mockProducts); // Finally resolve the products
-    
+
     // Mock the model's find method to return an object with all the chainable methods
     productModel.find = findMock.mockReturnValue({
       populate: populateMock,
@@ -286,15 +286,14 @@ describe("getProductController", () => {
     expect(res.send).toHaveBeenCalledWith({
       success: false,
       message: "Error in getting products",
-      error: expect.any(String)
+      error: expect.any(String),
     });
   });
-  
 });
 
 describe("getSingleProductController", () => {
   it("should retrieve requested product successfully", async () => {
-    const req = { params: { slug: "novel"} };
+    const req = { params: { slug: "novel" } };
     const res = mockResponse();
 
     const mockProducts = [
@@ -314,29 +313,27 @@ describe("getSingleProductController", () => {
             type: "image/jpeg",
           },
         },
-      }
+      },
     ];
-    const findOneMock = jest.fn().mockReturnThis();  // This will return 'this' so that we can chain methods
+    const findOneMock = jest.fn().mockReturnThis(); // This will return 'this' so that we can chain methods
     const selectMock = jest.fn().mockReturnThis();
     const populateMock = jest.fn().mockResolvedValue(mockProducts);
-    
+
     // Mock the model's find method to return an object with all the chainable methods
     productModel.findOne = findOneMock.mockReturnValue({
       select: selectMock,
-      populate: populateMock
+      populate: populateMock,
     });
 
     await getSingleProductController(req, res);
 
-    expect(findOneMock).toHaveBeenCalledWith({slug: "novel"});
+    expect(findOneMock).toHaveBeenCalledWith({ slug: "novel" });
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({
       success: true,
       message: "Single Product Fetched",
-      product: mockProducts
+      product: mockProducts,
     });
-
-    
   });
 
   it("should return 500 if an error occurs during retrieval", async () => {
@@ -508,10 +505,10 @@ describe("productPhotoController", () => {
           shipping: true,
           photo: {
             data: Buffer.from("mock-image-data"),
-            contentType: "image/jpeg"
-          }
-        }
-      }
+            contentType: "image/jpeg",
+          },
+        },
+      },
     ];
 
     // Mock findById method to return mockProduct
@@ -524,8 +521,6 @@ describe("productPhotoController", () => {
     //expect(res.set).toHaveBeenCalledWith("Content-type", "image/jpeg");
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith(mockProduct.photo.data);
-
-    
   });
 });
 
@@ -533,7 +528,7 @@ describe("productFiltersController", () => {
   it("should filter products successfully", async () => {
     const req = {
       checked: [],
-      radio: [100, 200]
+      radio: [100, 200],
     };
     const res = mockResponse();
 
@@ -546,7 +541,7 @@ describe("productFiltersController", () => {
           category: "Test Category",
           quantity: 10,
           shipping: true,
-        }
+        },
       },
       {
         fields: {
@@ -556,8 +551,8 @@ describe("productFiltersController", () => {
           category: "Test Category",
           quantity: 10,
           shipping: true,
-        }
-      }
+        },
+      },
     ];
 
     const findMock = jest.fn().mockResolvedValue(mockProducts);
@@ -566,7 +561,7 @@ describe("productFiltersController", () => {
     await productFiltersController(req, res);
 
     expect(findMock).toHaveBeenCalledWith({
-      price: { $gte: 100, $lte: 200 }
+      price: { $gte: 100, $lte: 200 },
     });
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({
@@ -578,7 +573,7 @@ describe("productFiltersController", () => {
   it("should return 500 if an error occurs during filtering", async () => {
     const req = {
       checked: [],
-      radio: [100, 200]
+      radio: [100, 200],
     };
     const res = mockResponse();
 
@@ -592,21 +587,20 @@ describe("productFiltersController", () => {
     await productFiltersController(req, res);
 
     expect(findMock).toHaveBeenCalledWith({
-      price: { $gte: 100, $lte: 200 }
+      price: { $gte: 100, $lte: 200 },
     });
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith({
       success: false,
       message: "Error WHile Filtering Products",
-      error: expect.any(Error)
+      error: expect.any(Error),
     });
   });
-  
 });
 
 describe("productListCOntroller", () => {
   it("should retrieve all products per page successfully", async () => {
-    const req = { params : {page: 1}};
+    const req = { params: { page: 1 } };
     const res = mockResponse();
 
     const mockProducts = [
@@ -626,14 +620,14 @@ describe("productListCOntroller", () => {
             type: "image/jpeg",
           },
         },
-      }
+      },
     ];
-    const findMock = jest.fn().mockReturnThis();  // This will return 'this' so that we can chain methods
+    const findMock = jest.fn().mockReturnThis(); // This will return 'this' so that we can chain methods
     const selectMock = jest.fn().mockReturnThis();
     const skipMock = jest.fn().mockReturnThis();
     const limitMock = jest.fn().mockReturnThis();
     const sortMock = jest.fn().mockResolvedValue(mockProducts); // Finally resolve the products
-    
+
     // Mock the model's find method to return an object with all the chainable methods
     productModel.find = findMock.mockReturnValue({
       select: selectMock,
@@ -653,7 +647,7 @@ describe("productListCOntroller", () => {
   });
 
   it("should return 500 if an error occurs during retrieval", async () => {
-    const req = { params : {page: 1}};
+    const req = { params: { page: 1 } };
     const res = mockResponse();
 
     // Mock findOne to throw an error
@@ -670,14 +664,12 @@ describe("productListCOntroller", () => {
     expect(res.send).toHaveBeenCalledWith({
       success: false,
       message: "error in per page ctrl",
-      error: expect.any(Error)
+      error: expect.any(Error),
     });
   });
-  
 });
 
 describe("searchProductController", () => {
-
   const mockProducts = [
     {
       _id: "64b8f1a1e4b0a1a2b3c4d5e6",
@@ -723,7 +715,7 @@ describe("searchProductController", () => {
       const regex = new RegExp(keyword, "i");
       const filteredProducts = mockProducts.filter(
         (product) =>
-          regex.test(product.name) || regex.test(product.description)
+          regex.test(product.name) || regex.test(product.description),
       );
       return {
         select: jest.fn().mockResolvedValue(filteredProducts),
@@ -780,7 +772,7 @@ describe("searchProductController", () => {
       const regex = new RegExp(keyword, "i");
       const filteredProducts = mockProducts.filter(
         (product) =>
-          regex.test(product.name) || regex.test(product.description)
+          regex.test(product.name) || regex.test(product.description),
       );
       return {
         select: jest.fn().mockResolvedValue(filteredProducts),
@@ -844,7 +836,7 @@ describe("realtedProductController", () => {
     const pidtest1 = new mongoose.Types.ObjectId().toHexString();
     const pidtest2 = new mongoose.Types.ObjectId().toHexString();
 
-    const req = { params: { pid, cid }};
+    const req = { params: { pid, cid } };
     const res = mockResponse();
 
     const mockProducts = [
@@ -857,12 +849,11 @@ describe("realtedProductController", () => {
         category: {
           _id: cid,
           name: "name",
-          slug: "slug"
+          slug: "slug",
         },
         quantity: 10,
         shipping: true,
-        
-      }, 
+      },
       {
         _id: pidtest2,
         name: "Test Novel",
@@ -872,33 +863,33 @@ describe("realtedProductController", () => {
         category: {
           _id: new mongoose.Types.ObjectId().toHexString(),
           name: "name",
-          slug: "slug"
+          slug: "slug",
         },
         quantity: 10,
         shipping: true,
-        
-      }
+      },
     ];
-    const findMock = jest.fn().mockReturnThis();  // This will return 'this' so that we can chain methods
+    const findMock = jest.fn().mockReturnThis(); // This will return 'this' so that we can chain methods
     const selectMock = jest.fn().mockReturnThis();
     const limitMock = jest.fn().mockReturnThis();
-    const populateMock = jest.fn().mockResolvedValue(
-      mockProducts.filter((product) => product.category._id === cid)
-    );
-    
-    
+    const populateMock = jest
+      .fn()
+      .mockResolvedValue(
+        mockProducts.filter((product) => product.category._id === cid),
+      );
+
     // Mock the model's find method to return an object with all the chainable methods
     productModel.find = findMock.mockReturnValue({
       select: selectMock,
       limit: limitMock,
-      populate: populateMock
+      populate: populateMock,
     });
 
     await realtedProductController(req, res);
 
     expect(findMock).toHaveBeenCalledWith({
       category: cid,
-      _id: { $ne: pid}
+      _id: { $ne: pid },
     });
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({
@@ -908,7 +899,7 @@ describe("realtedProductController", () => {
   });
 
   it("should return 500 if an error occurs during retrieval of related products", async () => {
-    const req = { params: { pid: "123", cid: "Novel" }};
+    const req = { params: { pid: "123", cid: "Novel" } };
     const res = mockResponse();
 
     // Mock findOne to throw an error
@@ -922,32 +913,30 @@ describe("realtedProductController", () => {
 
     expect(findMock).toHaveBeenCalledWith({
       category: "Novel",
-      _id: { $ne: "123"}
+      _id: { $ne: "123" },
     });
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith({
       success: false,
       message: "error while geting related product",
-      error: expect.any(Error)
+      error: expect.any(Error),
     });
   });
-  
 });
 
 describe("productCountController", () => {
   it("Returns the current count of products", async () => {
-    
     const req = {};
     const res = mockResponse();
-    
+
     const mockValue = 10;
 
-    const findMock = jest.fn().mockReturnThis();  // This will return 'this' so that we can chain methods
+    const findMock = jest.fn().mockReturnThis(); // This will return 'this' so that we can chain methods
     const countMock = jest.fn().mockResolvedValue(mockValue); // Finally resolve the products
-    
+
     // Mock the model's find method to return an object with all the chainable methods
     productModel.find = findMock.mockReturnValue({
-      estimatedDocumentCount: countMock
+      estimatedDocumentCount: countMock,
     });
 
     await productCountController(req, res);
@@ -955,25 +944,21 @@ describe("productCountController", () => {
     expect(res.status).toHaveBeenCalledWith(200); // Verify the status code
     expect(res.send).toHaveBeenCalledWith({
       success: true,
-      total: mockValue // Verify the total count
+      total: mockValue, // Verify the total count
     });
-    
-
   });
-
-  
 });
 
 describe("productCategoryController", () => {
   it("should return products for the given category", async () => {
-    const req = {params: {slug: "electronics"}};
+    const req = { params: { slug: "electronics" } };
     const res = mockResponse();
-    
+
     const mockCategory = [
       {
         name: "electronics",
-        slug: "electronics"
-      }
+        slug: "electronics",
+      },
     ];
     const mockProducts = [
       {
@@ -991,18 +976,20 @@ describe("productCategoryController", () => {
         category: "book",
         quantity: 10,
         shipping: true,
-      }
+      },
     ];
 
     categoryModel.findOne.mockResolvedValue(mockCategory);
 
     const findMock = jest.fn().mockReturnThis();
-    const populateMock = jest.fn().mockResolvedValue(
-      mockProducts.filter((product) => product.category === "electronics")
-    );
+    const populateMock = jest
+      .fn()
+      .mockResolvedValue(
+        mockProducts.filter((product) => product.category === "electronics"),
+      );
 
     productModel.find = findMock.mockReturnValue({
-      populate: populateMock
+      populate: populateMock,
     });
 
     await productCategoryController(req, res);
@@ -1019,9 +1006,9 @@ describe("productCategoryController", () => {
   });
 
   it("should return 400 if an error occurs", async () => {
-    const req = {params: {slug: "electronics"}};
+    const req = { params: { slug: "electronics" } };
     const res = mockResponse();
-    
+
     const findOneMock = jest.fn().mockImplementation(() => {
       throw new Error("Database Error");
     });
@@ -1038,7 +1025,6 @@ describe("productCategoryController", () => {
     });
   });
 });
-
 
 describe("brainTreeTokenController unit tests", () => {
   let req, res;
