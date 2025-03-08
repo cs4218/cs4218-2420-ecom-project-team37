@@ -12,8 +12,12 @@ const Products = () => {
   // Get all products
   const getAllProducts = async () => {
     try {
-      const { data } = await axios.get("/api/v1/product/get-product");
-      setProducts(data.products);
+      const response = await axios.get("/api/v1/product/get-product");
+      if (response && response.data && response.data.products) {
+        setProducts(response.data.products);
+      } else {
+        toast.error("Invalid response format");
+      }    
     } catch (error) {
       console.log(error);
       toast.error("Something Went Wrong");
