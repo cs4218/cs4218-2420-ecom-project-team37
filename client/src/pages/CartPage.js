@@ -19,20 +19,19 @@ const CartPage = () => {
 
   //total price
   const totalPrice = () => {
-    try {
-      let total = 0;
-      cart?.map((item) => {
-        total = total + item.price;
-      });
-      return total.toLocaleString("en-US", {
-        style: "currency",
-        currency: "USD",
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    let total = 0;
+    cart?.forEach((item) => {
+      // Handle missing or invalid prices
+      const price = parseFloat(item.price) || 0;
+      total = total + Math.abs(price); // Use Math.abs to handle negative prices
+    });
+    return total.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
   };
-  //detele item
+  
+  //delete item
   const removeCartItem = (pid) => {
     try {
       let myCart = [...cart];
@@ -54,32 +53,10 @@ const CartPage = () => {
       console.log(error);
     }
   };
+  
   useEffect(() => {
     getToken();
   }, [auth?.token]);
-
-  // Add these useEffect hooks after your existing useEffect
-  useEffect(() => {
-    console.log('Auth token changed:', auth?.token);
-  }, [auth?.token]);
-
-  useEffect(() => {
-    console.log('Cart length changed:', cart?.length);
-  }, [cart?.length]);
-
-  useEffect(() => {
-    console.log('Client token changed:', clientToken);
-  }, [clientToken]);
-
-  // For debugging the payment interface condition
-  useEffect(() => {
-    console.log('Payment interface conditions:', {
-      hasClientToken: !!clientToken,
-      hasAuthToken: !!auth?.token,
-      hasCartItems: !!cart?.length,
-      showPaymentInterface: !(!clientToken || !auth?.token || !cart?.length)
-    });
-  }, [clientToken, auth?.token, cart?.length]);
 
   //handle payments
   const handlePayment = async () => {
