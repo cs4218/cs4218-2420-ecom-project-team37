@@ -55,10 +55,12 @@ export const createProductController = async (req, res) => {
       $or: [{ name: { $regex: new RegExp(`^${name}$`, "i") } }, { slug: slug }],
     });
     if (existingProduct) {
-      return res.status(409).send({
-        success: false,
-        message: "Product with this name already exists",
-      });
+      return res
+        .status(409)
+        .send({
+          success: false,
+          message: "Product with this name already exists",
+        });
     }
 
     const products = new productModel({ ...req.fields, slug: slugify(name) });
@@ -207,10 +209,12 @@ export const updateProductController = async (req, res) => {
       _id: { $ne: req.params.pid },
     });
     if (existingProduct) {
-      return res.status(409).send({
-        success: false,
-        message: "Another product with this name already exists",
-      });
+      return res
+        .status(409)
+        .send({
+          success: false,
+          message: "Another product with this name already exists",
+        });
     }
     const product = await productModel.findByIdAndUpdate(
       req.params.pid,
