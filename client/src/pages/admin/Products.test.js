@@ -20,6 +20,8 @@ jest.mock("../../context/cart", () => ({
 jest.mock("../../context/search", () => ({
   useSearch: jest.fn(() => [{ keyword: "" }, jest.fn()]),
 }));
+jest.mock("../../hooks/useCategory", () => jest.fn(() => []));
+
 
 describe("Products Component", () => {
   beforeEach(() => {
@@ -73,7 +75,7 @@ describe("Products Component", () => {
   });
 
   it("should display an error message", async () => {
-    axios.get.mockRejectedValue(new Error("API call failed"));
+    axios.get.mockRejectedValue("API call failed");
 
     render(
       <Router>
