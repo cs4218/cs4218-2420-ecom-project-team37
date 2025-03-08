@@ -31,30 +31,41 @@ describe("Category Controller Tests", () => {
             expect(res.send).toHaveBeenCalledWith({ message: "Name is required" });
         });
 
-        test("should return 200 if category already exists", async () => {
+        test("should return 409 if category already exists", async () => {
             req.body = { name: "Electronics" };
-            categoryModel.findOne = jest.fn().mockResolvedValue({ name: "Electronics" });
+            categoryModel.findOne = jest.fn().mockImplementation((query) => {
+                if (query.$or && 
+                    (query.$or[0].name.$regex.toString().includes("Electronics") || 
+                     query.$or[1].slug === "electronics")) {
+                  return Promise.resolve({ name: "Electronics", slug: "electronics" });
+                }
+                return Promise.resolve(null);
+              });
 
             await createCategoryController(req, res);
 
-            expect(categoryModel.findOne).toHaveBeenCalledWith({ name: "Electronics" });
-            expect(res.status).toHaveBeenCalledWith(200);
+      expect(categoryModel.findOne).toHaveBeenCalled();            
+      expect(res.status).toHaveBeenCalledWith(409);
             expect(res.send).toHaveBeenCalledWith({
-                success: true,
+                success: false,
                 message: "Category already exists",
             });
         });
 
         test("should create new category and return 201", async () => {
             req.body = { name: "Books" };
-            categoryModel.findOne = jest.fn().mockResolvedValue(null);
+            categoryModel.findOne = jest.fn().mockImplementation((query) => {
+                return Promise.resolve(null);
+              });
+
+
             const savedCategory = { name: "Books", slug: slugify("Books"), _id: "123" };
 
             categoryModel.prototype.save = jest.fn().mockResolvedValue(savedCategory);
 
             await createCategoryController(req, res);
 
-            expect(categoryModel.findOne).toHaveBeenCalledWith({ name: "Books" });
+            expect(categoryModel.findOne).toHaveBeenCalled();
             expect(categoryModel.prototype.save).toHaveBeenCalled();
             expect(res.status).toHaveBeenCalledWith(201);
             expect(res.send).toHaveBeenCalledWith({
