@@ -63,6 +63,20 @@ describe("Category Controller Tests", () => {
                 category: savedCategory,
             });
         });
+
+        test("should handle errors and return 500", async () => {
+            req.body = { name: "Books" };
+            categoryModel.findOne = jest.fn().mockRejectedValue(new Error("Database error"));
+            
+            await createCategoryController(req, res);
+            
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.send).toHaveBeenCalledWith({
+                success: false,
+                error: expect.any(Error),
+                message: "Error in category",
+            });
+        });
     });
 
     describe("updateCategoryController", () => {
@@ -90,6 +104,21 @@ describe("Category Controller Tests", () => {
                 category: updatedCategory,
             });
         });
+
+        test("should handle errors and return 500", async () => {
+            req.params = { id: "123" };
+            req.body = { name: "Updated Category" };
+            categoryModel.findByIdAndUpdate = jest.fn().mockRejectedValue(new Error("Database error"));
+            
+            await updateCategoryController(req, res);
+            
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.send).toHaveBeenCalledWith({
+                success: false,
+                error: expect.any(Error),
+                message: "Error while updating category",
+            });
+        });
     });
 
     describe("categoryController (get all categories)", () => {
@@ -106,8 +135,21 @@ describe("Category Controller Tests", () => {
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.send).toHaveBeenCalledWith({
                 success: true,
-                message: "All Categories List",
+                message: "All categories list",
                 category: categoriesList,
+            });
+        });
+
+        test("should handle errors and return 500", async () => {
+            categoryModel.find = jest.fn().mockRejectedValue(new Error("Database error"));
+            
+            await categoryController(req, res);
+            
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.send).toHaveBeenCalledWith({
+                success: false,
+                error: expect.any(Error),
+                message: "Error while getting all categories",
             });
         });
     });
@@ -124,8 +166,22 @@ describe("Category Controller Tests", () => {
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.send).toHaveBeenCalledWith({
                 success: true,
-                message: "Get Single Category Successfully",
+                message: "Get single category successfully",
                 category: foundCategory,
+            });
+        });
+
+        test("should handle errors and return 500", async () => {
+            req.params = { slug: "books" };
+            categoryModel.findOne = jest.fn().mockRejectedValue(new Error("Database error"));
+            
+            await singleCategoryController(req, res);
+            
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.send).toHaveBeenCalledWith({
+                success: false,
+                error: expect.any(Error),
+                message: "Error while getting single category",
             });
         });
     });
@@ -141,7 +197,21 @@ describe("Category Controller Tests", () => {
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.send).toHaveBeenCalledWith({
                 success: true,
-                message: "Category Deleted Successfully",
+                message: "Category deleted successfully",
+            });
+        });
+
+        test("should handle errors and return 500", async () => {
+            req.params = { id: "123" };
+            categoryModel.findByIdAndDelete = jest.fn().mockRejectedValue(new Error("Database error"));
+            
+            await deleteCategoryController(req, res);
+            
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.send).toHaveBeenCalledWith({
+                success: false,
+                error: expect.any(Error),
+                message: "Error while deleting category",
             });
         });
     });

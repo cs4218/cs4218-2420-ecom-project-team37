@@ -8,7 +8,7 @@ export const createCategoryController = async (req, res) => {
     }
     const existingCategory = await categoryModel.findOne({ name });
     if (existingCategory) {
-      return res.status(200).send({ // Might want to change the code to 409
+      return res.status(200).send({ 
         success: true,
         message: "Category already exists",
       });
@@ -63,7 +63,7 @@ export const categoryController = async (req, res) => {
     const category = await categoryModel.find({});
     res.status(200).send({
       success: true,
-      message: "All Categories List",
+      message: "All categories list",
       category,
     });
   } catch (error) {
@@ -82,7 +82,7 @@ export const singleCategoryController = async (req, res) => {
     const category = await categoryModel.findOne({ slug: req.params.slug });
     res.status(200).send({
       success: true,
-      message: "Get Single Category Successfully",
+      message: "Get single category successfully",
       category,
     });
   } catch (error) {
@@ -90,7 +90,7 @@ export const singleCategoryController = async (req, res) => {
     res.status(500).send({
       success: false,
       error,
-      message: "Error while getting Single Category",
+      message: "Error while getting single category",
     });
   }
 };
@@ -102,13 +102,13 @@ export const deleteCategoryController = async (req, res) => {
     await categoryModel.findByIdAndDelete(id);
     res.status(200).send({
       success: true,
-      message: "Category Deleted Successfully",
+      message: "Category deleted successfully",
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while deleting category",
+      message: "Error while deleting category",
       error,
     });
   }
