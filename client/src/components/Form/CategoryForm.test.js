@@ -9,7 +9,11 @@ describe("CategoryForm", () => {
     const value = "initial value";
 
     render(
-      <CategoryForm handleSubmit={handleSubmit} value={value} setValue={setValue} />
+      <CategoryForm
+        handleSubmit={handleSubmit}
+        value={value}
+        setValue={setValue}
+      />,
     );
 
     const input = screen.getByPlaceholderText("Enter new category");
@@ -26,7 +30,11 @@ describe("CategoryForm", () => {
     const value = "";
 
     render(
-      <CategoryForm handleSubmit={handleSubmit} value={value} setValue={setValue} />
+      <CategoryForm
+        handleSubmit={handleSubmit}
+        value={value}
+        setValue={setValue}
+      />,
     );
 
     const input = screen.getByPlaceholderText("Enter new category");
@@ -40,7 +48,11 @@ describe("CategoryForm", () => {
     const value = "some category";
 
     render(
-      <CategoryForm handleSubmit={handleSubmit} value={value} setValue={setValue} />
+      <CategoryForm
+        handleSubmit={handleSubmit}
+        value={value}
+        setValue={setValue}
+      />,
     );
 
     const submitButton = screen.getByRole("button", { name: /submit/i });

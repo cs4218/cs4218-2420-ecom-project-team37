@@ -17,13 +17,13 @@ const CategoryProduct = () => {
   const getProductsByCategory = async () => {
     try {
       const response = await axios.get(
-        `/api/v1/product/product-category/${params.slug}`
+        `/api/v1/product/product-category/${params.slug}`,
       );
       setProducts(response?.data?.products || []);
       setCategory(response?.data?.category || {});
     } catch (error) {
       console.log(error);
-    } 
+    }
   };
 
   return (
