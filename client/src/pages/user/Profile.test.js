@@ -5,6 +5,8 @@ import axios from "axios";
 import { BrowserRouter } from "react-router-dom";
 import toast from "react-hot-toast";
 
+const mockString = "mockString";
+
 jest.mock("../../context/auth", () => ({
   useAuth: jest.fn(),
 }));
@@ -15,6 +17,12 @@ jest.mock("react-hot-toast", () => ({
   success: jest.fn(),
 }));
 jest.spyOn(console, "log").mockImplementation(() => {});
+jest.spyOn(JSON, "parse").mockImplementation(() => {
+  return { user: "mockUser" };
+});
+jest.spyOn(JSON, "stringify").mockImplementation(() => {
+  return mockString;
+});
 
 // Mock hooks because Profile is wrapped in Header
 jest.mock("../../context/cart", () => ({
@@ -28,6 +36,15 @@ jest.mock("../../context/search", () => ({
 jest.mock("../../components/Layout", () => ({ children }) => (
   <div>{children}</div>
 ));
+
+Object.defineProperty(window, "localStorage", {
+  value: {
+    setItem: jest.fn(),
+    getItem: jest.fn(),
+    removeItem: jest.fn(),
+  },
+  writable: true,
+});
 
 const mockUser = {
   name: "John Doe",
@@ -46,22 +63,22 @@ describe("Profile Component", () => {
     render(
       <BrowserRouter>
         <Profile />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByText("USER PROFILE")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Enter Your Name")).toHaveValue(
-      mockUser.name
+      mockUser.name,
     );
     expect(screen.getByPlaceholderText("Enter Your Email")).toHaveValue(
-      mockUser.email
+      mockUser.email,
     );
     expect(screen.getByPlaceholderText("Enter Your Email")).toBeDisabled();
     expect(screen.getByPlaceholderText("Enter Your Phone")).toHaveValue(
-      mockUser.phone
+      mockUser.phone,
     );
     expect(screen.getByPlaceholderText("Enter Your Address")).toHaveValue(
-      mockUser.address
+      mockUser.address,
     );
   });
 
@@ -69,7 +86,7 @@ describe("Profile Component", () => {
     render(
       <BrowserRouter>
         <Profile />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     const nameInput = screen.getByPlaceholderText("Enter Your Name");
@@ -103,13 +120,13 @@ describe("Profile Component", () => {
         },
       },
     });
-  
+
     render(
       <BrowserRouter>
         <Profile />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
-  
+
     fireEvent.change(screen.getByPlaceholderText("Enter Your Name"), {
       target: { value: "Updated Name" },
     });
@@ -119,20 +136,27 @@ describe("Profile Component", () => {
     fireEvent.change(screen.getByPlaceholderText("Enter Your Password"), {
       target: { value: "123456" },
     });
-  
+
     fireEvent.click(screen.getByText("UPDATE"));
-  
+
     await waitFor(() => {
-        expect(axios.put).toHaveBeenCalledWith("/api/v1/auth/profile", expect.objectContaining({
+      expect(axios.put).toHaveBeenCalledWith(
+        "/api/v1/auth/profile",
+        expect.objectContaining({
           name: "Updated Name",
           email: "john@example.com",
           phone: "99999999",
           address: "123 Street Name",
-          password: "123456"
-        }));
-      });
+          password: "123456",
+        }),
+      );
+      expect(localStorage.getItem).toHaveBeenCalledWith("auth");
+      expect(localStorage.setItem).toHaveBeenCalledWith("auth", mockString);
+      expect(toast.success).toHaveBeenCalledWith(
+        "Profile Updated Successfully",
+      );
+    });
   });
-  
 
   it("handles API errors successfully", async () => {
     axios.put.mockRejectedValue(new Error("API Error"));
@@ -140,7 +164,7 @@ describe("Profile Component", () => {
     render(
       <BrowserRouter>
         <Profile />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     fireEvent.click(screen.getByText("UPDATE"));
@@ -152,13 +176,16 @@ describe("Profile Component", () => {
 
   it("shows an error toast when invalid data sent to API", async () => {
     axios.put.mockResolvedValue({
-      data: { error: new Error("Invalid data Error"), message: "Some fields are empty" },
+      data: {
+        error: new Error("Invalid data Error"),
+        message: "Some fields are empty",
+      },
     });
 
     render(
       <BrowserRouter>
         <Profile />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     fireEvent.click(screen.getByText("UPDATE"));

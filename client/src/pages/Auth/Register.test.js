@@ -57,7 +57,7 @@ describe("Register Component", () => {
         <Routes>
           <Route path="/register" element={<Register />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     fireEvent.change(getByPlaceholderText("Enter Your Name"), {
@@ -86,7 +86,7 @@ describe("Register Component", () => {
 
     await waitFor(() => expect(axios.post).toHaveBeenCalled());
     expect(toast.success).toHaveBeenCalledWith(
-      "Register Successfully, please login"
+      "Register Successfully, please login",
     );
   });
 
@@ -98,7 +98,7 @@ describe("Register Component", () => {
         <Routes>
           <Route path="/register" element={<Register />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     fireEvent.change(getByPlaceholderText("Enter Your Name"), {
@@ -142,7 +142,7 @@ describe("Register Component", () => {
         <Routes>
           <Route path="/register" element={<Register />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     fireEvent.change(getByPlaceholderText("Enter Your Name"), {
