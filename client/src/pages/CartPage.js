@@ -4,7 +4,6 @@ import { useCart } from "../context/cart";
 import { useAuth } from "../context/auth";
 import { useNavigate } from "react-router-dom";
 import DropIn from "braintree-web-drop-in-react";
-import { AiFillWarning } from "react-icons/ai";
 import axios from "axios";
 import toast from "react-hot-toast";
 import "../styles/CartStyles.css";
@@ -21,9 +20,8 @@ const CartPage = () => {
   const totalPrice = () => {
     let total = 0;
     cart?.forEach((item) => {
-      // Handle missing or invalid prices
       const price = parseFloat(item.price) || 0;
-      total = total + Math.abs(price); // Use Math.abs to handle negative prices
+      total = total + Math.abs(price);
     });
     return total.toLocaleString("en-US", {
       style: "currency",
@@ -79,19 +77,19 @@ const CartPage = () => {
   };
   return (
     <Layout>
-      <div className=" cart-page">
+      <div className="cart-page">
         <div className="row">
           <div className="col-md-12">
             <h1 className="text-center bg-light p-2 mb-1">
               {!auth?.user
                 ? "Hello Guest"
-                : `Hello  ${auth?.token && auth?.user?.name}`}
+                : `Hello ${auth?.token && auth?.user?.name}`}
               <p className="text-center">
                 {cart?.length
-                  ? `You Have ${cart.length} items in your cart ${
-                      auth?.token ? "" : "please login to checkout !"
+                  ? `You have ${cart.length} items in your cart ${
+                      auth?.token ? "" : "please login to checkout!"
                     }`
-                  : " Your Cart Is Empty"}
+                  : "Your Cart Is Empty"}
               </p>
             </h1>
           </div>
