@@ -1,0 +1,16 @@
+.product-page {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: whitesmoke;
+}
+.product-page .card-text {
+    color: rgb(90, 89, 89);
+}
+  
+.product-page .card img:hover {
+    transform: scale(0.9);
+}
+  
+.product-page .card-img-top {
+    height: 300px !important;
+}

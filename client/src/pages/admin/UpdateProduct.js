@@ -50,7 +50,7 @@ const UpdateProduct = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something wwent wrong in getting category");
+      toast.error("Something went wrong in getting category");
     }
   };
 
@@ -59,8 +59,28 @@ const UpdateProduct = () => {
   }, []);
 
   //create product function
+
   const handleUpdate = async (e) => {
     e.preventDefault();
+
+    const { data } = await axios.get(
+      `/api/v1/product/get-product/${params.slug}`,
+    );
+    const existingProduct = data.product;
+
+    const isUnchanged =
+      name === existingProduct.name &&
+      description === existingProduct.description &&
+      price === existingProduct.price &&
+      quantity === existingProduct.quantity &&
+      category === existingProduct.category._id &&
+      shipping === (existingProduct.shipping ? "1" : "0") &&
+      !photo;
+
+    if (isUnchanged) {
+      return toast.success("No changes detected.");
+    }
+
     if (quantity <= 0) {
       return toast.error("Quantity must be more than zero");
     }
@@ -80,6 +100,7 @@ const UpdateProduct = () => {
     ) {
       return toast.error("All fields are required");
     }
+
     try {
       const productData = new FormData();
       productData.append("name", name);
@@ -89,35 +110,40 @@ const UpdateProduct = () => {
       photo && productData.append("photo", photo);
       productData.append("category", category);
       productData.append("shipping", shipping);
-      const { data } = await axios.put(
+
+      const updateResponse = await axios.put(
         `/api/v1/product/update-product/${id}`,
         productData,
       );
-      if (!data.success) {
-        toast.error(data.message);
+
+      if (!updateResponse.data.success) {
+        toast.error(updateResponse.data.message);
       } else {
         toast.success("Product Updated Successfully");
         navigate("/dashboard/admin/products");
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong");
+      toast.error(error.response?.data?.message || "Update went wrong");
     }
   };
 
   //delete a product
   const handleDelete = async () => {
     try {
-      let answer = window.prompt("Are you sure want to delete this product?");
-      if (!answer) return;
+      let answer = window.prompt("Type 'yes' to confirm deletion:");
+      if (answer?.toLowerCase() !== "yes") {
+        toast.error("Product deletion cancelled");
+        return;
+      }
       const { data } = await axios.delete(
         `/api/v1/product/delete-product/${id}`,
       );
-      toast.success("Product deleted Succfully");
+      toast.success("Product deleted successfully");
       navigate("/dashboard/admin/products");
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong");
+      toast.error("Delete went wrong");
     }
   };
   return (
