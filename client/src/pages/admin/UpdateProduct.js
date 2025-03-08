@@ -124,7 +124,7 @@ const UpdateProduct = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Update went wrong");
+      toast.error(error.response?.data?.message || "Update went wrong");
     }
   };
 

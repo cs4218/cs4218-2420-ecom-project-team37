@@ -28,7 +28,7 @@ const CartPage = () => {
       currency: "USD",
     });
   };
-  
+
   //delete item
   const removeCartItem = (pid) => {
     try {
@@ -51,7 +51,7 @@ const CartPage = () => {
       console.log(error);
     }
   };
-  
+
   useEffect(() => {
     getToken();
   }, [auth?.token]);
