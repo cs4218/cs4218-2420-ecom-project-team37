@@ -34,9 +34,11 @@ describe("Category Controller Tests", () => {
     test("should return 409 if category already exists", async () => {
       req.body = { name: "Electronics" };
       categoryModel.findOne = jest.fn().mockImplementation((query) => {
-        if (query.$or && 
-            (query.$or[0].name.$regex.toString().includes("Electronics") || 
-             query.$or[1].slug === "electronics")) {
+        if (
+          query.$or &&
+          (query.$or[0].name.$regex.toString().includes("Electronics") ||
+            query.$or[1].slug === "electronics")
+        ) {
           return Promise.resolve({ name: "Electronics", slug: "electronics" });
         }
         return Promise.resolve(null);
@@ -55,14 +57,14 @@ describe("Category Controller Tests", () => {
     test("should create new category and return 201", async () => {
       req.body = { name: "Books" };
       categoryModel.findOne = jest.fn().mockImplementation((query) => {
-      return Promise.resolve(null);
-    });
-    
-    const savedCategory = {
-      name: "Books",
-      slug: slugify("Books"),
-      _id: "123",
-    };
+        return Promise.resolve(null);
+      });
+
+      const savedCategory = {
+        name: "Books",
+        slug: slugify("Books"),
+        _id: "123",
+      };
 
       categoryModel.prototype.save = jest.fn().mockResolvedValue(savedCategory);
 

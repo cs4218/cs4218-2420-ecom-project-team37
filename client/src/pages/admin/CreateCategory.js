@@ -26,7 +26,9 @@ const CreateCategory = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.message || "Something went wrong in input form");
+      toast.error(
+        error.response?.data?.message || "Something went wrong in input form",
+      );
     }
   };
 
