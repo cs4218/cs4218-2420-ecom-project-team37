@@ -31,10 +31,14 @@ export const createProductController = async (req, res) => {
         return res.status(400).send({ error: "Description is required" });
       case !price:
         return res.status(400).send({ error: "Price is required" });
+      case price < 0: 
+        return res.status(400).send({ error: "Price must be positive" }); 
       case !category:
         return res.status(400).send({ error: "Category is required" });
       case !quantity:
         return res.status(400).send({ error: "Quantity is required" });
+      case quantity < 0: 
+      return res.status(400).send({ error: "Quantity must be more than zero" }); 
       case shipping === undefined:
         return res.status(400).send({ error: "Shipping option is required" });
       case !req.files || !req.files.photo:
@@ -42,8 +46,9 @@ export const createProductController = async (req, res) => {
       case photo && photo.size > 1000000:
         return res
           .status(400)
-          .send({ error: "Photo is required and should be less than 1MB" });
+          .send({ error: "Photo size must be less than 1MB." });
     }
+    
 
     const products = new productModel({ ...req.fields, slug: slugify(name) });
     if (photo) {
