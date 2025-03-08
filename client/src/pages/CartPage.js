@@ -69,7 +69,7 @@ const CartPage = () => {
       localStorage.removeItem("cart");
       setCart([]);
       navigate("/dashboard/user/orders");
-      toast.success("Payment Completed Successfully");
+      toast.success("Payment Completed Successfully ");
     } catch (error) {
       console.log(error);
       setLoading(false);
@@ -94,7 +94,7 @@ const CartPage = () => {
             </h1>
           </div>
         </div>
-        <div className="container">
+        <div className="container ">
           <div className="row ">
             <div className="col-md-7  p-0 m-0">
               {cart?.map((p) => (
@@ -124,7 +124,7 @@ const CartPage = () => {
                 </div>
               ))}
             </div>
-            <div className="col-md-5 cart-summary">
+            <div className="col-md-5 cart-summary ">
               <h2>Cart Summary</h2>
               <p>Total | Checkout | Payment</p>
               <hr />
