@@ -102,6 +102,21 @@ const renderWithProviders = (
   );
 };
 
+const originalError = console.error;
+beforeAll(() => {
+  console.error = (...args) => {
+    // if (/Warning.*not wrapped in act/.test(args[0])) {
+    //   return;
+    // }
+    // originalError.call(console, ...args);
+    return;
+  };
+});
+
+afterAll(() => {
+  console.error = originalError;
+});
+
 describe('CartPage Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -526,7 +541,7 @@ describe('CartPage Component', () => {
         authValue: [{ user: null }, jest.fn()] 
       });
       
-      const loginButton = screen.getByText('Plase Login to checkout');
+      const loginButton = screen.getByText('Please Login to checkout');
       fireEvent.click(loginButton);
       
       expect(navigateMock).toHaveBeenCalledWith('/login', { state: '/cart' });
