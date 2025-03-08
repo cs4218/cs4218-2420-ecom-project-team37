@@ -316,13 +316,13 @@ describe("Product Component Unit Tests", () => {
     axios.get.mockResolvedValue({
       data: { success: false, message: "Failed to fetch categories" },
     });
-  
+
     render(
       <Router>
         <CreateProduct />
-      </Router>
+      </Router>,
     );
-  
+
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith("Failed to fetch categories");
     });
@@ -335,21 +335,21 @@ describe("Product Component Unit Tests", () => {
         category: [{ _id: "1", name: "Electronics" }],
       },
     });
-  
+
     axios.post.mockResolvedValue({
       data: { success: false, message },
     });
-  
+
     render(
       <Router>
         <CreateProduct />
-      </Router>
+      </Router>,
     );
-  
+
     await waitFor(() => {
       expect(axios.get).toHaveBeenCalled();
     });
-  
+
     fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), {
       target: { value: "Laptop" },
     });
@@ -362,23 +362,23 @@ describe("Product Component Unit Tests", () => {
     fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), {
       target: { value: "5" },
     });
-  
+
     fireEvent.mouseDown(screen.getByText(/Select a Category/i));
     fireEvent.click(await screen.findByText(/Electronics/i));
-  
+
     // Upload photo
     const file = new File(["photo"], "photo.jpg", { type: "image/jpeg" });
     fireEvent.change(screen.getByLabelText(/Upload Photo/i), {
       target: { files: [file] },
     });
-  
+
     // Select shipping
     fireEvent.mouseDown(screen.getByText(/Select Shipping/i));
     fireEvent.click(screen.getByText("Yes"));
-  
+
     // Submit
     fireEvent.click(screen.getByText("CREATE PRODUCT"));
-  
+
     // Verify server error toast
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith(message);
@@ -392,18 +392,18 @@ describe("Product Component Unit Tests", () => {
         category: [{ _id: "1", name: "Electronics" }],
       },
     });
-  
+
     const error = new Error("Network error");
     axios.post.mockRejectedValue(error);
-  
+
     jest.spyOn(console, "log").mockImplementation(() => {});
-  
+
     render(
       <Router>
         <CreateProduct />
-      </Router>
+      </Router>,
     );
-  
+
     // Select category
     const categoryDropdown = screen.getByText(/Select a Category/i);
     fireEvent.mouseDown(categoryDropdown);
@@ -441,14 +441,14 @@ describe("Product Component Unit Tests", () => {
       selector: ".ant-select-item-option-content",
     });
     fireEvent.click(shippingOption);
-    
+
     // Submit
     fireEvent.click(screen.getByText("CREATE PRODUCT"));
-  
+
     await waitFor(() => {
       expect(console.log).toHaveBeenCalledWith(error);
     });
-  
+
     console.log.mockRestore();
   });
 
@@ -714,7 +714,7 @@ describe("Product Component Unit Tests", () => {
       expect(toast.error).toHaveBeenCalledWith("All fields are required");
     });
   });
-  
+
   test("should fail to create product with these invalid fields: name, price, shipping", async () => {
     axios.get.mockResolvedValue({
       data: {
