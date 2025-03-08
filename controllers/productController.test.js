@@ -121,23 +121,23 @@ describe("createProductController", () => {
     expect(res.send).toHaveBeenCalledWith({ error: "Name is required" });
   });
 
-  it('should reject negative price', async () => {
+  it("should reject negative price", async () => {
     const req = {
       fields: {
-        name: 'Test Product',
-        description: 'Test description',
-        price: -100,  
-        category: 'Test Category',
+        name: "Test Product",
+        description: "Test description",
+        price: -100,
+        category: "Test Category",
         quantity: 10,
-        shipping: true
+        shipping: true,
       },
       files: {
         photo: {
-          path: 'dummy/path.jpg',
+          path: "dummy/path.jpg",
           size: 500000,
-          type: 'image/jpeg'
-        }
-      }
+          type: "image/jpeg",
+        },
+      },
     };
     const res = mockResponse();
 
@@ -145,27 +145,27 @@ describe("createProductController", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith({
-      error: 'Price must be positive'
+      error: "Price must be positive",
     });
   });
 
-  it('should reject negative quantity', async () => {
+  it("should reject negative quantity", async () => {
     const req = {
       fields: {
-        name: 'Test Product',
-        description: 'Test description',
+        name: "Test Product",
+        description: "Test description",
         price: 100,
-        category: 'Test Category',
-        quantity: -10, 
-        shipping: true
+        category: "Test Category",
+        quantity: -10,
+        shipping: true,
       },
       files: {
         photo: {
-          path: 'dummy/path.jpg',
+          path: "dummy/path.jpg",
           size: 500000,
-          type: 'image/jpeg'
-        }
-      }
+          type: "image/jpeg",
+        },
+      },
     };
     const res = mockResponse();
 
@@ -173,27 +173,27 @@ describe("createProductController", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith({
-      error: 'Quantity must be more than zero'
+      error: "Quantity must be more than zero",
     });
   });
 
-  it('should reject large photo size', async () => {
+  it("should reject large photo size", async () => {
     const req = {
       fields: {
-        name: 'Test Product',
-        description: 'Test description',
+        name: "Test Product",
+        description: "Test description",
         price: 100,
-        category: 'Test Category',
+        category: "Test Category",
         quantity: 10,
-        shipping: true
+        shipping: true,
       },
       files: {
         photo: {
-          path: 'dummy/path.jpg',
-          size: 2000000, 
-          type: 'image/jpeg'
-        }
-      }
+          path: "dummy/path.jpg",
+          size: 2000000,
+          type: "image/jpeg",
+        },
+      },
     };
     const res = mockResponse();
 
@@ -201,7 +201,7 @@ describe("createProductController", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith({
-      error: 'Photo size must be less than 1MB.'
+      error: "Photo size must be less than 1MB.",
     });
   });
 });
