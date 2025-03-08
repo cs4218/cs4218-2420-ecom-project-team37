@@ -384,6 +384,13 @@ describe("updateProductController", () => {
     slugify.mockReturnValue("updated-product");
     fs.readFileSync.mockReturnValue("new dummy image data");
 
+    productModel.findById = jest.fn().mockResolvedValue({
+      _id: "123",
+      name: "Old Product Name",
+    });
+
+    productModel.findOne = jest.fn().mockResolvedValue(null);
+
     const fakeSave = jest.fn().mockResolvedValue(true);
     const productInstance = { photo: {}, save: fakeSave };
     productModel.findByIdAndUpdate = jest
