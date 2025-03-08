@@ -25,7 +25,7 @@ describe("Category Controller Tests", () => {
 
     describe("createCategoryController", () => {
         test("should return 400 if name is not provided", async () => {
-            req.body = {}; // No name provided
+            req.body = {}; 
             await createCategoryController(req, res);
             expect(res.status).toHaveBeenCalledWith(400);
             expect(res.send).toHaveBeenCalledWith({ message: "Name is required" });

@@ -22,7 +22,6 @@ jest.mock('react-hot-toast', () => ({
 }));
 jest.mock('../components/Layout', () => ({ children }) => <div data-testid="layout">{children}</div>);
 
-// Helper function to wait for all pending promises
 const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
 
 describe('CategoryProduct Component', () => {
@@ -61,7 +60,6 @@ describe('CategoryProduct Component', () => {
   });
 
   test('renders loading state initially', async () => {
-    // Even the initial render should be in act
     let component;
     await act(async () => {
       component = render(<CategoryProduct />);
@@ -72,7 +70,6 @@ describe('CategoryProduct Component', () => {
   });
 
   test('fetches and displays products', async () => {
-    // Create a resolvable promise to control when the API responds
     let resolveApiCall;
     const apiPromise = new Promise(resolve => {
       resolveApiCall = () => {
@@ -80,21 +77,18 @@ describe('CategoryProduct Component', () => {
       };
     });
     
-    // Mock axios.get to return our controlled promise
     axios.get.mockImplementation(() => apiPromise);
     
-    // First render the component
     await act(async () => {
       render(<CategoryProduct />);
     });
     
-    // Then resolve the API call inside act
     await act(async () => {
       resolveApiCall();
       await flushPromises();
     });
     
-    // Now check that UI was updated with the correct data
+    // Check that UI was updated with the correct data
     expect(screen.getByText(`Category - ${mockCategory.name}`)).toBeInTheDocument();
     expect(screen.getByText(`${mockProducts.length} result found`)).toBeInTheDocument();
     expect(screen.getByText(mockProducts[0].name)).toBeInTheDocument();
@@ -109,7 +103,6 @@ describe('CategoryProduct Component', () => {
   });
 
   test('navigates to product detail when "More Details" is clicked', async () => {
-    // Create a resolvable promise to control when the API responds
     let resolveApiCall;
     const apiPromise = new Promise(resolve => {
       resolveApiCall = () => {
@@ -117,21 +110,17 @@ describe('CategoryProduct Component', () => {
       };
     });
     
-    // Mock axios.get to return our controlled promise
     axios.get.mockImplementation(() => apiPromise);
     
-    // First render the component
     await act(async () => {
       render(<CategoryProduct />);
     });
     
-    // Then resolve the API call inside act
     await act(async () => {
       resolveApiCall();
       await flushPromises();
     });
     
-    // Now interact with the component
     await act(async () => {
       fireEvent.click(screen.getAllByText('More Details')[0]);
     });
@@ -140,11 +129,9 @@ describe('CategoryProduct Component', () => {
   });
 
   test('handles API error gracefully', async () => {
-    // Mock console.log to check error logging
     const originalConsoleLog = console.log;
     console.log = jest.fn();
     
-    // Create a rejectable promise to control when the API fails
     let rejectApiCall;
     const apiPromise = new Promise((resolve, reject) => {
       rejectApiCall = () => {
@@ -154,15 +141,12 @@ describe('CategoryProduct Component', () => {
       };
     });
     
-    // Mock axios.get to return our controlled promise
     axios.get.mockImplementation(() => apiPromise);
     
-    // First render the component
     await act(async () => {
       render(<CategoryProduct />);
     });
     
-    // Then reject the API call inside act
     await act(async () => {
       rejectApiCall();
       await flushPromises();
@@ -170,12 +154,10 @@ describe('CategoryProduct Component', () => {
     
     expect(console.log).toHaveBeenCalled();
     
-    // Restore console.log
     console.log = originalConsoleLog;
   });
 
   test('renders empty state when no products are returned', async () => {
-    // Create a resolvable promise to control when the API responds
     let resolveApiCall;
     const apiPromise = new Promise(resolve => {
       resolveApiCall = () => {
@@ -183,15 +165,12 @@ describe('CategoryProduct Component', () => {
       };
     });
     
-    // Mock axios.get to return our controlled promise
     axios.get.mockImplementation(() => apiPromise);
     
-    // First render the component
     await act(async () => {
       render(<CategoryProduct />);
     });
     
-    // Then resolve the API call inside act
     await act(async () => {
       resolveApiCall();
       await flushPromises();
@@ -200,7 +179,6 @@ describe('CategoryProduct Component', () => {
     expect(screen.getByText(`Category - ${mockCategory.name}`)).toBeInTheDocument();
     expect(screen.getByText('0 result found')).toBeInTheDocument();
     
-    // Verify no product cards are rendered
     expect(screen.queryByText(mockProducts[0].name)).not.toBeInTheDocument();
   });
 

@@ -3,7 +3,6 @@ import { render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CartProvider, useCart } from "./cart.js";
 
-// A dummy component that uses the custom hook
 const DummyComponent = () => {
   const [cart, setCart] = useCart();
   return (
@@ -16,7 +15,6 @@ const DummyComponent = () => {
 
 describe("CartProvider and useCart", () => {
   beforeEach(() => {
-    // Clear localStorage before each test to ensure isolation
     localStorage.clear();
   });
 
@@ -39,7 +37,6 @@ describe("CartProvider and useCart", () => {
       </CartProvider>
     );
 
-    // The effect should load the cart from localStorage
     expect(screen.getByTestId("cart-length").textContent).toBe(
       storedCart.length.toString()
     );
@@ -51,7 +48,6 @@ describe("CartProvider and useCart", () => {
         <DummyComponent />
       </CartProvider>
     );
-    // Since localStorage is empty, cart should be an empty array
     expect(screen.getByTestId("cart-length").textContent).toBe("0");
   });
 
@@ -62,15 +58,12 @@ describe("CartProvider and useCart", () => {
       </CartProvider>
     );
     const button = screen.getByRole("button", { name: /add item/i });
-    // Initially, the cart is empty
     expect(screen.getByTestId("cart-length").textContent).toBe("0");
     
-    // Wrap the click event in act
     await act(async () => {
       userEvent.click(button);
     });
     
-    // The cart length should update to 1
     expect(screen.getByTestId("cart-length").textContent).toBe("1");
   });
 });

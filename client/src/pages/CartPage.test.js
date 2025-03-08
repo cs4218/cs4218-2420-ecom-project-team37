@@ -7,7 +7,6 @@ import CartPage from './CartPage';
 import { CartProvider } from '../context/cart';
 import { AuthProvider } from '../context/auth';
 
-// Mock modules
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: jest.fn(),
@@ -36,7 +35,6 @@ jest.mock("braintree-web-drop-in-react", () => {
   };
 });
 
-// Mock localStorage
 const localStorageMock = (() => {
   let store = {};
   return {
@@ -54,7 +52,6 @@ const localStorageMock = (() => {
 })();
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
-// Mock contexts
 jest.mock('../context/cart', () => {
   const originalModule = jest.requireActual('../context/cart');
   return {
@@ -79,7 +76,6 @@ jest.mock('../context/search', () => {
   };
 });
 
-// Helper function to render the component with all required providers
 const renderWithProviders = (
   ui,
   { 
@@ -112,7 +108,6 @@ describe('CartPage Component', () => {
     localStorageMock.clear();
   });
 
-  // Basic Rendering Tests
   describe('Basic Rendering', () => {
     test('renders empty cart message when cart is empty', () => {
       renderWithProviders(<CartPage />);
@@ -147,7 +142,6 @@ describe('CartPage Component', () => {
       expect(screen.getByText(/Hello.*John Doe/)).toBeInTheDocument();
     });
 
-    // Tests for drop-in payment UI display conditions
     describe('Drop-in Payment UI and Payment Button Display', () => {
       test('does not display drop-in UI when user is not authenticated', () => {
         const mockCart = [
@@ -169,7 +163,6 @@ describe('CartPage Component', () => {
           token: 'fake-token'
         };
         
-        // Mock the clientToken being available
         axios.get.mockResolvedValue({ data: { clientToken: 'mock-token' } });
         
         renderWithProviders(<CartPage />, {
@@ -211,7 +204,6 @@ describe('CartPage Component', () => {
           { _id: '1', name: 'Product 1', price: 100, description: 'Description 1' }
         ];
         
-        // Mock the clientToken being available
         axios.get.mockResolvedValue({ data: { clientToken: 'mock-token' } });
         
         renderWithProviders(<CartPage />, {
@@ -219,7 +211,6 @@ describe('CartPage Component', () => {
           authValue: [mockAuth, jest.fn()]
         });
         
-        // Wait for clientToken to be set after the axios call
         await waitFor(() => {
           expect(screen.getByTestId('braintree-dropin')).toBeInTheDocument();
           expect(screen.getByText('Make Payment')).toBeInTheDocument();
@@ -228,7 +219,6 @@ describe('CartPage Component', () => {
     });
   });
 
-  // Total Price Function Tests
   describe('totalPrice Function', () => {
     test('calculates and displays total price correctly for multiple items', () => {
       const mockCart = [
@@ -336,12 +326,10 @@ describe('CartPage Component', () => {
         </BrowserRouter>
       );
       
-      // Verify the error handling returns the default value
       expect(screen.getByText('Total : $0.00')).toBeInTheDocument();
     });
   });
 
-  // Remove Cart Item Tests
   describe('removeCartItem Function', () => {
     test('removes item from cart when remove button is clicked', () => {
       const mockCart = [
@@ -403,13 +391,11 @@ describe('CartPage Component', () => {
       ];
       const setCartMock = jest.fn();
       
-      // Override localStorage.setItem to throw an error
       const originalSetItem = localStorageMock.setItem;
       localStorageMock.setItem = jest.fn().mockImplementationOnce(() => {
         throw new Error('localStorage is not available');
       });
       
-      // Spy on console.log to verify error was logged
       const consoleLogSpy = jest.spyOn(console, 'log');
       
       renderWithProviders(<CartPage />, {
@@ -417,25 +403,20 @@ describe('CartPage Component', () => {
       });
       
       const removeButtons = screen.getAllByText('Remove');
-      fireEvent.click(removeButtons[0]); // Remove first item
+      fireEvent.click(removeButtons[0]); 
       
-      // The expected cart after removal
-      const expectedCart = [mockCart[1]]; // Only second item remains
+      const expectedCart = [mockCart[1]]; 
       
-      // Verify the cart state was updated correctly despite localStorage error
       expect(setCartMock).toHaveBeenCalledWith(expectedCart);
       
-      // Verify localStorage.setItem was called and threw an error
       expect(localStorageMock.setItem).toHaveBeenCalled();
       expect(consoleLogSpy).toHaveBeenCalled();
       
-      // Restore the original implementations
       localStorageMock.setItem = originalSetItem;
       consoleLogSpy.mockRestore();
     });
   });
 
-  // Braintree Payment Tests
   describe('Payment Integration', () => {
     test('fetches client token when component mounts', async () => {
       axios.get.mockResolvedValueOnce({ data: { clientToken: 'fake-client-token' } });
@@ -530,7 +511,6 @@ describe('CartPage Component', () => {
     });
   });
 
-  // Navigation Tests
   describe('Navigation', () => {
     test('redirects to login page when checkout button is clicked without being logged in', async () => {
       const mockCart = [
@@ -543,14 +523,12 @@ describe('CartPage Component', () => {
       
       renderWithProviders(<CartPage />, {
         cartValue: [mockCart, jest.fn()],
-        authValue: [{ user: null }, jest.fn()] // User not logged in
+        authValue: [{ user: null }, jest.fn()] 
       });
       
-      // Find the login button and click it
       const loginButton = screen.getByText('Plase Login to checkout');
       fireEvent.click(loginButton);
       
-      // Verify navigation to login page with state
       expect(navigateMock).toHaveBeenCalledWith('/login', { state: '/cart' });
     });
 
@@ -580,7 +558,7 @@ describe('CartPage Component', () => {
       ];
       
       const mockAuth = {
-        user: { name: 'John Doe', address: '' }, // No address
+        user: { name: 'John Doe', address: '' }, 
         token: 'fake-token'
       };
       

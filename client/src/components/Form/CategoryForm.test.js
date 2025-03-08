@@ -35,7 +35,6 @@ describe("CategoryForm", () => {
   });
 
   it("calls handleSubmit when the form is submitted", () => {
-    // Create a mock function that prevents default behavior
     const handleSubmit = jest.fn((e) => e.preventDefault());
     const setValue = jest.fn();
     const value = "some category";
