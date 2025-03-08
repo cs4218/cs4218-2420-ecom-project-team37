@@ -82,7 +82,7 @@ export const categoryController = async (req, res) => {
     const category = await categoryModel.find({});
     res.status(200).send({
       success: true,
-      message: "All categories list",
+      message: "All Categories List",
       category,
     });
   } catch (error) {
@@ -101,7 +101,7 @@ export const singleCategoryController = async (req, res) => {
     const category = await categoryModel.findOne({ slug: req.params.slug });
     res.status(200).send({
       success: true,
-      message: "Get single category successfully",
+      message: "Get Single Category Successfully",
       category,
     });
   } catch (error) {
@@ -109,7 +109,7 @@ export const singleCategoryController = async (req, res) => {
     res.status(500).send({
       success: false,
       error,
-      message: "Error while getting single category",
+      message: "Error while getting Single Category",
     });
   }
 };
@@ -121,13 +121,13 @@ export const deleteCategoryController = async (req, res) => {
     await categoryModel.findByIdAndDelete(id);
     res.status(200).send({
       success: true,
-      message: "Category deleted successfully",
+      message: "Category Deleted Successfully",
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error while deleting category",
+      message: "error while deleting category",
       error,
     });
   }

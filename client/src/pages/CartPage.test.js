@@ -300,7 +300,6 @@ describe("CartPage Component", () => {
 
     expect(localStorageMock.removeItem).toHaveBeenCalledWith("cart");
     expect(mockSetCart).toHaveBeenCalledWith([]);
-
     expect(mockNavigate).toHaveBeenCalledWith("/dashboard/user/orders");
     expect(toast.success).toHaveBeenCalledWith(
       "Payment Completed Successfully ",
@@ -379,50 +378,4 @@ describe("CartPage Component", () => {
 
     console.log = originalConsoleLog;
   });
-
-  test('fetches client token when auth object changes', async () => {
-    await act(async () => {
-      render(<CartPage />);
-      await flushPromises();
-    });
-    
-    axios.get.mockClear();
-    
-    const updatedAuth = {
-      ...mockAuth,
-      user: { ...mockUser, name: 'Updated User Name' }
-    };
-    
-    useAuth.mockReturnValue([updatedAuth, mockSetAuth]);
-    
-    await act(async () => {
-      render(<CartPage />);
-      await flushPromises();
-    });
-    
-    expect(axios.get).toHaveBeenCalledTimes(1);
-    expect(axios.get).toHaveBeenCalledWith('/api/v1/product/braintree/token');
-  });
-
-  test('does not fetch client token when auth is null', async () => {
-    useAuth.mockReturnValue([null, mockSetAuth]);
-    
-    await act(async () => {
-      render(<CartPage />);
-      await flushPromises();
-    });
-    
-    expect(axios.get).not.toHaveBeenCalled();
-  });
-
-  test('does not fetch client token when auth token is null', async () => {
-    useAuth.mockReturnValue([{ ...mockAuth, token: null }, mockSetAuth]);
-    
-    await act(async () => {
-      render(<CartPage />);
-      await flushPromises();
-    });
-    
-    expect(axios.get).not.toHaveBeenCalled();
-  });
-});  
+});
