@@ -33,6 +33,9 @@ const Products = () => {
         <div className="col-md-9">
           <h1 className="text-center">All Products List</h1>
           <div className="d-flex flex-wrap gap-3">
+            {products?.length === 0 && (
+              <p className="text-center w-100">No products found</p>
+            )}
             {products?.map((p) => (
               <Link
                 key={p._id}
