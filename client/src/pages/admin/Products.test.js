@@ -43,10 +43,10 @@ describe("Products Component", () => {
         products: [
           {
             _id: "pid_123",
-            name: "Novel", 
+            name: "Novel",
             slug: "novel-slug",
             description: "A bestselling novel",
-            price: 14.99
+            price: 14.99,
           },
         ],
       },
@@ -64,13 +64,12 @@ describe("Products Component", () => {
 
     const productLink = await screen.findByRole("link", { name: /Novel/i });
     expect(productLink).toBeInTheDocument();
-    
+
     expect(productLink).toHaveAttribute(
       "href",
       "/dashboard/admin/product/novel-slug",
     );
     expect(await screen.findByText("A bestselling novel")).toBeInTheDocument();
-
   });
 
   it("should display an error message", async () => {
