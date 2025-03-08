@@ -378,4 +378,5 @@ describe("CartPage Component", () => {
 
     console.log = originalConsoleLog;
   });
-});
+});  
+
