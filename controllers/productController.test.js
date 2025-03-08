@@ -8,9 +8,13 @@ import {
   deleteProductController,
   productCountController,
   searchProductController,
-  productListController
+  productListController,
+  productCategoryController,
+  realtedProductController
 } from "../controllers/productController.js";
+import mongoose from "mongoose";
 import productModel from "../models/productModel.js";
+import categoryModel from "../models/categoryModel.js";
 import orderModel from "../models/orderModel";
 import fs from "fs";
 import slugify from "slugify";
@@ -42,6 +46,7 @@ jest.mock("braintree", () => {
   };
 });
 jest.mock("../models/productModel.js");
+jest.mock("../models/categoryModel.js");
 jest.mock("../models/orderModel");
 jest.mock("slugify", () => jest.fn());
 jest.mock("fs", () => ({
@@ -683,7 +688,7 @@ describe("searchProductController", () => {
       },
     };
     const res = mockResponse();
-    
+
     // Mock the find method to return an empty array
     const findMock = jest.fn().mockImplementation((query) => {
       // Simulate MongoDB's $regex and $options: "i" functionality
@@ -748,6 +753,103 @@ describe("searchProductController", () => {
   });
 });
 
+describe("realtedProductController", () => {
+  it("should retrieve all related products successfully", async () => {
+    const pid = new mongoose.Types.ObjectId().toHexString(); // Mock product ID
+    const cid = new mongoose.Types.ObjectId().toHexString(); // Mock category ID as ObjectId
+    const pidtest1 = new mongoose.Types.ObjectId().toHexString();
+    const pidtest2 = new mongoose.Types.ObjectId().toHexString();
+
+    const req = { params: { pid, cid }};
+    const res = mockResponse();
+
+    const mockProducts = [
+      {
+        _id: pidtest1,
+        name: "Test Novel",
+        slug: "slug",
+        description: "Test description",
+        price: 100,
+        category: {
+          _id: cid,
+          name: "name",
+          slug: "slug"
+        },
+        quantity: 10,
+        shipping: true,
+        
+      }, 
+      {
+        _id: pidtest2,
+        name: "Test Novel",
+        slug: "slug",
+        description: "Test description",
+        price: 100,
+        category: {
+          _id: new mongoose.Types.ObjectId().toHexString(),
+          name: "name",
+          slug: "slug"
+        },
+        quantity: 10,
+        shipping: true,
+        
+      }
+    ];
+    const findMock = jest.fn().mockReturnThis();  // This will return 'this' so that we can chain methods
+    const selectMock = jest.fn().mockReturnThis();
+    const limitMock = jest.fn().mockReturnThis();
+    const populateMock = jest.fn().mockResolvedValue(
+      mockProducts.filter((product) => product.category._id === cid)
+    );
+    
+    
+    // Mock the model's find method to return an object with all the chainable methods
+    productModel.find = findMock.mockReturnValue({
+      select: selectMock,
+      limit: limitMock,
+      populate: populateMock
+    });
+
+    await realtedProductController(req, res);
+
+    expect(findMock).toHaveBeenCalledWith({
+      category: cid,
+      _id: { $ne: pid}
+    });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({
+      success: true,
+      products: [mockProducts[0]],
+    });
+  });
+
+  it("should return 500 if an error occurs during retrieval of related products", async () => {
+    const req = { params: { pid: "123", cid: "Novel" }};
+    const res = mockResponse();
+
+    // Mock findOne to throw an error
+    const findMock = jest.fn().mockImplementation(() => {
+      throw new Error("Database Error");
+    });
+
+    productModel.find = findMock;
+
+    await realtedProductController(req, res);
+
+    expect(findMock).toHaveBeenCalledWith({
+      category: "Novel",
+      _id: { $ne: "123"}
+    });
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith({
+      success: false,
+      message: "error while geting related product",
+      error: expect.any(Error)
+    });
+  });
+  
+});
+
 describe("productCountController", () => {
   it("Returns the current count of products", async () => {
     
@@ -777,6 +879,82 @@ describe("productCountController", () => {
 
   
 });
+
+describe("productCategoryController", () => {
+  it("should return products for the given category", async () => {
+    const req = {params: {slug: "electronics"}};
+    const res = mockResponse();
+    
+    const mockCategory = [
+      {
+        name: "electronics",
+        slug: "electronics"
+      }
+    ];
+    const mockProducts = [
+      {
+        name: "Test electronic",
+        description: "Test description",
+        price: 150,
+        category: "electronics",
+        quantity: 10,
+        shipping: true,
+      },
+      {
+        name: "Test book",
+        description: "Test description",
+        price: 150,
+        category: "book",
+        quantity: 10,
+        shipping: true,
+      }
+    ];
+
+    categoryModel.findOne.mockResolvedValue(mockCategory);
+
+    const findMock = jest.fn().mockReturnThis();
+    const populateMock = jest.fn().mockResolvedValue(
+      mockProducts.filter((product) => product.category === "electronics")
+    );
+
+    productModel.find = findMock.mockReturnValue({
+      populate: populateMock
+    });
+
+    await productCategoryController(req, res);
+
+    expect(categoryModel.findOne).toHaveBeenCalledWith({ slug: "electronics" });
+    expect(findMock).toHaveBeenCalledWith({ category: mockCategory });
+    //expect(populateMock).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({
+      success: true,
+      category: mockCategory,
+      products: [mockProducts[0]],
+    });
+  });
+
+  it("should return 400 if an error occurs", async () => {
+    const req = {params: {slug: "electronics"}};
+    const res = mockResponse();
+    
+    const findOneMock = jest.fn().mockImplementation(() => {
+      throw new Error("Database Error");
+    });
+
+    categoryModel.findOne = findOneMock;
+    await productCategoryController(req, res);
+
+    expect(categoryModel.findOne).toHaveBeenCalledWith({ slug: "electronics" });
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith({
+      success: false,
+      error: expect.any(Error),
+      message: "Error While Getting products",
+    });
+  });
+});
+
 
 describe("brainTreeTokenController unit tests", () => {
   let req, res;
