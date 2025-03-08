@@ -54,7 +54,7 @@ describe("Login Component", () => {
         <Routes>
           <Route path="/login" element={<Login />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(getByText("LOGIN FORM")).toBeInTheDocument();
@@ -67,7 +67,7 @@ describe("Login Component", () => {
         <Routes>
           <Route path="/login" element={<Login />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(getByText("LOGIN FORM")).toBeInTheDocument();
@@ -81,7 +81,7 @@ describe("Login Component", () => {
         <Routes>
           <Route path="/login" element={<Login />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     fireEvent.change(getByPlaceholderText("Enter Your Email"), {
       target: { value: "test@example.com" },
@@ -90,10 +90,10 @@ describe("Login Component", () => {
       target: { value: "password123" },
     });
     expect(getByPlaceholderText("Enter Your Email").value).toBe(
-      "test@example.com"
+      "test@example.com",
     );
     expect(getByPlaceholderText("Enter Your Password").value).toBe(
-      "password123"
+      "password123",
     );
   });
 
@@ -111,7 +111,7 @@ describe("Login Component", () => {
         <Routes>
           <Route path="/login" element={<Login />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     fireEvent.change(getByPlaceholderText("Enter Your Email"), {
@@ -141,7 +141,7 @@ describe("Login Component", () => {
         <Routes>
           <Route path="/login" element={<Login />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     fireEvent.change(getByPlaceholderText("Enter Your Email"), {
@@ -169,7 +169,7 @@ describe("Login Component", () => {
         <Routes>
           <Route path="/login" element={<Login />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     fireEvent.change(getByPlaceholderText("Enter Your Email"), {
@@ -195,7 +195,7 @@ describe("Login Component", () => {
             element={<div>Forgot Password Page</div>}
           />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     fireEvent.click(getByText("Forgot Password"));
@@ -204,5 +204,4 @@ describe("Login Component", () => {
       expect(getByText("Forgot Password Page")).toBeInTheDocument();
     });
   });
-
 });

@@ -180,13 +180,13 @@ export const updateProfileController = async (req, res) => {
       return res.status(400).send({
         success: false,
         message: "No fields to update",
-      })
+      });
     }
     //password
     if (password && password.length < 6) {
       return res.status(400).send({
         success: false,
-        message: "Password is required and at least 6 characters long"  
+        message: "Password is required and at least 6 characters long",
       });
     }
 
@@ -195,7 +195,7 @@ export const updateProfileController = async (req, res) => {
       return res.status(404).send({
         success: false,
         message: "User not found",
-      })
+      });
     }
 
     const hashedPassword = password ? await hashPassword(password) : undefined;
@@ -207,7 +207,7 @@ export const updateProfileController = async (req, res) => {
         phone: phone || user.phone,
         address: address || user.address,
       },
-      { new: true }
+      { new: true },
     );
     res.status(200).send({
       success: true,
@@ -249,7 +249,7 @@ export const getAllOrdersController = async (req, res) => {
       .find({})
       .populate("products", "-photo")
       .populate("buyer", "name")
-      .sort({ createdAt: "-1" });
+      .sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
     console.log(error);
@@ -269,7 +269,7 @@ export const orderStatusController = async (req, res) => {
     const orders = await orderModel.findByIdAndUpdate(
       orderId,
       { status },
-      { new: true }
+      { new: true },
     );
     res.json(orders);
   } catch (error) {

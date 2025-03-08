@@ -17,8 +17,8 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      default: "Not Process",
-      enum: ["Not Process", "Processing", "Shipped", "deliverd", "cancel"], // Linked with AdminOrders.js 
+      default: "Not Processed",
+      enum: ["Not Processed", "Processing", "Shipped", "Delivered", "Cancelled"], // Linked with AdminOrders.js 
     },
   },
   { timestamps: true }

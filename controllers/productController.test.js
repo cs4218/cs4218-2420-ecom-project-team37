@@ -68,7 +68,7 @@ beforeEach(() => {
 });
 
 describe("createProductController", () => {
-  it("Create a product successfully", async () => {
+  it("should create a product successfully", async () => {
     const req = {
       fields: {
         name: "Test Product",
@@ -113,7 +113,7 @@ describe("createProductController", () => {
     });
   });
 
-  it("Return error when fields are missing", async () => {
+  it("should return error when fields are missing", async () => {
     const req = {
       fields: {
         // Missing name
@@ -131,6 +131,90 @@ describe("createProductController", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith({ error: "Name is required" });
+  });
+
+  it('should reject negative price', async () => {
+    const req = {
+      fields: {
+        name: 'Test Product',
+        description: 'Test description',
+        price: -100,  
+        category: 'Test Category',
+        quantity: 10,
+        shipping: true
+      },
+      files: {
+        photo: {
+          path: 'dummy/path.jpg',
+          size: 500000,
+          type: 'image/jpeg'
+        }
+      }
+    };
+    const res = mockResponse();
+
+    await createProductController(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith({
+      error: 'Price must be positive'
+    });
+  });
+
+  it('should reject negative quantity', async () => {
+    const req = {
+      fields: {
+        name: 'Test Product',
+        description: 'Test description',
+        price: 100,
+        category: 'Test Category',
+        quantity: -10, 
+        shipping: true
+      },
+      files: {
+        photo: {
+          path: 'dummy/path.jpg',
+          size: 500000,
+          type: 'image/jpeg'
+        }
+      }
+    };
+    const res = mockResponse();
+
+    await createProductController(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith({
+      error: 'Quantity must be more than zero'
+    });
+  });
+
+  it('should reject large photo size', async () => {
+    const req = {
+      fields: {
+        name: 'Test Product',
+        description: 'Test description',
+        price: 100,
+        category: 'Test Category',
+        quantity: 10,
+        shipping: true
+      },
+      files: {
+        photo: {
+          path: 'dummy/path.jpg',
+          size: 2000000, 
+          type: 'image/jpeg'
+        }
+      }
+    };
+    const res = mockResponse();
+
+    await createProductController(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith({
+      error: 'Photo size must be less than 1MB.'
+    });
   });
 });
 
@@ -314,7 +398,7 @@ describe("updateProductController", () => {
     expect(productModel.findByIdAndUpdate).toHaveBeenCalledWith(
       req.params.pid,
       { ...req.fields, slug: "updated-product" },
-      { new: true }
+      { new: true },
     );
     expect(fs.readFileSync).toHaveBeenCalledWith(req.files.photo.path);
     expect(fakeSave).toHaveBeenCalled();
@@ -1061,7 +1145,7 @@ describe("brainTreePaymentController unit tests", () => {
     mockGateway.transaction.sale.mockImplementation(
       (transactionDetails, callback) => {
         callback(null, mockResult);
-      }
+      },
     );
     orderModel.prototype.save = jest.fn();
 
@@ -1075,7 +1159,7 @@ describe("brainTreePaymentController unit tests", () => {
           submitForSettlement: true,
         },
       },
-      expect.any(Function)
+      expect.any(Function),
     );
     expect(orderModel).toHaveBeenCalledWith({
       products: req.body.cart,
@@ -1093,7 +1177,7 @@ describe("brainTreePaymentController unit tests", () => {
     mockGateway.transaction.sale.mockImplementation(
       (transactionDetails, callback) => {
         callback(mockError, null);
-      }
+      },
     );
 
     await brainTreePaymentController(req, res);
@@ -1120,7 +1204,7 @@ describe("brainTreePaymentController unit tests", () => {
     mockGateway.transaction.sale.mockImplementation(
       (transactionDetails, callback) => {
         mockCallBack(null, mockResult);
-      }
+      },
     );
 
     await brainTreePaymentController(req, res);

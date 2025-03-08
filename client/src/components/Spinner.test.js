@@ -26,11 +26,11 @@ describe("Spinner Component", () => {
     render(
       <MemoryRouter>
         <Spinner path="login" />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(
-      screen.getByText(/redirecting to you in 3 second/i)
+      screen.getByText(/redirecting to you in 3 second/i),
     ).toBeInTheDocument();
   });
 
@@ -38,25 +38,25 @@ describe("Spinner Component", () => {
     render(
       <MemoryRouter>
         <Spinner path="login" />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(
-      screen.getByText(/redirecting to you in 3 second/i)
+      screen.getByText(/redirecting to you in 3 second/i),
     ).toBeInTheDocument();
 
     await act(async () => {
       jest.advanceTimersByTime(1000);
     });
     expect(
-      screen.getByText(/redirecting to you in 2 second/i)
+      screen.getByText(/redirecting to you in 2 second/i),
     ).toBeInTheDocument();
 
     await act(async () => {
       jest.advanceTimersByTime(1000);
     });
     expect(
-      screen.getByText(/redirecting to you in 1 second/i)
+      screen.getByText(/redirecting to you in 1 second/i),
     ).toBeInTheDocument();
   });
 
@@ -67,11 +67,11 @@ describe("Spinner Component", () => {
           <Route path="/" element={<Spinner path="login" />} />
           <Route path="/login" element={<div>Login Page</div>} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(
-      screen.getByText(/redirecting to you in 3 second/i)
+      screen.getByText(/redirecting to you in 3 second/i),
     ).toBeInTheDocument();
 
     await act(async () => {
