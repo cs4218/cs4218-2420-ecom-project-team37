@@ -34,7 +34,7 @@ describe("SearchInput Component", () => {
     render(
       <MemoryRouter>
         <SearchInput />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const searchInput = screen.getByPlaceholderText("Search");
@@ -63,7 +63,7 @@ describe("SearchInput Component", () => {
     render(
       <MemoryRouter>
         <SearchInput />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const searchInput = screen.getByPlaceholderText("Search");
@@ -99,7 +99,7 @@ describe("SearchInput Component", () => {
     render(
       <MemoryRouter>
         <SearchInput />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const searchInput = screen.getByPlaceholderText("Search");
@@ -112,7 +112,7 @@ describe("SearchInput Component", () => {
       expect(axios.get).toHaveBeenCalledWith("/api/v1/product/search/Book");
 
       expect(setValuesMock).not.toHaveBeenCalledWith(
-        expect.objectContaining({ results: expect.any(Array) })
+        expect.objectContaining({ results: expect.any(Array) }),
       );
 
       expect(consoleLogMock).toHaveBeenCalledWith(expect.any(Error));

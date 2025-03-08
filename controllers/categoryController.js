@@ -40,7 +40,7 @@ export const updateCategoryController = async (req, res) => {
     const category = await categoryModel.findByIdAndUpdate(
       id,
       { name, slug: slugify(name) },
-      { new: true }
+      { new: true },
     );
     res.status(200).send({
       success: true,
@@ -113,4 +113,3 @@ export const deleteCategoryController = async (req, res) => {
     });
   }
 };
-
