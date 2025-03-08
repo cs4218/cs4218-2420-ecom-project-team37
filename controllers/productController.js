@@ -50,6 +50,18 @@ export const createProductController = async (req, res) => {
           .status(400)
           .send({ error: "Photo size must be less than 1MB." });
     }
+    const slug = slugify(name);
+    const existingProduct = await productModel.findOne({
+      $or: [{ name: { $regex: new RegExp(`^${name}$`, "i") } }, { slug: slug }],
+    });
+    if (existingProduct) {
+      return res
+        .status(409)
+        .send({
+          success: false,
+          message: "Product with this name already exists",
+        });
+    }
 
     const products = new productModel({ ...req.fields, slug: slugify(name) });
     if (photo) {
@@ -165,6 +177,7 @@ export const updateProductController = async (req, res) => {
     const { name, description, price, category, quantity, shipping } =
       req.fields;
     const { photo } = req.files || {};
+    const pid = req.params.pid;
     // Validation
     switch (true) {
       case !name:
@@ -184,7 +197,25 @@ export const updateProductController = async (req, res) => {
           .status(400)
           .send({ error: "Photo is required and should be less than 1MB" });
     }
+    // Check if another product with the same name exists
+    const slug = slugify(name);
+    const productExists = await productModel.findById(pid);
+    if (!productExists) {
+      return res.status(404).send({ error: "Product not found" });
+    }
 
+    const existingProduct = await productModel.findOne({
+      $or: [{ name: { $regex: new RegExp(`^${name}$`, "i") } }, { slug: slug }],
+      _id: { $ne: req.params.pid },
+    });
+    if (existingProduct) {
+      return res
+        .status(409)
+        .send({
+          success: false,
+          message: "Another product with this name already exists",
+        });
+    }
     const product = await productModel.findByIdAndUpdate(
       req.params.pid,
       { ...req.fields, slug: slugify(name) },
