@@ -19,20 +19,19 @@ const CartPage = () => {
 
   //total price
   const totalPrice = () => {
-    try {
-      let total = 0;
-      cart?.map((item) => {
-        total = total + item.price;
-      });
-      return total.toLocaleString("en-US", {
-        style: "currency",
-        currency: "USD",
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    let total = 0;
+    cart?.forEach((item) => {
+      // Handle missing or invalid prices
+      const price = parseFloat(item.price) || 0;
+      total = total + Math.abs(price); // Use Math.abs to handle negative prices
+    });
+    return total.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
   };
-  //detele item
+  
+  //delete item
   const removeCartItem = (pid) => {
     try {
       let myCart = [...cart];
@@ -54,6 +53,7 @@ const CartPage = () => {
       console.log(error);
     }
   };
+  
   useEffect(() => {
     getToken();
   }, [auth?.token]);
@@ -162,7 +162,7 @@ const CartPage = () => {
                         })
                       }
                     >
-                      Plase Login to checkout
+                      Please Login to checkout
                     </button>
                   )}
                 </div>

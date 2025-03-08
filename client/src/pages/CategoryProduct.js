@@ -3,25 +3,27 @@ import Layout from "../components/Layout";
 import { useParams, useNavigate } from "react-router-dom";
 import "../styles/CategoryProductStyles.css";
 import axios from "axios";
+
 const CategoryProduct = () => {
   const params = useParams();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
-  const [category, setCategory] = useState([]);
+  const [category, setCategory] = useState({});
 
   useEffect(() => {
-    if (params?.slug) getPrductsByCat();
+    if (params?.slug) getProductsByCategory();
   }, [params?.slug]);
-  const getPrductsByCat = async () => {
+
+  const getProductsByCategory = async () => {
     try {
-      const { data } = await axios.get(
-        `/api/v1/product/product-category/${params.slug}`,
+      const response = await axios.get(
+        `/api/v1/product/product-category/${params.slug}`
       );
-      setProducts(data?.products);
-      setCategory(data?.category);
+      setProducts(response?.data?.products || []);
+      setCategory(response?.data?.category || {});
     } catch (error) {
       console.log(error);
-    }
+    } 
   };
 
   return (
@@ -67,7 +69,7 @@ const CategoryProduct = () => {
                         "cart",
                         JSON.stringify([...cart, p])
                       );
-                      toast.success("Item Added to cart");
+                      toast.success("Item Added to cart");  
                     }}
                   >
                     ADD TO CART
