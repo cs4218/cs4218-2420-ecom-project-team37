@@ -1,6 +1,5 @@
 # E-commerce website
-CI link example for Milestone 1: 
-https://github.com/cs4218/cs4218-2420-ecom-project-team37/actions/runs/13746921697/job/38442985014
+CI link example for Milestone 1: https://github.com/cs4218/cs4218-2420-ecom-project-team37/actions/runs/13746921697/job/38442985014
 
 ## Instructions
 
