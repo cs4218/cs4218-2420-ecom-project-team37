@@ -2,11 +2,7 @@
 import React from "react";
 import { render, fireEvent, waitFor, screen } from "@testing-library/react";
 import axios from "axios";
-import {
-  MemoryRouter,
-  Route,
-  Routes,
-} from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import "@testing-library/jest-dom/extend-expect";
 import toast from "react-hot-toast";
 import UpdateProduct from "./UpdateProduct";
@@ -34,9 +30,9 @@ jest.mock("../../components/Header", () => () => (
 describe("Update Product Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    global.URL.createObjectURL = jest.fn(() => "blob:mocked-url");
   });
 
-  // Mock the single product response
   const mockProduct = {
     data: {
       success: true,
@@ -433,7 +429,6 @@ describe("Update Product Component", () => {
       );
     });
 
-    // Ensure the product inputs are still populated correctly
     await waitFor(() => {
       expect(screen.getByPlaceholderText(/write a name/i).value).toBe(
         mockProduct.data.product.name,
@@ -567,4 +562,297 @@ describe("Update Product Component", () => {
     expect(screen.getByPlaceholderText(/write a price/i).value).toBe("99");
     expect(screen.getByPlaceholderText(/write a quantity/i).value).toBe("5");
   });
+  it("should show error when required fields are missing", async () => {
+    setupMocks();
+
+    render(
+      <MemoryRouter initialEntries={["/dashboard/admin/update-product/pid_1"]}>
+        <Routes>
+          <Route
+            path="/dashboard/admin/update-product/:slug"
+            element={<UpdateProduct />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+    fireEvent.change(screen.getByPlaceholderText(/write a name/i), {
+      target: { value: "" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/write a description/i), {
+      target: { value: "" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/write a price/i), {
+      target: { value: "" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/write a quantity/i), {
+      target: { value: "" },
+    });
+
+    fireEvent.click(screen.getByText("UPDATE PRODUCT"));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith("All fields are required"),
+    );
+  });
+  test("should fail to update product when photo size exceeds 1MB", async () => {
+    setupMocks();
+
+    await act(async () => {
+      render(
+        <MemoryRouter
+          initialEntries={["/dashboard/admin/update-product/pid_1"]}
+        >
+          <Routes>
+            <Route
+              path="/dashboard/admin/update-product/:slug"
+              element={<UpdateProduct />}
+            />
+          </Routes>
+        </MemoryRouter>,
+      );
+    });
+
+    await waitFor(() => {
+      expect(axios.get).toHaveBeenCalledWith("/api/v1/category/get-category");
+    });
+    await waitFor(() => {
+      expect(axios.get).toHaveBeenCalledWith(
+        "/api/v1/product/get-product/pid_1",
+      );
+    });
+
+    await waitFor(() => {
+      expect(screen.getAllByRole("combobox").length).toBeGreaterThan(0);
+    });
+
+    const dropdowns = screen.getAllByRole("combobox");
+    const categoryDropdown = dropdowns[0];
+    fireEvent.mouseDown(categoryDropdown);
+
+    const categoryOptions = screen.getAllByText(/Electronics/i);
+    fireEvent.click(categoryOptions[categoryOptions.length - 1]);
+
+    fireEvent.change(screen.getByPlaceholderText(/Write a Name/i), {
+      target: { value: "Updated Laptop" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Description/i), {
+      target: { value: "An even more powerful laptop" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Price/i), {
+      target: { value: "1599.99" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Write a Quantity/i), {
+      target: { value: "15" },
+    });
+
+    const shippingDropdown = dropdowns[1];
+    fireEvent.mouseDown(shippingDropdown);
+
+    const shippingOption = await screen.findByText("Yes", {
+      selector: ".ant-select-item-option-content",
+    });
+    fireEvent.click(shippingOption);
+
+    const largeFile = new File(["a".repeat(1.5 * 1024 * 1024)], "large.jpg", {
+      type: "image/jpeg",
+    });
+
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText(/upload photo/i), {
+        target: { files: [largeFile] },
+      });
+    });
+
+    fireEvent.click(screen.getByText("UPDATE PRODUCT"));
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        "Photo size must be less than 1MB.",
+      );
+    });
+
+    global.URL.createObjectURL.mockRestore();
+  });
+
+  test("should update a category state", async () => {
+    axios.get.mockImplementation((url) => {
+      if (url.includes("/api/v1/category/get-category")) {
+        return Promise.resolve({
+          data: {
+            success: true,
+            category: [
+              { _id: "categoryID1", name: "Electronics" },
+              { _id: "categoryID2", name: "Furniture" },
+            ],
+          },
+        });
+      }
+      if (url.includes("/api/v1/product/get-product/pid_1")) {
+        return Promise.resolve({
+          data: {
+            success: true,
+            product: {
+              _id: "pid_1",
+              name: "Old Laptop",
+              description: "A powerful laptop",
+              price: 1499.99,
+              quantity: 10,
+              category: { _id: "categoryID1" },
+              shipping: true,
+            },
+          },
+        });
+      }
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/dashboard/admin/update-product/pid_1"]}>
+        <Routes>
+          <Route
+            path="/dashboard/admin/update-product/:slug"
+            element={<UpdateProduct />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(axios.get).toHaveBeenCalledWith("/api/v1/category/get-category");
+    });
+    await waitFor(() => {
+      expect(axios.get).toHaveBeenCalledWith(
+        "/api/v1/product/get-product/pid_1",
+      );
+    });
+
+    const dropdowns = screen.getAllByRole("combobox");
+    const categoryDropdown = dropdowns[0]; 
+    fireEvent.mouseDown(categoryDropdown);
+
+    const categoryOption = await screen.findByText("Furniture", {
+      selector: ".ant-select-item-option-content",
+    });
+    fireEvent.click(categoryOption);
+    await waitFor(() => {
+      const selectedCategory = screen.getByText("Furniture", {
+        selector: ".ant-select-selection-item",
+      });
+      expect(selectedCategory).toBeInTheDocument();
+    });
+  });
+
+  test("should update a shipping state", async () => {
+    axios.get.mockImplementation((url) => {
+      if (url.includes("/api/v1/category/get-category")) {
+        return Promise.resolve({
+          data: {
+            success: true,
+            category: [
+              { _id: "categoryID1", name: "Electronics" },
+              { _id: "categoryID2", name: "Furniture" },
+            ],
+          },
+        });
+      }
+      if (url.includes("/api/v1/product/get-product/pid_1")) {
+        return Promise.resolve({
+          data: {
+            success: true,
+            product: {
+              _id: "pid_1",
+              name: "Old Laptop",
+              description: "A powerful laptop",
+              price: 1499.99,
+              quantity: 10,
+              category: { _id: "categoryID1" },
+              shipping: false, 
+            },
+          },
+        });
+      }
+    });
+  
+    render(
+      <MemoryRouter initialEntries={["/dashboard/admin/update-product/pid_1"]}>
+        <Routes>
+          <Route path="/dashboard/admin/update-product/:slug" element={<UpdateProduct />} />
+        </Routes>
+      </MemoryRouter>
+    );
+  
+    await waitFor(() => {
+      expect(axios.get).toHaveBeenCalledWith("/api/v1/category/get-category");
+    });
+    await waitFor(() => {
+      expect(axios.get).toHaveBeenCalledWith("/api/v1/product/get-product/pid_1");
+    });
+  
+    const dropdowns = screen.getAllByRole("combobox");
+    const shippingDropdown = dropdowns[1]; 
+    fireEvent.mouseDown(shippingDropdown);
+  
+    const shippingOption = await screen.findByText("Yes", {
+      selector: ".ant-select-item-option-content",
+    });
+    fireEvent.click(shippingOption);
+  
+    await waitFor(() => {
+      const selectedShipping = screen.getByText("Yes", {
+        selector: ".ant-select-selection-item",
+      });
+      expect(selectedShipping).toBeInTheDocument();
+    });
+  });
+  
+  test("Handles update failure correctly", async () => {
+    axios.put.mockResolvedValue({
+      data: {
+        success: false,
+        message: "Failed to update product",
+      },
+    });
+  
+    render(
+      <MemoryRouter initialEntries={["/dashboard/admin/update-product/pid_1"]}>
+        <Routes>
+          <Route path="/dashboard/admin/update-product/:slug" element={<UpdateProduct />} />
+        </Routes>
+      </MemoryRouter>
+    );
+  
+    await waitFor(() => {
+      expect(axios.get).toHaveBeenCalledWith("/api/v1/category/get-category");
+    });
+    await waitFor(() => {
+      expect(axios.get).toHaveBeenCalledWith("/api/v1/product/get-product/pid_1");
+    });
+  
+    fireEvent.change(screen.getByPlaceholderText("Write a Name"), {
+      target: { value: "Updated Laptop" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Write a Description"), {
+      target: { value: "Updated description" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Write a Price"), {
+      target: { value: "1299.99" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Write a Quantity"), {
+      target: { value: "5" },
+    });
+  
+    fireEvent.click(screen.getByText("UPDATE PRODUCT"));
+  
+    await waitFor(() => {
+      expect(axios.put).toHaveBeenCalledWith(
+        "/api/v1/product/update-product/pid_1",
+        expect.any(FormData)
+      );
+    });
+  
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith("Failed to update product");
+    });
+  });
+  
+  
 });

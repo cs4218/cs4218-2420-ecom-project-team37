@@ -22,7 +22,6 @@ jest.mock("../../context/search", () => ({
 }));
 jest.mock("../../hooks/useCategory", () => jest.fn(() => []));
 
-
 describe("Products Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
