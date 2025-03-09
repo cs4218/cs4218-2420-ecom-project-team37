@@ -899,7 +899,7 @@ describe("realtedProductController", () => {
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({
       success: true,
-      products: [mockProducts[0]],
+      products: [mockProducts[0]], //only returns the first one since the function should ideally return products with same category
     });
   });
 
@@ -946,7 +946,7 @@ describe("productCountController", () => {
 
     await productCountController(req, res);
     expect(findMock).toHaveBeenCalledWith({});
-    expect(res.status).toHaveBeenCalledWith(200); // Verify the status code
+    expect(res.status).toHaveBeenCalledWith(200); 
     expect(res.send).toHaveBeenCalledWith({
       success: true,
       total: mockValue, // Verify the total count
@@ -1001,12 +1001,12 @@ describe("productCategoryController", () => {
 
     expect(categoryModel.findOne).toHaveBeenCalledWith({ slug: "electronics" });
     expect(findMock).toHaveBeenCalledWith({ category: mockCategory });
-    //expect(populateMock).toHaveBeenCalled();
+
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({
       success: true,
       category: mockCategory,
-      products: [mockProducts[0]],
+      products: [mockProducts[0]], //only returns first product since 2nd one doesnt match category name
     });
   });
 
