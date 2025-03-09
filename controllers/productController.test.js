@@ -57,9 +57,10 @@ jest.spyOn(console, "log").mockImplementation(() => {});
 
 const mockResponse = () => {
   const res = {};
-  res.status = jest.fn().mockReturnValue(res);
+  res.status = jest.fn().mockReturnThis();
   res.send = jest.fn().mockReturnValue(res);
   res.json = jest.fn().mockReturnValue(res);
+  res.set = jest.fn();
   return res;
 };
 
@@ -501,31 +502,24 @@ describe("productPhotoController", () => {
     const req = { params: { pid: "12345" } };
     const res = mockResponse();
 
-    const mockProduct = [
-      {
-        fields: {
-          name: "Test Product",
-          description: "Test description",
-          price: 100,
-          category: "Test Category",
-          quantity: 10,
-          shipping: true,
-          photo: {
-            data: Buffer.from("mock-image-data"),
-            contentType: "image/jpeg",
-          },
-        },
+    // Select photo details only
+    const mockProduct = {
+      photo: {
+        data: Buffer.from("mock-image-data"),
+        contentType: "image/jpeg",
       },
-    ];
+    };
 
     // Mock findById method to return mockProduct
-    const findByIdMock = jest.fn().mockResolvedValue(mockProduct);
+    const findByIdMock = jest.fn().mockReturnValue({
+      select: jest.fn().mockResolvedValue(mockProduct)
+    });
     productModel.findById = findByIdMock;
 
     await productPhotoController(req, res);
 
     expect(findByIdMock).toHaveBeenCalledWith("12345");
-    //expect(res.set).toHaveBeenCalledWith("Content-type", "image/jpeg");
+    expect(res.set).toHaveBeenCalledWith("Content-type", "image/jpeg");
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith(mockProduct.photo.data);
   });
@@ -534,8 +528,10 @@ describe("productPhotoController", () => {
 describe("productFiltersController", () => {
   it("should filter products successfully", async () => {
     const req = {
-      checked: [],
-      radio: [100, 200],
+      body: {
+        checked: [],
+        radio: [100, 200],
+      }
     };
     const res = mockResponse();
 
@@ -573,14 +569,16 @@ describe("productFiltersController", () => {
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({
       success: true,
-      products: mockProducts[0],
+      products: mockProducts,
     });
   });
 
   it("should return 500 if an error occurs during filtering", async () => {
     const req = {
-      checked: [],
-      radio: [100, 200],
+      body: {
+        checked: [],
+        radio: [100, 200],
+      }
     };
     const res = mockResponse();
 
@@ -901,7 +899,7 @@ describe("realtedProductController", () => {
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({
       success: true,
-      products: [mockProducts[0]],
+      products: [mockProducts[0]], //only returns the first one since the function should ideally return products with same category
     });
   });
 
@@ -948,7 +946,7 @@ describe("productCountController", () => {
 
     await productCountController(req, res);
     expect(findMock).toHaveBeenCalledWith({});
-    expect(res.status).toHaveBeenCalledWith(200); // Verify the status code
+    expect(res.status).toHaveBeenCalledWith(200); 
     expect(res.send).toHaveBeenCalledWith({
       success: true,
       total: mockValue, // Verify the total count
@@ -1003,12 +1001,12 @@ describe("productCategoryController", () => {
 
     expect(categoryModel.findOne).toHaveBeenCalledWith({ slug: "electronics" });
     expect(findMock).toHaveBeenCalledWith({ category: mockCategory });
-    //expect(populateMock).toHaveBeenCalled();
+
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({
       success: true,
       category: mockCategory,
-      products: [mockProducts[0]],
+      products: [mockProducts[0]], //only returns first product since 2nd one doesnt match category name
     });
   });
 
