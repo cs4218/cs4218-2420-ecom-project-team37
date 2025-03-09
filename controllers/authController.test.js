@@ -508,20 +508,18 @@ describe("Update Profile Controller Test", () => {
     });
   });
 
-  it("should not update name, phone, address if not provided", async () => {
+  it("should not update name if not provided", async () => {
     const newHashedPassword = "new-hashed-password";
     const updatedUser = {
       _id: originalUser._id,
       name: originalUser.name,
       email: originalUser.email,
       password: newHashedPassword,
-      phone: originalUser.phone,
-      address: originalUser.address,
+      phone: req.body.phone,
+      address: req.body.address,
       role: originalUser.role,
     };
     req.body.name = undefined;
-    req.body.phone = undefined;
-    req.body.address = undefined;
     userModel.findById.mockResolvedValue(originalUser);
     hashPassword.mockResolvedValue(newHashedPassword);
     userModel.findByIdAndUpdate.mockResolvedValue(updatedUser);
@@ -533,7 +531,82 @@ describe("Update Profile Controller Test", () => {
       {
         name: originalUser.name,
         password: newHashedPassword,
+        phone: req.body.phone,
+        address: req.body.address,
+      },
+      { new: true },
+    );
+    expect(hashPassword).toHaveBeenCalledWith(req.body.password);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({
+      success: true,
+      message: "Profile Updated Successfully",
+      updatedUser: updatedUser,
+    });
+  });
+
+  it("should not update phone if not provided", async () => {
+    const newHashedPassword = "new-hashed-password";
+    const updatedUser = {
+      _id: originalUser._id,
+      name: req.body.name,
+      email: originalUser.email,
+      password: newHashedPassword,
+      phone: originalUser.phone,
+      address: req.body.address,
+      role: originalUser.role,
+    };
+    req.body.phone = undefined;
+    userModel.findById.mockResolvedValue(originalUser);
+    hashPassword.mockResolvedValue(newHashedPassword);
+    userModel.findByIdAndUpdate.mockResolvedValue(updatedUser);
+
+    await updateProfileController(req, res);
+
+    expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith(
+      req.user._id,
+      {
+        name: req.body.name,
+        password: newHashedPassword,
         phone: originalUser.phone,
+        address: req.body.address,
+      },
+      { new: true },
+    );
+    expect(hashPassword).toHaveBeenCalledWith(req.body.password);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({
+      success: true,
+      message: "Profile Updated Successfully",
+      updatedUser: updatedUser,
+    });
+  });
+
+  
+  it("should not update address if not provided", async () => {
+    const newHashedPassword = "new-hashed-password";
+    const updatedUser = {
+      _id: originalUser._id,
+      name: req.body.name,
+      email: originalUser.email,
+      password: newHashedPassword,
+      phone: originalUser.phone,
+      address: originalUser.address,
+      role: originalUser.role,
+    };
+    req.body.address = undefined;
+    userModel.findById.mockResolvedValue(originalUser);
+    hashPassword.mockResolvedValue(newHashedPassword);
+    userModel.findByIdAndUpdate.mockResolvedValue(updatedUser);
+
+    await updateProfileController(req, res);
+
+    expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith(
+      req.user._id,
+      {
+        name: req.body.name,
+        password: newHashedPassword,
+        phone: req.body.phone,
         address: originalUser.address,
       },
       { new: true },
@@ -547,8 +620,8 @@ describe("Update Profile Controller Test", () => {
     });
   });
 
-  it("should not update profile if password is less than 6 characters", async () => {
-    req.body.password = "123";
+  it("should not update profile if password is 2 characters", async () => {
+    req.body.password = "12";
     userModel.findById.mockResolvedValue(originalUser);
 
     await updateProfileController(req, res);
@@ -559,6 +632,36 @@ describe("Update Profile Controller Test", () => {
     expect(res.send).toHaveBeenCalledWith({
       success: false,
       message: "Password is required and at least 6 characters long",
+    });
+  });
+
+  it("should not update profile if password is 5 characters", async () => {
+    req.body.password = "12345";
+    userModel.findById.mockResolvedValue(originalUser);
+
+    await updateProfileController(req, res);
+
+    expect(hashPassword).not.toHaveBeenCalled();
+    expect(userModel.findByIdAndUpdate).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith({
+      success: false,
+      message: "Password is required and at least 6 characters long",
+    });
+  });
+
+  it("should update profile if password is 6 characters", async () => {
+    req.body.password = "123456";
+    userModel.findById.mockResolvedValue(originalUser);
+
+    await updateProfileController(req, res);
+
+    expect(hashPassword).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({
+      success: true,
+      message: "Profile Updated Successfully",
+      updatedUser: updatedUser,
     });
   });
 
