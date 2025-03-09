@@ -17,7 +17,7 @@ const Products = () => {
         setProducts(response.data.products);
       } else {
         toast.error("Invalid response format");
-      }    
+      }
     } catch (error) {
       console.log(error);
       toast.error("Something Went Wrong");
