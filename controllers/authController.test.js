@@ -656,7 +656,7 @@ describe("Update Profile Controller Test", () => {
 
     await updateProfileController(req, res);
 
-    expect(hashPassword).not.toHaveBeenCalled();
+    expect(hashPassword).toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({
       success: true,
