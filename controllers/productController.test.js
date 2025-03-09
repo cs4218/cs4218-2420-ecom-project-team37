@@ -57,9 +57,10 @@ jest.spyOn(console, "log").mockImplementation(() => {});
 
 const mockResponse = () => {
   const res = {};
-  res.status = jest.fn().mockReturnValue(res);
+  res.status = jest.fn().mockReturnThis();
   res.send = jest.fn().mockReturnValue(res);
   res.json = jest.fn().mockReturnValue(res);
+  res.set = jest.fn();
   return res;
 };
 
@@ -501,31 +502,24 @@ describe("productPhotoController", () => {
     const req = { params: { pid: "12345" } };
     const res = mockResponse();
 
-    const mockProduct = [
-      {
-        fields: {
-          name: "Test Product",
-          description: "Test description",
-          price: 100,
-          category: "Test Category",
-          quantity: 10,
-          shipping: true,
-          photo: {
-            data: Buffer.from("mock-image-data"),
-            contentType: "image/jpeg",
-          },
-        },
+    // Select photo details only
+    const mockProduct = {
+      photo: {
+        data: Buffer.from("mock-image-data"),
+        contentType: "image/jpeg",
       },
-    ];
+    };
 
     // Mock findById method to return mockProduct
-    const findByIdMock = jest.fn().mockResolvedValue(mockProduct);
+    const findByIdMock = jest.fn().mockReturnValue({
+      select: jest.fn().mockResolvedValue(mockProduct)
+    });
     productModel.findById = findByIdMock;
 
     await productPhotoController(req, res);
 
     expect(findByIdMock).toHaveBeenCalledWith("12345");
-    //expect(res.set).toHaveBeenCalledWith("Content-type", "image/jpeg");
+    expect(res.set).toHaveBeenCalledWith("Content-type", "image/jpeg");
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith(mockProduct.photo.data);
   });
@@ -534,8 +528,10 @@ describe("productPhotoController", () => {
 describe("productFiltersController", () => {
   it("should filter products successfully", async () => {
     const req = {
-      checked: [],
-      radio: [100, 200],
+      body: {
+        checked: [],
+        radio: [100, 200],
+      }
     };
     const res = mockResponse();
 
@@ -573,14 +569,16 @@ describe("productFiltersController", () => {
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({
       success: true,
-      products: mockProducts[0],
+      products: mockProducts,
     });
   });
 
   it("should return 500 if an error occurs during filtering", async () => {
     const req = {
-      checked: [],
-      radio: [100, 200],
+      body: {
+        checked: [],
+        radio: [100, 200],
+      }
     };
     const res = mockResponse();
 
