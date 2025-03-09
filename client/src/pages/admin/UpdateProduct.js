@@ -80,16 +80,6 @@ const UpdateProduct = () => {
     if (isUnchanged) {
       return toast.success("No changes detected.");
     }
-
-    if (quantity <= 0) {
-      return toast.error("Quantity must be more than zero");
-    }
-    if (price < 0) {
-      return toast.error("Price must be positive");
-    }
-    if (photo && photo.size > 1000000) {
-      return toast.error("Photo size must be less than 1MB.");
-    }
     if (
       !name ||
       !description ||
@@ -99,6 +89,15 @@ const UpdateProduct = () => {
       !shipping
     ) {
       return toast.error("All fields are required");
+    }
+    if (quantity <= 0) {
+      return toast.error("Quantity must be more than zero");
+    }
+    if (price < 0) {
+      return toast.error("Price must be positive");
+    }
+    if (photo && photo.size > 1000000) {
+      return toast.error("Photo size must be less than 1MB.");
     }
 
     try {
