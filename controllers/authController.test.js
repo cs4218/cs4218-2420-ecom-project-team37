@@ -473,6 +473,45 @@ describe("Update Profile Controller Test", () => {
     });
   });
 
+  
+  it("should update profile if password is 6 characters", async () => {
+    req.body.password = "123456";
+    const newHashedPassword = "new-hashed-password";
+    const updatedUser = {
+      _id: originalUser._id,
+      name: req.body.name,
+      email: originalUser.email,
+      password: newHashedPassword,
+      phone: req.body.phone,
+      address: req.body.address,
+      role: originalUser.role,
+    };
+
+    userModel.findById.mockResolvedValue(originalUser);
+    hashPassword.mockResolvedValue(newHashedPassword);
+    userModel.findByIdAndUpdate.mockResolvedValue(updatedUser);
+
+    await updateProfileController(req, res);
+
+    expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith(
+      req.user._id,
+      {
+        name: req.body.name,
+        password: newHashedPassword,
+        phone: req.body.phone,
+        address: req.body.address,
+      },
+      { new: true },
+    );
+    expect(hashPassword).toHaveBeenCalledWith(req.body.password);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith({
+      success: true,
+      message: "Profile Updated Successfully",
+      updatedUser: updatedUser,
+    });
+  });
+
   it("should not update password if password is not provided", async () => {
     const updatedUser = {
       _id: originalUser._id,
@@ -647,21 +686,6 @@ describe("Update Profile Controller Test", () => {
     expect(res.send).toHaveBeenCalledWith({
       success: false,
       message: "Password is required and at least 6 characters long",
-    });
-  });
-
-  it("should update profile if password is 6 characters", async () => {
-    req.body.password = "123456";
-    userModel.findById.mockResolvedValue(originalUser);
-
-    await updateProfileController(req, res);
-
-    expect(hashPassword).toHaveBeenCalled();
-    expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.send).toHaveBeenCalledWith({
-      success: true,
-      message: "Profile Updated Successfully",
-      updatedUser: updatedUser,
     });
   });
 
