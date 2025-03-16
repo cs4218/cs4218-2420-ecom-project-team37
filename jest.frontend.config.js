@@ -24,7 +24,6 @@ export default {
     "<rootDir>/client/src/pages/**/*.test.js",
     "<rootDir>/client/src/components/**/*.test.js",
     "<rootDir>/client/src/context/**/*.test.js",
-    "<rootDir>/client/src/pages/**/*.test.js",
     "<rootDir>/client/src/hooks/**/*.test.js",
   ],
 
@@ -38,9 +37,13 @@ export default {
   collectCoverageFrom: [
     "client/src/pages/**/*.js",
     "!client/src/pages/**/*.test.js",
-    "client/src/components/**",
-    "client/src/pages/**",
-    "client/src/context/**",
+    "!client/src/pages/**/*.integration.test.js",
+    "client/src/components/**/*.js",
+    "!client/src/components/**/*.test.js",
+    "!client/src/components/**/*.integration.test.js",
+    "client/src/context/**/*.js",
+    "!client/src/context/**/*.test.js",
+    "!client/src/context/**/*.integration.test.js",
   ],
   coverageThreshold: {
     global: {
