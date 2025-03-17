@@ -15,8 +15,8 @@ async function globalSetup() {
     // Create users
     const testUsers = [
       {
-        email: "user@example.com",
-        name: "User",
+        email: "test-user@example.com",
+        name: "Test User",
         answer: "Volleyball",
         address: "Test Address",
         phone: "12345678",
@@ -24,8 +24,8 @@ async function globalSetup() {
         role: 0,
       },
       {
-        email: "admin@example.com",
-        name: "Admin",
+        email: "test-admin@example.com",
+        name: "Test Admin",
         answer: "Volleyball",
         address: "Test Address",
         phone: "12345678",
@@ -38,39 +38,30 @@ async function globalSetup() {
 
     // Create categories
     const categories = await categoryModel.insertMany([
-      { name: "Category One", slug: "category-one" },
-      { name: "Category Two", slug: "category-two" },
+      { name: "TEST-Category One", slug: "test-category-one" },
+      { name: "TEST-Category Two", slug: "test-category-two" },
     ]);
 
     // Create products
     const products = await productModel.insertMany([
       {
-        name: "Product One",
-        slug: "product-one",
+        name: "TEST-Product One",
+        slug: "test-product-one",
         price: 100,
         quantity: 100,
         category: categories[0]._id,
-        description: "Product One Description",
+        description: "Test Product One Description",
       },
       {
-        name: "Product Two",
-        slug: "product-two",
+        name: "TEST-Product Two",
+        slug: "test-product-two",
         price: 200,
         quantity: 100,
         category: categories[0]._id,
-        description: "Product Two Description",
+        description: "Test Product Two Description",
       },
     ]);
 
-    // Create an order
-    await orderModel.insertMany([
-      {
-        buyer: createdUsers[0]._id,
-        status: "Not Processed",
-        payment: 100,
-        products: [products[0]._id],
-      },
-    ]);
 
     console.log("Test data inserted.");
     await mongoose.connection.close();

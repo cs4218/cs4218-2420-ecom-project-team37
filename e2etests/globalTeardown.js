@@ -7,25 +7,13 @@ import orderModel from "../models/orderModel.js";
 
 dotenv.config();
 
-
 async function globalTeardown() {
   try {
     await mongoose.connect(process.env.MONGO_URL);
 
-    await userModel.deleteMany({ email: { $in: ["user@example.com", "admin@example.com"] } });
-    await categoryModel.deleteMany({ 
-      $or: [
-        { slug: { $in: ["category-one", "category-two"] } },
-        { name: /^TEST-/ }
-      ],
-    });
-    await productModel.deleteMany({
-      $or: [
-        { slug: { $in: ["product-one", "product-two"] } }, 
-        { name: /^TEST-/ }, 
-      ],
-    });
-    await orderModel.deleteMany({});
+    await userModel.deleteMany({ email: { $in: ["test-user@example.com", "test-admin@example.com"] } });
+    await categoryModel.deleteMany({ name: /^TEST-/ });
+    await productModel.deleteMany({ name: /^TEST-/ });
 
     console.log("Test data removed.");
     await mongoose.connection.close();
