@@ -726,7 +726,7 @@ describe("Update Product Component", () => {
     });
 
     const dropdowns = screen.getAllByRole("combobox");
-    const categoryDropdown = dropdowns[0]; 
+    const categoryDropdown = dropdowns[0];
     fireEvent.mouseDown(categoryDropdown);
 
     const categoryOption = await screen.findByText("Furniture", {
@@ -765,37 +765,42 @@ describe("Update Product Component", () => {
               price: 1499.99,
               quantity: 10,
               category: { _id: "categoryID1" },
-              shipping: false, 
+              shipping: false,
             },
           },
         });
       }
     });
-  
+
     render(
       <MemoryRouter initialEntries={["/dashboard/admin/update-product/pid_1"]}>
         <Routes>
-          <Route path="/dashboard/admin/update-product/:slug" element={<UpdateProduct />} />
+          <Route
+            path="/dashboard/admin/update-product/:slug"
+            element={<UpdateProduct />}
+          />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
-  
+
     await waitFor(() => {
       expect(axios.get).toHaveBeenCalledWith("/api/v1/category/get-category");
     });
     await waitFor(() => {
-      expect(axios.get).toHaveBeenCalledWith("/api/v1/product/get-product/pid_1");
+      expect(axios.get).toHaveBeenCalledWith(
+        "/api/v1/product/get-product/pid_1",
+      );
     });
-  
+
     const dropdowns = screen.getAllByRole("combobox");
-    const shippingDropdown = dropdowns[1]; 
+    const shippingDropdown = dropdowns[1];
     fireEvent.mouseDown(shippingDropdown);
-  
+
     const shippingOption = await screen.findByText("Yes", {
       selector: ".ant-select-item-option-content",
     });
     fireEvent.click(shippingOption);
-  
+
     await waitFor(() => {
       const selectedShipping = screen.getByText("Yes", {
         selector: ".ant-select-selection-item",
@@ -803,7 +808,7 @@ describe("Update Product Component", () => {
       expect(selectedShipping).toBeInTheDocument();
     });
   });
-  
+
   test("Handles update failure correctly", async () => {
     axios.put.mockResolvedValue({
       data: {
@@ -811,22 +816,27 @@ describe("Update Product Component", () => {
         message: "Failed to update product",
       },
     });
-  
+
     render(
       <MemoryRouter initialEntries={["/dashboard/admin/update-product/pid_1"]}>
         <Routes>
-          <Route path="/dashboard/admin/update-product/:slug" element={<UpdateProduct />} />
+          <Route
+            path="/dashboard/admin/update-product/:slug"
+            element={<UpdateProduct />}
+          />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
-  
+
     await waitFor(() => {
       expect(axios.get).toHaveBeenCalledWith("/api/v1/category/get-category");
     });
     await waitFor(() => {
-      expect(axios.get).toHaveBeenCalledWith("/api/v1/product/get-product/pid_1");
+      expect(axios.get).toHaveBeenCalledWith(
+        "/api/v1/product/get-product/pid_1",
+      );
     });
-  
+
     fireEvent.change(screen.getByPlaceholderText("Write a Name"), {
       target: { value: "Updated Laptop" },
     });
@@ -839,20 +849,18 @@ describe("Update Product Component", () => {
     fireEvent.change(screen.getByPlaceholderText("Write a Quantity"), {
       target: { value: "5" },
     });
-  
+
     fireEvent.click(screen.getByText("UPDATE PRODUCT"));
-  
+
     await waitFor(() => {
       expect(axios.put).toHaveBeenCalledWith(
         "/api/v1/product/update-product/pid_1",
-        expect.any(FormData)
+        expect.any(FormData),
       );
     });
-  
+
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith("Failed to update product");
     });
   });
-  
-  
 });

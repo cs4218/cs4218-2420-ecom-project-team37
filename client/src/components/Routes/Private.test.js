@@ -9,7 +9,9 @@ jest.mock("axios");
 jest.mock("../../context/auth", () => ({
   useAuth: jest.fn(),
 }));
-jest.mock("../Spinner", () => () => <div data-testid="spinner">Loading...</div>);
+jest.mock("../Spinner", () => () => (
+  <div data-testid="spinner">Loading...</div>
+));
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
   Outlet: () => <div data-testid="outlet">Protected Content</div>,
@@ -19,7 +21,7 @@ describe("PrivateRoute Component", () => {
   let mockSetAuth;
 
   beforeEach(() => {
-    jest.clearAllMocks(); 
+    jest.clearAllMocks();
     mockSetAuth = jest.fn();
   });
 
@@ -28,14 +30,14 @@ describe("PrivateRoute Component", () => {
     axios.get.mockImplementation(
       () =>
         new Promise((resolve) =>
-          setTimeout(() => resolve({ data: { ok: true } }), 100)
-        )
+          setTimeout(() => resolve({ data: { ok: true } }), 100),
+        ),
     );
 
     render(
       <MemoryRouter>
         <PrivateRoute />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByTestId("spinner")).toBeInTheDocument();
@@ -48,7 +50,7 @@ describe("PrivateRoute Component", () => {
     render(
       <MemoryRouter>
         <PrivateRoute />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -65,7 +67,7 @@ describe("PrivateRoute Component", () => {
     render(
       <MemoryRouter>
         <PrivateRoute />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -76,18 +78,17 @@ describe("PrivateRoute Component", () => {
     expect(screen.queryByTestId("outlet")).not.toBeInTheDocument();
   });
   it("should render Spinner without calling API if no token is present", async () => {
-    jest.clearAllMocks(); 
-  
+    jest.clearAllMocks();
+
     useAuth.mockReturnValue([{ token: null }, mockSetAuth]);
-  
+
     render(
       <MemoryRouter>
         <PrivateRoute />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
-  
+
     expect(screen.getByTestId("spinner")).toBeInTheDocument();
     expect(axios.get).not.toHaveBeenCalled();
   });
-  
 });

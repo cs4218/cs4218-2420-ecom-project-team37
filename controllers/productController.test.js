@@ -512,7 +512,7 @@ describe("productPhotoController", () => {
 
     // Mock findById method to return mockProduct
     const findByIdMock = jest.fn().mockReturnValue({
-      select: jest.fn().mockResolvedValue(mockProduct)
+      select: jest.fn().mockResolvedValue(mockProduct),
     });
     productModel.findById = findByIdMock;
 
@@ -531,7 +531,7 @@ describe("productFiltersController", () => {
       body: {
         checked: [],
         radio: [100, 200],
-      }
+      },
     };
     const res = mockResponse();
 
@@ -578,7 +578,7 @@ describe("productFiltersController", () => {
       body: {
         checked: [],
         radio: [100, 200],
-      }
+      },
     };
     const res = mockResponse();
 
@@ -946,7 +946,7 @@ describe("productCountController", () => {
 
     await productCountController(req, res);
     expect(findMock).toHaveBeenCalledWith({});
-    expect(res.status).toHaveBeenCalledWith(200); 
+    expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({
       success: true,
       total: mockValue, // Verify the total count
