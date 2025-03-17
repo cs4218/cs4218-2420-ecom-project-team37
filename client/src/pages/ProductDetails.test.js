@@ -97,10 +97,10 @@ describe("ProductDetails Component", () => {
 
     expect(screen.getByText(`Name : ${mockProduct.name}`)).toBeInTheDocument();
     expect(
-      screen.getByText(`Description : ${mockProduct.description}`)
+      screen.getByText(`Description : ${mockProduct.description}`),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(`Category : ${mockProduct.category.name}`)
+      screen.getByText(`Category : ${mockProduct.category.name}`),
     ).toBeInTheDocument();
   });
 
@@ -167,7 +167,7 @@ describe("ProductDetails Component", () => {
     });
 
     expect(mockNavigate).toHaveBeenCalledWith(
-      `/product/${mockRelatedProducts[0].slug}`
+      `/product/${mockRelatedProducts[0].slug}`,
     );
   });
 
@@ -244,5 +244,4 @@ describe("ProductDetails Component", () => {
 
     expect(console.log).toHaveBeenCalledWith(expect.any(Error));
   });
-  
 });
