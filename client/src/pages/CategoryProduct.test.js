@@ -210,4 +210,242 @@ describe("CategoryProduct Component", () => {
 
     expect(axios.get).not.toHaveBeenCalled();
   });
+
+  // INTEGRATION TESTS
+  
+  describe("Integration Tests", () => {
+    test("handles malformed API response with missing products array", async () => {
+      let resolveApiCall;
+      const apiPromise = new Promise((resolve) => {
+        resolveApiCall = () => {
+          resolve({ data: { category: mockCategory } });
+        };
+      });
+  
+      axios.get.mockImplementation(() => apiPromise);
+  
+      await act(async () => {
+        render(<CategoryProduct />);
+      });
+  
+      await act(async () => {
+        resolveApiCall();
+        await flushPromises();
+      });
+  
+      expect(screen.getByText("0 result found")).toBeInTheDocument();
+    });
+  
+    test("handles malformed API response with missing category object", async () => {
+      let resolveApiCall;
+      const apiPromise = new Promise((resolve) => {
+        resolveApiCall = () => {
+          resolve({ data: { products: mockProducts } });
+        };
+      });
+  
+      axios.get.mockImplementation(() => apiPromise);
+  
+      await act(async () => {
+        render(<CategoryProduct />);
+      });
+  
+      await act(async () => {
+        resolveApiCall();
+        await flushPromises();
+      });
+  
+      expect(screen.getByText("Category -")).toBeInTheDocument();
+    });
+  
+    test("handles completely malformed API response", async () => {
+      let resolveApiCall;
+      const apiPromise = new Promise((resolve) => {
+        resolveApiCall = () => {
+          resolve({ data: "invalid data" });
+        };
+      });
+  
+      axios.get.mockImplementation(() => apiPromise);
+  
+      await act(async () => {
+        render(<CategoryProduct />);
+      });
+  
+      await act(async () => {
+        resolveApiCall();
+        await flushPromises();
+      });
+  
+      expect(screen.getByText("Category -")).toBeInTheDocument();
+      expect(screen.getByText("0 result found")).toBeInTheDocument();
+    });
+  
+    test("handles products with missing properties", async () => {
+      const productsWithMissingProps = [
+        {
+          _id: "1",
+          // Missing name
+          slug: "test-product-1",
+          description: "This is a test product description",
+          // Missing price
+        },
+        {
+          // Missing _id
+          name: "Test Product 2",
+          // Missing slug
+          description: "This is another test product description",
+          price: 149.99,
+        },
+      ];
+  
+      let resolveApiCall;
+      const apiPromise = new Promise((resolve) => {
+        resolveApiCall = () => {
+          resolve({ 
+            data: { 
+              products: productsWithMissingProps, 
+              category: mockCategory 
+            } 
+          });
+        };
+      });
+  
+      axios.get.mockImplementation(() => apiPromise);
+  
+      await act(async () => {
+        render(<CategoryProduct />);
+      });
+  
+      await act(async () => {
+        resolveApiCall();
+        await flushPromises();
+      });
+  
+      expect(screen.getByText("2 result found")).toBeInTheDocument();
+      
+      const cards = document.querySelectorAll('.card');
+      expect(cards.length).toBe(2);
+    });
+
+    test("handles products with null or undefined values", async () => {
+      const productsWithNullValues = [
+        {
+          _id: "1",
+          name: null,
+          slug: "test-product-1",
+          description: undefined,
+          price: null,
+        }
+      ];
+  
+      let resolveApiCall;
+      const apiPromise = new Promise((resolve) => {
+        resolveApiCall = () => {
+          resolve({ 
+            data: { 
+              products: productsWithNullValues, 
+              category: mockCategory 
+            } 
+          });
+        };
+      });
+  
+      axios.get.mockImplementation(() => apiPromise);
+  
+      await act(async () => {
+        render(<CategoryProduct />);
+      });
+  
+      await act(async () => {
+        resolveApiCall();
+        await flushPromises();
+      });
+  
+      expect(screen.getByText("1 result found")).toBeInTheDocument();
+      
+      const cards = document.querySelectorAll('.card');
+      expect(cards.length).toBe(1);
+    });
+
+    test("handles multiple API calls for the same category", async () => {
+      let resolveFirstCall, resolveSecondCall;
+      let firstCallPromise = new Promise(resolve => { 
+        resolveFirstCall = () => resolve({ 
+          data: { 
+            products: [mockProducts[0]], 
+            category: mockCategory 
+          } 
+        });
+      });
+
+      let secondCallPromise = new Promise(resolve => {
+        resolveSecondCall = () => resolve({ 
+          data: { 
+            products: mockProducts, 
+            category: mockCategory 
+          } 
+        });
+      });
+      
+      axios.get.mockImplementationOnce(() => firstCallPromise)
+           .mockImplementationOnce(() => secondCallPromise);
+      
+      await act(async () => {
+        render(<CategoryProduct />);
+      });
+      
+      await act(async () => {
+        resolveFirstCall();
+        await flushPromises();
+      });
+      
+      expect(screen.getByText("1 result found")).toBeInTheDocument();
+      
+      await act(async () => {
+        useParams.mockReturnValue({ slug: "test-category-updated" });
+        render(<CategoryProduct />);
+      });
+      
+      await act(async () => {
+        resolveSecondCall();
+        await flushPromises();
+      });
+
+      expect(screen.getByText("2 result found")).toBeInTheDocument();
+      
+      expect(axios.get).toHaveBeenCalledTimes(2);
+      expect(axios.get.mock.calls[0][0]).toContain("test-category");
+      expect(axios.get.mock.calls[1][0]).toContain("test-category-updated");
+    });
+
+    test("handles product image loading failures", async () => {
+      let resolveApiCall;
+      const apiPromise = new Promise((resolve) => {
+        resolveApiCall = () => {
+          resolve({ data: { products: mockProducts, category: mockCategory } });
+        };
+      });
+  
+      axios.get.mockImplementation(() => apiPromise);
+  
+      await act(async () => {
+        render(<CategoryProduct />);
+      });
+  
+      await act(async () => {
+        resolveApiCall();
+        await flushPromises();
+      });
+  
+      const images = screen.getAllByRole('img');
+      expect(images.length).toBe(2);
+  
+      await act(async () => {
+        fireEvent.error(images[0]);
+      });
+
+      expect(screen.getByText(mockProducts[0].name)).toBeInTheDocument();
+    });
+  });
 });

@@ -20,12 +20,41 @@ const HomePage = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  //get all cat
+  // Safely format price
+  const formatPrice = (price) => {
+    const numPrice = parseFloat(price);
+    if (price === undefined || price === null || isNaN(numPrice)) {
+      return 'N/A';
+    }
+    
+    try {
+      return numPrice.toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+      });
+    } catch (error) {
+      console.log("Error formatting price:", error);
+      return 'N/A';
+    }
+  };
+
+  // Safely truncate description
+  const truncateDescription = (description) => {
+    if (!description) return "No description available";
+    
+    try {
+      return description.substring(0, 60) + "...";
+    } catch (error) {
+      return "No description available";
+    }
+  };
+
+  // get all categories
   const getAllCategory = async () => {
     try {
       const { data } = await axios.get("/api/v1/category/get-category");
       if (data?.success) {
-        setCategories(data?.category);
+        setCategories(data?.category || []);
       }
     } catch (error) {
       console.log(error);
@@ -36,24 +65,25 @@ const HomePage = () => {
     getAllCategory();
     getTotal();
   }, []);
-  //get products
+
+  // get products
   const getAllProducts = async () => {
     try {
       setLoading(true);
       const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
       setLoading(false);
-      setProducts(data.products);
+      setProducts(data?.products || []);
     } catch (error) {
       setLoading(false);
       console.log(error);
     }
   };
 
-  //getTOtal COunt
+  // get total count
   const getTotal = async () => {
     try {
       const { data } = await axios.get("/api/v1/product/product-count");
-      setTotal(data?.total);
+      setTotal(data?.total || 0);
     } catch (error) {
       console.log(error);
     }
@@ -63,20 +93,21 @@ const HomePage = () => {
     if (page === 1) return;
     loadMore();
   }, [page]);
-  //load more
+
+  // load more
   const loadMore = async () => {
     try {
       setLoading(true);
       const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
       setLoading(false);
-      setProducts([...products, ...data?.products]);
+      setProducts([...products, ...(data?.products || [])]);
     } catch (error) {
       console.log(error);
       setLoading(false);
     }
   };
 
-  // filter by cat
+  // filter by category
   const handleFilter = (value, id) => {
     let all = [...checked];
     if (value) {
@@ -86,6 +117,7 @@ const HomePage = () => {
     }
     setChecked(all);
   };
+
   useEffect(() => {
     if (!checked.length || !radio.length) getAllProducts();
   }, [checked.length, radio.length]);
@@ -94,18 +126,33 @@ const HomePage = () => {
     if (checked.length || radio.length) filterProduct();
   }, [checked, radio]);
 
-  //get filterd product
+  // get filtered product
   const filterProduct = async () => {
     try {
       const { data } = await axios.post("/api/v1/product/product-filters", {
         checked,
         radio,
       });
-      setProducts(data?.products);
+      setProducts(data?.products || []);
     } catch (error) {
       console.log(error);
     }
   };
+
+  // Safely add to cart
+  const handleAddToCart = (product) => {
+    if (!product) return;
+    
+    try {
+      setCart([...cart, product]);
+      localStorage.setItem("cart", JSON.stringify([...cart, product]));
+      toast.success("Item Added to cart");
+    } catch (error) {
+      console.log("Error adding to cart:", error);
+      toast.error("Failed to add item to cart");
+    }
+  };
+
   return (
     <Layout title={"ALL Products - Best offers "}>
       {/* banner image */}
@@ -122,10 +169,10 @@ const HomePage = () => {
           <div className="d-flex flex-column">
             {categories?.map((c) => (
               <Checkbox
-                key={c._id}
-                onChange={(e) => handleFilter(e.target.checked, c._id)}
+                key={c?._id || Math.random().toString()}
+                onChange={(e) => handleFilter(e.target.checked, c?._id)}
               >
-                {c.name}
+                {c?.name || "Unnamed Category"}
               </Checkbox>
             ))}
           </div>
@@ -134,8 +181,8 @@ const HomePage = () => {
           <div className="d-flex flex-column">
             <Radio.Group onChange={(e) => setRadio(e.target.value)}>
               {Prices?.map((p) => (
-                <div key={p._id}>
-                  <Radio value={p.array}>{p.name}</Radio>
+                <div key={p?._id || Math.random().toString()}>
+                  <Radio value={p?.array}>{p?.name || "Unnamed Price Range"}</Radio>
                 </div>
               ))}
             </Radio.Group>
@@ -152,53 +199,51 @@ const HomePage = () => {
         <div className="col-md-9 ">
           <h1 className="text-center">All Products</h1>
           <div className="d-flex flex-wrap">
-            {products?.map((p) => (
-              <div className="card m-2" key={p._id}>
-                <img
-                  src={`/api/v1/product/product-photo/${p._id}`}
-                  className="card-img-top"
-                  alt={p.name}
-                />
-                <div className="card-body">
-                  <div className="card-name-price">
-                    <h5 className="card-title">{p.name}</h5>
-                    <h5 className="card-title card-price">
-                      {p.price.toLocaleString("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      })}
-                    </h5>
-                  </div>
-                  <p className="card-text ">
-                    {p.description.substring(0, 60)}...
-                  </p>
-                  <div className="card-name-price">
-                    <button
-                      className="btn btn-info ms-1"
-                      onClick={() => navigate(`/product/${p.slug}`)}
-                    >
-                      More Details
-                    </button>
-                    <button
-                      className="btn btn-dark ms-1"
-                      onClick={() => {
-                        setCart([...cart, p]);
-                        localStorage.setItem(
-                          "cart",
-                          JSON.stringify([...cart, p]),
-                        );
-                        toast.success("Item Added to cart");
-                      }}
-                    >
-                      ADD TO CART
-                    </button>
+            {Array.isArray(products) && products.map((p) => {
+              if (!p) return null;
+              return (
+                <div className="card m-2" key={p?._id || Math.random().toString()}>
+                  <img
+                    src={p?._id ? `/api/v1/product/product-photo/${p._id}` : "https://via.placeholder.com/150"}
+                    className="card-img-top"
+                    alt={p?.name || "Product Image"}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "https://via.placeholder.com/150";
+                    }}
+                  />
+                  <div className="card-body">
+                    <div className="card-name-price">
+                      <h5 className="card-title">{p?.name || "Unnamed Product"}</h5>
+                      <h5 className="card-title card-price">
+                        {formatPrice(p?.price)}
+                      </h5>
+                    </div>
+                    <p className="card-text ">
+                      {truncateDescription(p?.description)}
+                    </p>
+                    <div className="card-name-price">
+                      <button
+                        className="btn btn-info ms-1"
+                        onClick={() => p?.slug && navigate(`/product/${p.slug}`)}
+                        disabled={!p?.slug}
+                      >
+                        More Details
+                      </button>
+                      <button
+                        className="btn btn-dark ms-1"
+                        onClick={() => handleAddToCart(p)}
+                      >
+                        ADD TO CART
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <div className="m-2 p-3">
-            {products && products.length < total && (
+            {products && Array.isArray(products) && products.length > 0 && products.length < total && (
               <button
                 className="btn loadmore"
                 onClick={(e) => {
