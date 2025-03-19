@@ -11,8 +11,7 @@ import connectDB from "../config/db";
 import dotenv from "dotenv";
 
 dotenv.config();
-console.log("ENV Loaded: ", process.env.BRAINTREE_PUBLIC_KEY); 
-jest.spyOn(console, "log");
+jest.spyOn(console, "log").mockImplementation(() => {});
 jest.spyOn(JWT, "verify");
 jest.spyOn(userModel, "findById");
 

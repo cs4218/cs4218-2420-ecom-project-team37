@@ -29,36 +29,7 @@ jobs:
           cd client
           npm install
 
-      - name: Create .env file
-        run: |
-          echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> .env
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-          echo "BRAINTREE_MERCHANT_ID=${{ secrets.BRAINTREE_MERCHANT_ID }}" >> .env
-          echo "BRAINTREE_PUBLIC_KEY=${{ secrets.BRAINTREE_PUBLIC_KEY }}" >> .env
-          echo "BRAINTREE_PRIVATE_KEY=${{ secrets.BRAINTREE_PRIVATE_KEY }}" >> .env
-          echo "PORT=${{ secrets.PORT }}" >> .env
-          echo "DEV_MODE=${{ secrets.DEV_MODE }}" >> .env
-        shell: bash 
-        
-      - name: Debug Environment Variables
-        run: |
-          echo "✅ Debugging GitHub Secrets"
-          echo "MONGO_URL=${{ secrets.MONGO_URL }}"
-          echo "BRAINTREE_PUBLIC_KEY=${{ secrets.BRAINTREE_PUBLIC_KEY }}"
-          echo "PORT=${{ secrets.PORT }}"
-          echo "DEV_MODE=${{ secrets.DEV_MODE }}"
-        shell: bash
-
       - name: Run Jest tests
-        env:
-          MONGO_URL: ${{ secrets.MONGO_URL }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          BRAINTREE_MERCHANT_ID: ${{ secrets.BRAINTREE_MERCHANT_ID }}
-          BRAINTREE_PUBLIC_KEY: ${{ secrets.BRAINTREE_PUBLIC_KEY }}
-          BRAINTREE_PRIVATE_KEY: ${{ secrets.BRAINTREE_PRIVATE_KEY }}
-          PORT: ${{ secrets.PORT }}
-          DEV_MODE: ${{ secrets.DEV_MODE }}
         run: |
           echo "Running Tests..."
-          echo "BRAINTREE_PUBLIC_KEY: $BRAINTREE_PUBLIC_KEY" # Debugging
           npm test
