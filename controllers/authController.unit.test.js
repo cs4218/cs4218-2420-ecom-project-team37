@@ -473,7 +473,6 @@ describe("Update Profile Controller Test", () => {
     });
   });
 
-  
   it("should update profile if password is 6 characters", async () => {
     req.body.password = "123456";
     const newHashedPassword = "new-hashed-password";
@@ -621,7 +620,6 @@ describe("Update Profile Controller Test", () => {
     });
   });
 
-  
   it("should not update address if not provided", async () => {
     const newHashedPassword = "new-hashed-password";
     const updatedUser = {
