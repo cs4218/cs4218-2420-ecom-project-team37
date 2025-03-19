@@ -49,4 +49,7 @@ jobs:
           BRAINTREE_PRIVATE_KEY: ${{ secrets.BRAINTREE_PRIVATE_KEY }}
           PORT: ${{ secrets.PORT }}
           DEV_MODE: ${{ secrets.DEV_MODE }}
-        run: npm test
+        run: |
+          echo "Running Tests..."
+          echo "BRAINTREE_PUBLIC_KEY: $BRAINTREE_PUBLIC_KEY" # Debugging
+          npm test
