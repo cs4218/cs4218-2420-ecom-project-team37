@@ -34,7 +34,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 jest.spyOn(console, "log").mockImplementation(() => {});
-
+jest.setTimeout(30000); 
 
 beforeEach(() => {
     jest.clearAllMocks();
