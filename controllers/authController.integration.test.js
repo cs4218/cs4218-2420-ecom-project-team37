@@ -17,8 +17,7 @@ import connectDB from "../config/db";
 import mongoose, { Types } from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
-jest.spyOn(console, "log")
-// jest.spyOn(console, "log").mockImplementation(() => {});
+jest.spyOn(console, "log").mockImplementation(() => {});
 jest.spyOn(userModel, "findByIdAndUpdate");
 
 describe("authController integration tests", () => {
