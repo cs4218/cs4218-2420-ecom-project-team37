@@ -29,6 +29,9 @@ import connectDB from "../config/db";
 import request from "supertest";
 import {app} from '../server.js';
 import { hashPassword } from "../helpers/authHelper.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 jest.spyOn(console, "log").mockImplementation(() => {});
 
