@@ -108,9 +108,7 @@ import {
           );
         });
         
-      afterEach(async () => {
-          await orderModel.deleteMany({});
-      });
+
   
       describe("Product Controller Tests", () => {
           beforeEach(async () => {
@@ -328,10 +326,10 @@ import {
       });
   
       describe("Braintree Token and Payment Integration Tests", () => {
-          afterEach(async () => {
-              await orderModel.deleteMany({});
-          });
-  
+        afterEach(async () => {
+            await orderModel.deleteMany({});
+        });
+
           it("should return a token from braintree", async () => {
               const response = await request(app).get(`/api/v1/product/braintree/token`);
               
