@@ -38,6 +38,15 @@ jobs:
           echo "BRAINTREE_PRIVATE_KEY=${{ secrets.BRAINTREE_PRIVATE_KEY }}" >> .env
           echo "PORT=${{ secrets.PORT }}" >> .env
           echo "DEV_MODE=${{ secrets.DEV_MODE }}" >> .env
+        shell: bash 
+        
+      - name: Debug Environment Variables
+        run: |
+          echo "✅ Debugging GitHub Secrets"
+          echo "MONGO_URL=${{ secrets.MONGO_URL }}"
+          echo "BRAINTREE_PUBLIC_KEY=${{ secrets.BRAINTREE_PUBLIC_KEY }}"
+          echo "PORT=${{ secrets.PORT }}"
+          echo "DEV_MODE=${{ secrets.DEV_MODE }}"
         shell: bash
 
       - name: Run Jest tests
