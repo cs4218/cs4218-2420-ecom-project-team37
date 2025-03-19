@@ -11,18 +11,18 @@ import {
   productListController,
   productCategoryController,
   realtedProductController,
-} from "../controllers/productController.js";
+} from "./productController.js";
 import mongoose from "mongoose";
 import productModel from "../models/productModel.js";
 import categoryModel from "../models/categoryModel.js";
-import orderModel from "../models/orderModel";
+import orderModel from "../models/orderModel.js";
 import fs from "fs";
 import slugify from "slugify";
 import braintree from "braintree";
 import {
   brainTreeTokenController,
   brainTreePaymentController,
-} from "./productController";
+} from "./productController.js";
 
 jest.mock("braintree", () => {
   const mockGenerate = jest.fn();

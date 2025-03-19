@@ -5,7 +5,7 @@ import {
   categoryController,
   singleCategoryController,
   deleteCategoryController,
-} from "./categoryController";
+} from "./categoryController.js";
 import categoryModel from "../models/categoryModel.js";
 import slugify from "slugify";
 
