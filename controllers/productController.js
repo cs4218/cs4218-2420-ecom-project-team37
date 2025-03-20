@@ -397,6 +397,20 @@ export const brainTreeTokenController = async (req, res) => {
 export const brainTreePaymentController = async (req, res) => {
   try {
     const { nonce, cart } = req.body;
+    if (!nonce) {
+      return res.status(400).send({ 
+        success: false,
+        message: "Nounce is required" 
+      });
+    }
+
+    if (!cart || cart.length < 1) {
+      return res.status(400).send({ 
+        success: false,
+        message: "Cart is required and cannot be empty" 
+      });
+    }
+
     let total = 0;
     cart.map((i) => {
       total += i.price;
@@ -416,7 +430,7 @@ export const brainTreePaymentController = async (req, res) => {
             payment: result,
             buyer: req.user._id,
           }).save();
-          res.json({ ok: true });
+          res.status(200).json({ ok: true });
         } else {
           res.status(500).send(error);
         }

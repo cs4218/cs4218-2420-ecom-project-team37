@@ -1,7 +1,7 @@
 import userModel from "../models/userModel.js";
 import orderModel from "../models/orderModel.js";
+import { comparePassword, hashPassword } from "../helpers/authHelper.js";
 
-import { comparePassword, hashPassword } from "./../helpers/authHelper.js";
 import JWT from "jsonwebtoken";
 
 export const registerController = async (req, res) => {
@@ -230,7 +230,8 @@ export const getOrdersController = async (req, res) => {
     const orders = await orderModel
       .find({ buyer: req.user._id })
       .populate("products", "-photo")
-      .populate("buyer", "name");
+      .populate("buyer", "name")
+      .lean();
     res.json(orders);
   } catch (error) {
     console.log(error);
@@ -249,7 +250,8 @@ export const getAllOrdersController = async (req, res) => {
       .find({})
       .populate("products", "-photo")
       .populate("buyer", "name")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
     res.json(orders);
   } catch (error) {
     console.log(error);
@@ -266,11 +268,30 @@ export const orderStatusController = async (req, res) => {
   try {
     const { orderId } = req.params;
     const { status } = req.body;
+    if (!orderId || !status) {
+      return res.status(400).send({
+        success: false,
+        message: "Order Id and Status is required",
+      });
+    }
+    const statusArr = ["Not Processed", "Processing", "Shipped", "Delivered", "Cancelled"];
+    if (!statusArr.includes(status)) {
+      return res.status(400).send({
+        success: false,
+        message: "Invalid Status",
+      });
+    }
     const orders = await orderModel.findByIdAndUpdate(
       orderId,
       { status },
       { new: true },
     );
+    if (!orders) {
+      return res.status(404).send({
+        success: false,
+        message: "Order not found",
+      });
+    }
     res.json(orders);
   } catch (error) {
     console.log(error);
