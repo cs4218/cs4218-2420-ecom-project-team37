@@ -604,7 +604,10 @@ describe("authController integration tests", () => {
         payment: product1.price + product2.price,
         buyer: user1._id,
         status: "Not Processed",
+        createdAt: new Date(Date.now() + 300),
       });
+
+
 
       order2 = await orderModel.create({
         _id: new Types.ObjectId(),
@@ -612,6 +615,7 @@ describe("authController integration tests", () => {
         payment: product1.price,
         buyer: user1._id,
         status: "Processing",
+        createdAt: new Date(Date.now() + 4000),
       });
 
       order3 = await orderModel.create({
@@ -620,6 +624,7 @@ describe("authController integration tests", () => {
         payment: product2.price,
         buyer: user2._id,
         status: "Processing",
+        createdAt: new Date(Date.now() + 8000),
       });
 
       req = {}
@@ -661,7 +666,7 @@ describe("authController integration tests", () => {
       expect(new Date(secondOrder.createdAt).getTime()).toBeGreaterThan(new Date(thirdOrder.createdAt).getTime());
     })
 
-    it("check if proudcts and buyers are populated correctly", async () => {
+    it("check if products and buyers are populated correctly", async () => {
       await getAllOrdersController(req, res);
 
       expect(res.json).toHaveBeenCalled();

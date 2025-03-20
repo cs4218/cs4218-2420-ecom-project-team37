@@ -27,7 +27,7 @@ import {
 import { MongoMemoryServer } from "mongodb-memory-server";
 import connectDB from "../config/db";
 import request from "supertest";
-import {app} from '../server.js';
+import { app, server } from '../server.js';
 import { hashPassword } from "../helpers/authHelper.js";
 import dotenv from "dotenv";
 
@@ -49,8 +49,10 @@ describe("Braintree Token and Payment Integration Tests", () => {
     
     beforeAll(async () => {
         // Start up in memory db
+        await mongoose.connection.close();
         mongoServer = await MongoMemoryServer.create();
         process.env.MONGO_URL = mongoServer.getUri();
+        await connectDB();
 
         const hash_password = await hashPassword(password);
 
@@ -97,6 +99,7 @@ describe("Braintree Token and Payment Integration Tests", () => {
   
     afterAll(async () => {
         // drop db and close all connections
+        server.close();
         await mongoose.connection.dropDatabase();
         await mongoose.connection.close();
         await mongoServer.stop();
