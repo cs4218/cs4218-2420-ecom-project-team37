@@ -11,16 +11,15 @@ test('User logins to homepage and searches one product that exists', async ({ pa
 
   await page.waitForURL("http://localhost:3000");
   await page.getByRole('searchbox', { name: 'Search' }).click();
-  await page.getByRole('searchbox', { name: 'Search' }).fill('textbook');
+  await page.getByRole('searchbox', { name: 'Search' }).fill('Test-Product One');
   await page.getByRole('button', { name: 'Search' }).click();
 
   // Should navigate to /search URL path
   await page.waitForURL('http://localhost:3000/search');
 
-  await expect(page.getByRole('img', { name: 'Textbook' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Textbook' })).toBeVisible();
-  await expect(page.getByText('A comprehensive textbook...')).toBeVisible();
-  await expect(page.getByText('$ 79.99')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'TEST-Product One' })).toBeVisible();
+  await expect(page.getByText('Test Product One Description')).toBeVisible();
+  await expect(page.getByText('$ 100')).toBeVisible();
   await expect(page.locator('h6')).toContainText('Found 1');
 });
 
@@ -29,13 +28,12 @@ test('User searches one product that exists', async ({ page }) => {
   await page.goto("http://localhost:3000/search");
 
   await page.getByRole('searchbox', { name: 'Search' }).click();
-  await page.getByRole('searchbox', { name: 'Search' }).fill('textbook');
+  await page.getByRole('searchbox', { name: 'Search' }).fill('Test-Product One');
   await page.getByRole('button', { name: 'Search' }).click();
 
-  await expect(page.getByRole('img', { name: 'Textbook' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Textbook' })).toBeVisible();
-  await expect(page.getByText('A comprehensive textbook...')).toBeVisible();
-  await expect(page.getByText('$ 79.99')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'TEST-Product One' })).toBeVisible();
+  await expect(page.getByText('Test Product One Description')).toBeVisible();
+  await expect(page.getByText('$ 100')).toBeVisible();
   await expect(page.locator('h6')).toContainText('Found 1');
 });
 
@@ -54,17 +52,15 @@ test('User searches a keyword matching more than one product', async ({ page }) 
   await page.goto('http://localhost:3000/search');
 
   await page.getByRole('searchbox', { name: 'Search' }).click();
-  await page.getByRole('searchbox', { name: 'Search' }).fill('book');
+  await page.getByRole('searchbox', { name: 'Search' }).fill('TEST-Product');
   await page.getByRole('button', { name: 'Search' }).click();
 
-  await expect(page.getByRole('img', { name: 'Textbook' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Textbook' })).toBeVisible();
-  await expect(page.getByText('A comprehensive textbook...')).toBeVisible();
-  await expect(page.getByText('$ 79.99')).toBeVisible();
-  await expect(page.getByRole('img', { name: 'The Law of Contract in' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'The Law of Contract in' })).toBeVisible();
-  await expect(page.getByText('A bestselling book in')).toBeVisible();
-  await expect(page.getByText('$ 54.99')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'TEST-Product One' })).toBeVisible();
+  await expect(page.getByText('Test Product One Description')).toBeVisible();
+  await expect(page.getByText('$ 100')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'TEST-Product Two' })).toBeVisible();
+  await expect(page.getByText('Test Product Two Description')).toBeVisible();
+  await expect(page.getByText('$ 200')).toBeVisible();
   await expect(page.locator('h6')).toContainText('Found 2');
 });
 
@@ -72,22 +68,20 @@ test('User changes the current keyword search from a product to another', async 
   // First product
   await page.goto('http://localhost:3000/search');
   await page.getByRole('searchbox', { name: 'Search' }).click();
-  await page.getByRole('searchbox', { name: 'Search' }).fill('textbook');
+  await page.getByRole('searchbox', { name: 'Search' }).fill('Test-Product One');
   await page.getByRole('button', { name: 'Search' }).click();
 
-  await expect(page.getByRole('img', { name: 'Textbook' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Textbook' })).toBeVisible();
-  await expect(page.getByText('A comprehensive textbook...')).toBeVisible();
-  await expect(page.getByText('$')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'TEST-Product One' })).toBeVisible();
+  await expect(page.getByText('Test Product One Description')).toBeVisible();
+  await expect(page.getByText('$ 100')).toBeVisible();
 
   // Second Product
   await page.getByRole('searchbox', { name: 'Search' }).click();
-  await page.getByRole('searchbox', { name: 'Search' }).fill('shirt');
+  await page.getByRole('searchbox', { name: 'Search' }).fill('Test-Product Two');
   await page.getByRole('button', { name: 'Search' }).click();
-  await expect(page.getByRole('img', { name: 'NUS T-shirt' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'NUS T-shirt' })).toBeVisible();
-  await expect(page.getByText('Plain NUS T-shirt for sale...')).toBeVisible();
-  await expect(page.getByText('$')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'TEST-Product Two' })).toBeVisible();
+  await expect(page.getByText('Test Product Two Description')).toBeVisible();
+  await expect(page.getByText('$ 200')).toBeVisible();
 })
 
 test('Should not allow empty search query', async ({ page }) => {
@@ -99,23 +93,22 @@ test('Should not allow empty search query', async ({ page }) => {
 });
 
 // Following test case test the more details functionality in search page
-test('User clicks on more details of the product textbook', async({ page }) => {
+test('User clicks on more details of test product one', async({ page }) => {
   await page.goto('http://localhost:3000/search');
   await page.getByRole('searchbox', { name: 'Search' }).click();
-  await page.getByRole('searchbox', { name: 'Search' }).fill('textbook');
+  await page.getByRole('searchbox', { name: 'Search' }).fill('Test-Product One');
   await page.getByRole('searchbox', { name: 'Search' }).press('Enter');
   await page.getByRole('button', { name: 'Search' }).click();
 
-  await expect(page.getByRole('img', { name: 'Textbook' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'TEST-Product One' })).toBeVisible();
 
   await page.getByRole('button', { name: 'More Details' }).click();
-  await page.waitForURL("http://localhost:3000/product/textbook");
+  await page.waitForURL("http://localhost:3000/product/test-product-one");
 
-  await expect(page.getByRole('img', { name: 'Textbook' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Name : Textbook' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Description : A comprehensive' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Price :$' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Category : Book' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'TEST-Product One' })).toBeVisible();
+  await expect(page.getByText('Test Product One Description')).toBeVisible();
+  await expect(page.getByText('Price :$100.00' )).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Category : TEST-Category One' })).toBeVisible();
 })
 
 // Following test case test the add to cart functionality in search page
@@ -126,10 +119,10 @@ test('User adds textbook to cart successfully', async ({ page }) => {
   await expect(page.getByRole('superscript')).toMatchAriaSnapshot(`- superscript: "0"`);
 
   await page.getByRole('searchbox', { name: 'Search' }).click();
-  await page.getByRole('searchbox', { name: 'Search' }).fill('textbook');
+  await page.getByRole('searchbox', { name: 'Search' }).fill('Test-Product One');
   await page.getByRole('button', { name: 'Search' }).click();
 
-  await expect(page.getByRole('img', { name: 'Textbook' })).toBeVisible();
+  await expect(page.getByText('Test Product One Description')).toBeVisible();
 
   await page.getByRole('button', { name: 'ADD TO CART' }).first().click();
 
@@ -140,8 +133,7 @@ test('User adds textbook to cart successfully', async ({ page }) => {
   await page.waitForURL("http://localhost:3000/cart");
 
   // Textbook is added to cart successfully
-  await expect(page.getByRole('img', { name: 'Textbook' })).toBeVisible();
-  await expect(page.getByText('Textbook', { exact: true })).toBeVisible();
-  await expect(page.getByText('A comprehensive textbook')).toBeVisible();
-  await expect(page.getByText('Price :')).toBeVisible();
+  await expect(page.getByText('TEST-Product One', { exact: true })).toBeVisible();
+  await expect(page.getByText('Test Product One Description')).toBeVisible();
+  await expect(page.getByText('Price : 100')).toBeVisible();
 });
