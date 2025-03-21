@@ -10,8 +10,9 @@ dotenv.config();
 
 async function globalSetup() {
   try {
-    // Use test database URL
-    await mongoose.connect(process.env.MONGO_TEST_URL);
+    // Connect using the modified URL from connectDB
+    process.env.TEST_MODE = 'true';
+    await mongoose.connect(process.env.MONGO_URL.replace(/\/[^/]*$/, '/e2e_test'));
     
     // Clear any existing test data
     await mongoose.connection.dropDatabase();
