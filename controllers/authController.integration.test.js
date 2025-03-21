@@ -28,8 +28,8 @@ describe("authController integration tests", () => {
     mongoServer = await MongoMemoryServer.create();
     process.env.MONGO_URL = mongoServer.getUri();
     await connectDB();
-  })
-  
+  });
+
   afterAll(async () => {
     // drop db and close all connections
     await mongoose.connection.dropDatabase();
@@ -39,13 +39,13 @@ describe("authController integration tests", () => {
 
   // Bypass middleware and mock req, res
   describe("Update profile controller", () => {
-    let req,res;
+    let req, res;
     let originalUser;
     let originalPassword;
 
     beforeEach(async () => {
       originalPassword = "testpassword";
- 
+
       const hashedPassword = await hashPassword(originalPassword);
       originalUser = userModel({
         _id: new Types.ObjectId(),
@@ -55,30 +55,30 @@ describe("authController integration tests", () => {
         phone: "123456789",
         address: "test address",
         answer: "test answer",
-        role: 0
+        role: 0,
       });
       // insert original user
       await originalUser.save();
 
       // update user
       req = {
-            user: {
-              _id: originalUser._id,
-            },
-            body: {
-              name: "John Doe",
-              password: "password123",
-              phone: "12344000",
-              address: "123 Street",
-            },
-          };
-      
+        user: {
+          _id: originalUser._id,
+        },
+        body: {
+          name: "John Doe",
+          password: "password123",
+          phone: "12344000",
+          address: "123 Street",
+        },
+      };
+
       res = {
         status: jest.fn().mockReturnThis(),
         send: jest.fn(),
         json: jest.fn(),
       };
-    })
+    });
 
     afterEach(async () => {
       // clear all collections before each test
@@ -86,10 +86,9 @@ describe("authController integration tests", () => {
       for (const key in collections) {
         await collections[key].deleteMany({});
       }
-      jest.clearAllMocks(); 
+      jest.clearAllMocks();
     });
-  
-    
+
     it("Should update profile if password is valid and all fields are given", async () => {
       const expectedUpdatedUser = {
         _id: originalUser._id,
@@ -99,28 +98,32 @@ describe("authController integration tests", () => {
         email: originalUser.email,
         role: originalUser.role,
         answer: originalUser.answer,
-      }
+      };
 
       await updateProfileController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      
-      const responseData = res.send.mock.calls[0][0]; 
+
+      const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBe(true);
       expect(responseData.message).toBe("Profile Updated Successfully");
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
-      expect(responseData.updatedUser.address).toBe(expectedUpdatedUser.address);
+      expect(responseData.updatedUser.address).toBe(
+        expectedUpdatedUser.address,
+      );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
       expect(responseData.updatedUser.answer).toBe(expectedUpdatedUser.answer);
-      
+
       // Check password is updated
-      const isPasswordValid = await comparePassword(req.body.password, responseData.updatedUser.password);
-      expect(isPasswordValid).toBe(true); 
-    
-    })         
-    
+      const isPasswordValid = await comparePassword(
+        req.body.password,
+        responseData.updatedUser.password,
+      );
+      expect(isPasswordValid).toBe(true);
+    });
+
     it("Should update profile if password is 6 characters", async () => {
       req.body.password = "123456";
       const expectedUpdatedUser = {
@@ -131,26 +134,31 @@ describe("authController integration tests", () => {
         email: originalUser.email,
         role: originalUser.role,
         answer: originalUser.answer,
-      }
+      };
 
       await updateProfileController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      
-      const responseData = res.send.mock.calls[0][0]; 
+
+      const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBe(true);
       expect(responseData.message).toBe("Profile Updated Successfully");
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
-      expect(responseData.updatedUser.address).toBe(expectedUpdatedUser.address);
+      expect(responseData.updatedUser.address).toBe(
+        expectedUpdatedUser.address,
+      );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
       expect(responseData.updatedUser.answer).toBe(expectedUpdatedUser.answer);
-      
+
       // Check password is updated
-      const isPasswordValid = await comparePassword(req.body.password, responseData.updatedUser.password);
-      expect(isPasswordValid).toBe(true); 
-    })         
+      const isPasswordValid = await comparePassword(
+        req.body.password,
+        responseData.updatedUser.password,
+      );
+      expect(isPasswordValid).toBe(true);
+    });
 
     it("Should not update password if password is not provided", async () => {
       req.body.password = undefined;
@@ -162,30 +170,34 @@ describe("authController integration tests", () => {
         email: originalUser.email,
         role: originalUser.role,
         answer: originalUser.answer,
-      }
+      };
 
       await updateProfileController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      
-      const responseData = res.send.mock.calls[0][0]; 
+
+      const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBe(true);
       expect(responseData.message).toBe("Profile Updated Successfully");
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
-      expect(responseData.updatedUser.address).toBe(expectedUpdatedUser.address);
+      expect(responseData.updatedUser.address).toBe(
+        expectedUpdatedUser.address,
+      );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
       expect(responseData.updatedUser.answer).toBe(expectedUpdatedUser.answer);
-      
-      // Check password is the same as old password
-      const isPasswordValid = await comparePassword(originalPassword, responseData.updatedUser.password);
-      expect(isPasswordValid).toBe(true); 
-    })  
 
-    
+      // Check password is the same as old password
+      const isPasswordValid = await comparePassword(
+        originalPassword,
+        responseData.updatedUser.password,
+      );
+      expect(isPasswordValid).toBe(true);
+    });
+
     it("Should not update name if not provided", async () => {
-      req.body.name = undefined
+      req.body.name = undefined;
       const expectedUpdatedUser = {
         _id: originalUser._id,
         name: originalUser.name,
@@ -194,29 +206,34 @@ describe("authController integration tests", () => {
         email: originalUser.email,
         role: originalUser.role,
         answer: originalUser.answer,
-      }
+      };
 
       await updateProfileController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      
-      const responseData = res.send.mock.calls[0][0]; 
+
+      const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBe(true);
       expect(responseData.message).toBe("Profile Updated Successfully");
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
-      expect(responseData.updatedUser.address).toBe(expectedUpdatedUser.address);
+      expect(responseData.updatedUser.address).toBe(
+        expectedUpdatedUser.address,
+      );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
       expect(responseData.updatedUser.answer).toBe(expectedUpdatedUser.answer);
-      
+
       // Check password is updated
-      const isPasswordValid = await comparePassword(req.body.password, responseData.updatedUser.password);
-      expect(isPasswordValid).toBe(true); 
-    })  
+      const isPasswordValid = await comparePassword(
+        req.body.password,
+        responseData.updatedUser.password,
+      );
+      expect(isPasswordValid).toBe(true);
+    });
 
     it("Should not update phone if not provided", async () => {
-      req.body.phone = undefined
+      req.body.phone = undefined;
       const expectedUpdatedUser = {
         _id: originalUser._id,
         name: req.body.name,
@@ -225,29 +242,34 @@ describe("authController integration tests", () => {
         email: originalUser.email,
         role: originalUser.role,
         answer: originalUser.answer,
-      }
+      };
 
       await updateProfileController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      
-      const responseData = res.send.mock.calls[0][0]; 
+
+      const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBe(true);
       expect(responseData.message).toBe("Profile Updated Successfully");
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
-      expect(responseData.updatedUser.address).toBe(expectedUpdatedUser.address);
+      expect(responseData.updatedUser.address).toBe(
+        expectedUpdatedUser.address,
+      );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
       expect(responseData.updatedUser.answer).toBe(expectedUpdatedUser.answer);
-      
+
       // Check password is updated
-      const isPasswordValid = await comparePassword(req.body.password, responseData.updatedUser.password);
-      expect(isPasswordValid).toBe(true); 
-    })  
+      const isPasswordValid = await comparePassword(
+        req.body.password,
+        responseData.updatedUser.password,
+      );
+      expect(isPasswordValid).toBe(true);
+    });
 
     it("Should not update address if not provided", async () => {
-      req.body.address = undefined
+      req.body.address = undefined;
       const expectedUpdatedUser = {
         _id: originalUser._id,
         name: req.body.name,
@@ -256,103 +278,112 @@ describe("authController integration tests", () => {
         email: originalUser.email,
         role: originalUser.role,
         answer: originalUser.answer,
-      }
+      };
 
       await updateProfileController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      
-      const responseData = res.send.mock.calls[0][0]; 
+
+      const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBe(true);
       expect(responseData.message).toBe("Profile Updated Successfully");
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
-      expect(responseData.updatedUser.address).toBe(expectedUpdatedUser.address);
+      expect(responseData.updatedUser.address).toBe(
+        expectedUpdatedUser.address,
+      );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
       expect(responseData.updatedUser.answer).toBe(expectedUpdatedUser.answer);
-      
+
       // Check password is updated
-      const isPasswordValid = await comparePassword(req.body.password, responseData.updatedUser.password);
-      expect(isPasswordValid).toBe(true); 
-    })  
+      const isPasswordValid = await comparePassword(
+        req.body.password,
+        responseData.updatedUser.password,
+      );
+      expect(isPasswordValid).toBe(true);
+    });
 
     it("Should not update profile if password is 2 character", async () => {
-      req.body.password = "12" 
-     
+      req.body.password = "12";
+
       await updateProfileController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      
+
       const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBe(false);
-      expect(responseData.message).toBe("Password is required and at least 6 characters long");
+      expect(responseData.message).toBe(
+        "Password is required and at least 6 characters long",
+      );
       expect(userModel.findByIdAndUpdate).not.toHaveBeenCalled();
-    }) 
-    
+    });
+
     it("Should not update profile if password is 5 character", async () => {
-      req.body.password = "12345" 
-     
+      req.body.password = "12345";
+
       await updateProfileController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      
+
       const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBe(false);
-      expect(responseData.message).toBe("Password is required and at least 6 characters long");
+      expect(responseData.message).toBe(
+        "Password is required and at least 6 characters long",
+      );
       expect(userModel.findByIdAndUpdate).not.toHaveBeenCalled();
-    })  
-  
+    });
+
     it("Should return 400 error if name, password, address, phone is empty", async () => {
-      req.body.name = ""
-      req.body.phone = ""
-      req.body.address = ""
-      req.body.password = ""
-     
+      req.body.name = "";
+      req.body.phone = "";
+      req.body.address = "";
+      req.body.password = "";
+
       await updateProfileController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      
+
       const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBe(false);
       expect(responseData.message).toBe("No fields to update");
       expect(userModel.findByIdAndUpdate).not.toHaveBeenCalled();
-    })  
+    });
 
     it("Should return 404 error if user not found", async () => {
       // fake user id
       req.user._id = new Types.ObjectId();
-     
+
       await updateProfileController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(404);
-      
+
       const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBe(false);
       expect(responseData.message).toBe("User not found");
       expect(userModel.findByIdAndUpdate).not.toHaveBeenCalled();
-    })
+    });
 
     it("Should return 500 error if something went wrong", async () => {
       req.user = undefined;
-     
+
       await updateProfileController(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      
+
       const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBe(false);
       expect(responseData.message).toBe("Error While Update Profile");
       expect(userModel.findByIdAndUpdate).not.toHaveBeenCalled();
-    })  
-  })  
+    });
+  });
 
-  describe("getOrdersController integration tests", () => { 
+  describe("getOrdersController integration tests", () => {
     let user1, user2, user3, product1, product2, order1, order2, order3;
     let req, res;
 
     beforeEach(async () => {
-      jest.clearAllMocks()
+      jest.clearAllMocks();
       user1 = await userModel.create({
         _id: new Types.ObjectId(),
         name: "testuser",
@@ -361,9 +392,9 @@ describe("authController integration tests", () => {
         phone: "123456789",
         address: "test address",
         answer: "test answer",
-        role: 0
+        role: 0,
       });
-  
+
       user2 = await userModel.create({
         _id: new Types.ObjectId(),
         name: "testuser2",
@@ -372,7 +403,7 @@ describe("authController integration tests", () => {
         phone: "123456789",
         address: "test address",
         answer: "test answer",
-        role: 0
+        role: 0,
       });
 
       user3 = await userModel.create({
@@ -383,7 +414,7 @@ describe("authController integration tests", () => {
         phone: "123456789",
         address: "test address",
         answer: "test answer",
-        role: 0
+        role: 0,
       });
 
       product1 = await productModel.create({
@@ -400,7 +431,7 @@ describe("authController integration tests", () => {
         },
         shipping: true,
       });
-  
+
       product2 = await productModel.create({
         _id: new Types.ObjectId(),
         name: "Test Product 2",
@@ -443,8 +474,8 @@ describe("authController integration tests", () => {
       req = {
         user: {
           _id: user1._id,
-        }
-      }
+        },
+      };
 
       res = {
         status: jest.fn().mockReturnThis(),
@@ -458,8 +489,8 @@ describe("authController integration tests", () => {
       for (const key in collections) {
         await collections[key].deleteMany({});
       }
-      jest.clearAllMocks(); 
-    })
+      jest.clearAllMocks();
+    });
 
     it("Should return all orders for user1 with all products and buyer populated correctly", async () => {
       req.user._id = user1._id;
@@ -472,14 +503,18 @@ describe("authController integration tests", () => {
 
       const firstOrder = returnedOrders[0];
       expect(firstOrder._id.toString()).toBe(order1._id.toString());
-  
+
       expect(firstOrder.buyer).toBeDefined();
       expect(firstOrder.buyer.name).toBe(user1.name);
       expect(Object.keys(firstOrder.buyer).length).toBe(2);
 
       expect(firstOrder.products).toHaveLength(2);
-      expect(firstOrder.products[0]._id.toString()).toBe(product1._id.toString());
-      expect(firstOrder.products[1]._id.toString()).toBe(product2._id.toString());
+      expect(firstOrder.products[0]._id.toString()).toBe(
+        product1._id.toString(),
+      );
+      expect(firstOrder.products[1]._id.toString()).toBe(
+        product2._id.toString(),
+      );
       expect(firstOrder.products[0].photo).toBeUndefined();
       expect(firstOrder.products[1].photo).toBeUndefined();
 
@@ -491,9 +526,11 @@ describe("authController integration tests", () => {
       expect(Object.keys(secondOrder.buyer).length).toBe(2);
 
       expect(secondOrder.products).toHaveLength(1);
-      expect(secondOrder.products[0]._id.toString()).toBe(product1._id.toString());
+      expect(secondOrder.products[0]._id.toString()).toBe(
+        product1._id.toString(),
+      );
       expect(firstOrder.products[1].photo).toBeUndefined();
-    })
+    });
 
     it("Should return all orders for user2 with all products and buyer populated correctly", async () => {
       req.user._id = user2._id;
@@ -506,16 +543,18 @@ describe("authController integration tests", () => {
 
       const firstOrder = returnedOrders[0];
       expect(firstOrder._id.toString()).toBe(order3._id.toString());
-  
+
       expect(firstOrder.buyer).toBeDefined();
       expect(firstOrder.buyer.name).toBe(user2.name);
       expect(Object.keys(firstOrder.buyer).length).toBe(2);
-  
+
       expect(firstOrder.products).toHaveLength(1);
-      expect(firstOrder.products[0]._id.toString()).toBe(product2._id.toString());
+      expect(firstOrder.products[0]._id.toString()).toBe(
+        product2._id.toString(),
+      );
       expect(firstOrder.products[0].photo).toBeUndefined();
-    })
-  
+    });
+
     it("should return no orders if user does not have order", async () => {
       req.user._id = user3._id;
 
@@ -524,8 +563,8 @@ describe("authController integration tests", () => {
       expect(res.json).toHaveBeenCalled();
       const returnedOrders = res.json.mock.calls[0][0];
       expect(returnedOrders.length).toBe(0);
-    })
-    
+    });
+
     it("should handle invalid user ID", async () => {
       req.user._id = "invalid_id";
 
@@ -540,12 +579,12 @@ describe("authController integration tests", () => {
     });
   });
 
-  describe("getAllOrdersController integration tests", () => { 
+  describe("getAllOrdersController integration tests", () => {
     let user1, user2, product1, product2, order1, order2, order3;
     let req, res;
 
     beforeEach(async () => {
-      jest.clearAllMocks()
+      jest.clearAllMocks();
       user1 = await userModel.create({
         _id: new Types.ObjectId(),
         name: "testuser",
@@ -554,9 +593,9 @@ describe("authController integration tests", () => {
         phone: "123456789",
         address: "test address",
         answer: "test answer",
-        role: 0
+        role: 0,
       });
-  
+
       user2 = await userModel.create({
         _id: new Types.ObjectId(),
         name: "testuser2",
@@ -565,7 +604,7 @@ describe("authController integration tests", () => {
         phone: "123456789",
         address: "test address",
         answer: "test answer",
-        role: 0
+        role: 0,
       });
 
       product1 = await productModel.create({
@@ -582,7 +621,7 @@ describe("authController integration tests", () => {
         },
         shipping: true,
       });
-  
+
       product2 = await productModel.create({
         _id: new Types.ObjectId(),
         name: "Test Product 2",
@@ -607,8 +646,6 @@ describe("authController integration tests", () => {
         createdAt: new Date(Date.now() + 300),
       });
 
-
-
       order2 = await orderModel.create({
         _id: new Types.ObjectId(),
         products: [product1._id],
@@ -627,7 +664,7 @@ describe("authController integration tests", () => {
         createdAt: new Date(Date.now() + 8000),
       });
 
-      req = {}
+      req = {};
 
       res = {
         status: jest.fn().mockReturnThis(),
@@ -641,8 +678,8 @@ describe("authController integration tests", () => {
       for (const key in collections) {
         await collections[key].deleteMany({});
       }
-      jest.clearAllMocks(); 
-    })
+      jest.clearAllMocks();
+    });
 
     it("get all orders sorted by time", async () => {
       await getAllOrdersController(req, res);
@@ -662,9 +699,13 @@ describe("authController integration tests", () => {
       expect(thirdOrder._id.toString()).toBe(order1._id.toString());
 
       // ensure time is sorted
-      expect(new Date(firstOrder.createdAt).getTime()).toBeGreaterThan(new Date(secondOrder.createdAt).getTime());
-      expect(new Date(secondOrder.createdAt).getTime()).toBeGreaterThan(new Date(thirdOrder.createdAt).getTime());
-    })
+      expect(new Date(firstOrder.createdAt).getTime()).toBeGreaterThan(
+        new Date(secondOrder.createdAt).getTime(),
+      );
+      expect(new Date(secondOrder.createdAt).getTime()).toBeGreaterThan(
+        new Date(thirdOrder.createdAt).getTime(),
+      );
+    });
 
     it("check if products and buyers are populated correctly", async () => {
       await getAllOrdersController(req, res);
@@ -680,7 +721,9 @@ describe("authController integration tests", () => {
 
       const firstOrderProducts = firstOrder.products;
       expect(firstOrderProducts).toHaveLength(1);
-      expect(firstOrderProducts[0]._id.toString()).toBe(product2._id.toString());
+      expect(firstOrderProducts[0]._id.toString()).toBe(
+        product2._id.toString(),
+      );
       expect(firstOrderProducts[0].photo).toBeUndefined();
 
       const secondOrder = returnedOrders[1];
@@ -690,7 +733,9 @@ describe("authController integration tests", () => {
 
       const secondOrderProducts = secondOrder.products;
       expect(secondOrderProducts).toHaveLength(1);
-      expect(secondOrderProducts[0]._id.toString()).toBe(product1._id.toString());
+      expect(secondOrderProducts[0]._id.toString()).toBe(
+        product1._id.toString(),
+      );
       expect(secondOrderProducts[0].photo).toBeUndefined();
 
       const thirdOrder = returnedOrders[2];
@@ -700,29 +745,32 @@ describe("authController integration tests", () => {
 
       const thirdOrderProducts = thirdOrder.products;
       expect(thirdOrderProducts).toHaveLength(2);
-      expect(thirdOrderProducts[0]._id.toString()).toBe(product1._id.toString());
-      expect(thirdOrderProducts[1]._id.toString()).toBe(product2._id.toString());
+      expect(thirdOrderProducts[0]._id.toString()).toBe(
+        product1._id.toString(),
+      );
+      expect(thirdOrderProducts[1]._id.toString()).toBe(
+        product2._id.toString(),
+      );
       expect(thirdOrderProducts[0].photo).toBeUndefined();
       expect(thirdOrderProducts[1].photo).toBeUndefined();
-    })
+    });
 
     it("return empty array if no orders", async () => {
       await orderModel.deleteMany({});
       await getAllOrdersController(req, res);
-  
+
       expect(res.json).toHaveBeenCalled();
       const returnedOrders = res.json.mock.calls[0][0];
       expect(returnedOrders.length).toBe(0);
-    })
-  })
-
+    });
+  });
 
   describe("orderStatuscontroller integration tests", () => {
     let user1, user2, product1, product2, order1, order2, order3;
     let req, res;
 
     beforeEach(async () => {
-      jest.clearAllMocks()
+      jest.clearAllMocks();
       user1 = await userModel.create({
         _id: new Types.ObjectId(),
         name: "testuser",
@@ -731,9 +779,9 @@ describe("authController integration tests", () => {
         phone: "123456789",
         address: "test address",
         answer: "test answer",
-        role: 0
+        role: 0,
       });
-  
+
       user2 = await userModel.create({
         _id: new Types.ObjectId(),
         name: "testuser2",
@@ -742,7 +790,7 @@ describe("authController integration tests", () => {
         phone: "123456789",
         address: "test address",
         answer: "test answer",
-        role: 0
+        role: 0,
       });
 
       product1 = await productModel.create({
@@ -759,7 +807,7 @@ describe("authController integration tests", () => {
         },
         shipping: true,
       });
-  
+
       product2 = await productModel.create({
         _id: new Types.ObjectId(),
         name: "Test Product 2",
@@ -805,8 +853,8 @@ describe("authController integration tests", () => {
         },
         body: {
           status: "Shipped",
-        }
-      }
+        },
+      };
 
       res = {
         status: jest.fn().mockReturnThis(),
@@ -820,8 +868,8 @@ describe("authController integration tests", () => {
       for (const key in collections) {
         await collections[key].deleteMany({});
       }
-      jest.clearAllMocks(); 
-    })
+      jest.clearAllMocks();
+    });
 
     it("update existing order status to shipped", async () => {
       req.params.orderId = order1._id;
@@ -833,7 +881,7 @@ describe("authController integration tests", () => {
       const returnedOrder = res.json.mock.calls[0][0];
       expect(returnedOrder._id.toString()).toBe(order1._id.toString());
       expect(returnedOrder.status).toBe(req.body.status);
-    })
+    });
 
     it("update existing order to same status", async () => {
       req.params.orderId = order1._id;
@@ -845,19 +893,19 @@ describe("authController integration tests", () => {
       const returnedOrder = res.json.mock.calls[0][0];
       expect(returnedOrder._id.toString()).toBe(order1._id.toString());
       expect(returnedOrder.status).toBe(req.body.status);
-    })
+    });
 
     it("verify database was actually updated", async () => {
       req.params.orderId = order1._id;
       req.body.status = "Delivered";
-    
+
       await orderStatusController(req, res);
-      
+
       expect(res.json).toHaveBeenCalled();
       const updatedOrder = await orderModel.findById(order1._id);
       expect(updatedOrder.status).toBe("Delivered");
     });
-    
+
     it("return 404 if order not found", async () => {
       req.params.orderId = new Types.ObjectId();
 
@@ -868,21 +916,21 @@ describe("authController integration tests", () => {
         success: false,
         message: "Order not found",
       });
-    })
+    });
 
     it("should handle invalid objectId format", async () => {
       req.params.orderId = "invalid_id";
       req.body.status = "Shipped";
-    
+
       await orderStatusController(req, res);
-      
+
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
         message: "Error While Updating Order",
         error: expect.any(Error),
       });
-    })
+    });
 
     it("should handle missing orderId in req", async () => {
       req.params = {};
@@ -894,50 +942,50 @@ describe("authController integration tests", () => {
         success: false,
         message: "Order Id and Status is required",
       });
-    })
-    
+    });
+
     it("should handle error when update with missing status", async () => {
       req.params.orderId = order1._id;
       req.body = {};
-      
+
       await orderStatusController(req, res);
-      
+
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
         message: "Order Id and Status is required",
       });
     });
-    
+
     it("invalid status in req", async () => {
       req.params.orderId = order1._id;
       req.body.status = "invalidStatus";
-      
+
       await orderStatusController(req, res);
-      
+
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith({
         success: false,
         message: "Invalid Status",
       });
     });
-    
+
     it("should preserve other order fields when updating status", async () => {
       req.params.orderId = order1._id;
       req.body.status = "Shipped";
-      
+
       await orderStatusController(req, res);
-      
+
       expect(res.json).toHaveBeenCalled();
 
       const returnedOrder = res.json.mock.calls[0][0];
       expect(returnedOrder.buyer.toString()).toBe(order1.buyer.toString());
       expect(returnedOrder.payment).toBe(order1.payment);
-      
+
       expect(returnedOrder.products.length).toBe(order1.products.length);
       returnedOrder.products.forEach((product, index) => {
         expect(product.toString()).toBe(order1.products[index].toString());
       });
-    })
-  })
+    });
+  });
 });

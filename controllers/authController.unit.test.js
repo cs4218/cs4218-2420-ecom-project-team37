@@ -770,7 +770,7 @@ describe("Get Orders Controller Test", () => {
     const mockPopulateProducts = jest.fn().mockReturnThis();
     const mockPopulateBuyer = jest.fn().mockReturnThis();
     const mockLean = jest.fn().mockResolvedValue(mockOrder);
-  
+
     orderModel.find.mockReturnValue({
       populate: mockPopulateProducts,
     });
@@ -794,8 +794,7 @@ describe("Get Orders Controller Test", () => {
     const error = new Error("Something went wrong");
     const mockPopulateProducts = jest.fn().mockReturnThis();
     const mockPopulateBuyer = jest.fn().mockReturnThis();
-    const mockLean = jest.fn().mockRejectedValue(error)
-    
+    const mockLean = jest.fn().mockRejectedValue(error);
 
     orderModel.find.mockReturnValue({
       populate: mockPopulateProducts,
@@ -873,7 +872,7 @@ describe("Get All Orders Controller Test", () => {
     });
     mockSort.mockReturnValue({
       lean: mockLean,
-    })
+    });
 
     await getAllOrdersController(req, res);
 
@@ -890,8 +889,8 @@ describe("Get All Orders Controller Test", () => {
     const mockPopulateProducts = jest.fn().mockReturnThis();
     const mockPopulateBuyer = jest.fn().mockReturnThis();
     const mockSort = jest.fn().mockReturnThis();
-    const mockLean = jest.fn().mockRejectedValue(error)
-    
+    const mockLean = jest.fn().mockRejectedValue(error);
+
     orderModel.find.mockReturnValue({
       populate: mockPopulateProducts,
     });
@@ -903,7 +902,7 @@ describe("Get All Orders Controller Test", () => {
     });
     mockSort.mockReturnValue({
       lean: mockLean,
-    })
+    });
 
     await getAllOrdersController(req, res);
 

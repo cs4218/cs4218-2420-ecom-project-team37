@@ -398,16 +398,16 @@ export const brainTreePaymentController = async (req, res) => {
   try {
     const { nonce, cart } = req.body;
     if (!nonce) {
-      return res.status(400).send({ 
+      return res.status(400).send({
         success: false,
-        message: "Nounce is required" 
+        message: "Nounce is required",
       });
     }
 
     if (!cart || cart.length < 1) {
-      return res.status(400).send({ 
+      return res.status(400).send({
         success: false,
-        message: "Cart is required and cannot be empty" 
+        message: "Cart is required and cannot be empty",
       });
     }
 

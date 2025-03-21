@@ -274,7 +274,13 @@ export const orderStatusController = async (req, res) => {
         message: "Order Id and Status is required",
       });
     }
-    const statusArr = ["Not Processed", "Processing", "Shipped", "Delivered", "Cancelled"];
+    const statusArr = [
+      "Not Processed",
+      "Processing",
+      "Shipped",
+      "Delivered",
+      "Cancelled",
+    ];
     if (!statusArr.includes(status)) {
       return res.status(400).send({
         success: false,
