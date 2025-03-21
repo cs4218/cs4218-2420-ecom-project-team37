@@ -9,16 +9,13 @@ dotenv.config();
 
 async function globalTeardown() {
   try {
-    await mongoose.connect(process.env.MONGO_URL);
-
-    await userModel.deleteMany({ email: { $in: ["test-user@example.com", "test-admin@example.com"] } });
-    await categoryModel.deleteMany({ name: /^TEST-/ });
-    await productModel.deleteMany({ name: /^TEST-/ });
-
-    console.log("Test data removed.");
+    await mongoose.connect(process.env.MONGO_TEST_URL);
+    await mongoose.connection.dropDatabase();
+    console.log("Test database dropped.");
     await mongoose.connection.close();
   } catch (error) {
     console.error("Error in global teardown:", error);
+    throw error;
   }
 }
 
