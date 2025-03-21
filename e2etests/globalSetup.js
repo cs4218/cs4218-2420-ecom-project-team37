@@ -10,7 +10,11 @@ dotenv.config();
 
 async function globalSetup() {
   try {
-    await mongoose.connect(process.env.MONGO_URL);
+    // Use test database URL
+    await mongoose.connect(process.env.MONGO_TEST_URL);
+    
+    // Clear any existing test data
+    await mongoose.connection.dropDatabase();
 
     // Create users
     const testUsers = [
@@ -67,6 +71,7 @@ async function globalSetup() {
     await mongoose.connection.close();
   } catch (error) {
     console.error("Error in global setup:", error);
+    throw error;
   }
 }
 
