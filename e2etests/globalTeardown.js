@@ -1,9 +1,5 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import userModel from "../models/userModel.js";
-import categoryModel from "../models/categoryModel.js";
-import productModel from "../models/productModel.js";
-import orderModel from "../models/orderModel.js";
 
 dotenv.config();
 
