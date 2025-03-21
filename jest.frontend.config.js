@@ -34,6 +34,8 @@ export default {
 
   // jest code coverage
   collectCoverage: true,
+  coverageDirectory: "coverage/frontend",
+  coverageReporters: ["lcov", "text"],
   collectCoverageFrom: [
     "client/src/pages/**/*.js",
     "!client/src/pages/**/*.test.js",
