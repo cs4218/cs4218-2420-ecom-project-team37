@@ -16,70 +16,39 @@ const CartPage = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Safely format price
-  const formatPrice = (price) => {
-    const numPrice = parseFloat(price);
-    if (isNaN(numPrice)) return 'N/A';
-    
-    try {
-      return numPrice.toLocaleString("en-US", {
-        style: "currency",
-        currency: "USD",
-      });
-    } catch (error) {
-      console.log("Error formatting price:", error);
-      return 'N/A';
-    }
-  };
-
-  // total price calculation with error handling
+  //total price
   const totalPrice = () => {
-    if (!Array.isArray(cart)) return formatPrice(0);
-    
     let total = 0;
-    cart.forEach((item) => {
-      if (!item) return;
-      
-      // Handle non-numeric or missing price values
-      const price = parseFloat(item?.price);
-      if (!isNaN(price)) {
-        total += Math.abs(price);
-      }
+    cart?.forEach((item) => {
+      const price = parseFloat(item.price) || 0;
+      total = total + Math.abs(price);
     });
-    
-    return formatPrice(total);
+    return total.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
   };
 
-  // delete item with improved error handling
+  //delete item
   const removeCartItem = (pid) => {
     try {
-      if (!pid || !Array.isArray(cart)) return;
-      
       let myCart = [...cart];
-      let index = myCart.findIndex((item) => item?._id === pid);
-      
-      // Make sure we found a valid index
-      if (index !== -1) {
-        myCart.splice(index, 1);
-        setCart(myCart);
-        localStorage.setItem("cart", JSON.stringify(myCart));
-      }
+      let index = myCart.findIndex((item) => item._id === pid);
+      myCart.splice(index, 1);
+      setCart(myCart);
+      localStorage.setItem("cart", JSON.stringify(myCart));
     } catch (error) {
-      console.log("Error removing cart item:", error);
+      console.log(error);
     }
   };
 
-  // get payment gateway token with improved error handling
+  //get payment gateway token
   const getToken = async () => {
     try {
-      const response = await axios.get("/api/v1/product/braintree/token");
-      
-      // Verify that response.data exists and has the expected structure
-      if (response?.data && typeof response.data === 'object') {
-        setClientToken(response.data.clientToken || "");
-      }
+      const { data } = await axios.get("/api/v1/product/braintree/token");
+      setClientToken(data?.clientToken);
     } catch (error) {
-      console.log("Error fetching token:", error);
+      console.log(error);
     }
   };
 
@@ -89,57 +58,25 @@ const CartPage = () => {
     }
   }, [auth]);
 
-  // handle payments with robust error handling and response validation
+  //handle payments
   const handlePayment = async () => {
     try {
-      if (!instance) {
-        console.log("Payment instance not available");
-        return;
-      }
-      
       setLoading(true);
       const { nonce } = await instance.requestPaymentMethod();
-      
-      const response = await axios.post("/api/v1/product/braintree/payment", {
+      const { data } = await axios.post("/api/v1/product/braintree/payment", {
         nonce,
         cart,
       });
-      
-      // Check if payment was successful
-      if (response?.data?.success) {
-        localStorage.removeItem("cart");
-        setCart([]);
-        navigate("/dashboard/user/orders");
-        toast.success("Payment Completed Successfully ");
-      } else {
-        // Handle partial or failed payment
-        toast.error(response?.data?.message || "Payment failed");
-      }
+      setLoading(false);
+      localStorage.removeItem("cart");
+      setCart([]);
+      navigate("/dashboard/user/orders");
+      toast.success("Payment Completed Successfully ");
     } catch (error) {
-      console.log("Payment error:", error);
-      toast.error("Payment processing failed. Please try again.");
-    } finally {
+      console.log(error);
       setLoading(false);
     }
   };
-
-  // Safely access cart length
-  const getCartLength = () => {
-    if (!cart || !Array.isArray(cart)) return 0;
-    return cart.length;
-  };
-
-  // Safely truncate description text
-  const truncateDescription = (description) => {
-    if (!description) return "No description available";
-    
-    try {
-      return description.substring(0, 30) + (description.length > 30 ? "..." : "");
-    } catch (error) {
-      return "No description available";
-    }
-  };
-
   return (
     <Layout>
       <div className="cart-page">
@@ -148,10 +85,10 @@ const CartPage = () => {
             <h1 className="text-center bg-light p-2 mb-1">
               {!auth?.user
                 ? "Hello Guest"
-                : `Hello ${auth?.token && auth?.user?.name || "User"}`}
+                : `Hello ${auth?.token && auth?.user?.name}`}
               <p className="text-center">
-                {getCartLength() > 0
-                  ? `You have ${getCartLength()} items in your cart ${
+                {cart?.length
+                  ? `You have ${cart.length} items in your cart ${
                       auth?.token ? "" : "please login to checkout!"
                     }`
                   : "Your Cart Is Empty"}
@@ -161,41 +98,33 @@ const CartPage = () => {
         </div>
         <div className="container ">
           <div className="row ">
-            <div className="col-md-7 p-0 m-0">
-              {Array.isArray(cart) && cart.map((p, index) => {
-                if (!p) return null;
-                return (
-                  <div className="row card flex-row" key={p?._id || `cart-item-${index}`}>
-                    <div className="col-md-4">
-                      <img
-                        src={p?._id ? `/api/v1/product/product-photo/${p._id}` : "https://via.placeholder.com/150"}
-                        className="card-img-top"
-                        alt={p?.name || "Product"}
-                        width="100%"
-                        height={"130px"}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = "https://via.placeholder.com/150";
-                        }}
-                      />
-                    </div>
-                    <div className="col-md-4">
-                      <p>{p?.name || "Unnamed Product"}</p>
-                      <p>{truncateDescription(p?.description)}</p>
-                      <p>Price : {p?.price || "N/A"}</p>
-                    </div>
-                    <div className="col-md-4 cart-remove-btn">
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => p?._id && removeCartItem(p._id)}
-                        disabled={!p?._id}
-                      >
-                        Remove
-                      </button>
-                    </div>
+            <div className="col-md-7  p-0 m-0">
+              {cart?.map((p) => (
+                <div className="row card flex-row" key={p._id}>
+                  <div className="col-md-4">
+                    <img
+                      src={`/api/v1/product/product-photo/${p._id}`}
+                      className="card-img-top"
+                      alt={p.name}
+                      width="100%"
+                      height={"130px"}
+                    />
                   </div>
-                );
-              })}
+                  <div className="col-md-4">
+                    <p>{p.name}</p>
+                    <p>{p.description.substring(0, 30)}</p>
+                    <p>Price : {p.price}</p>
+                  </div>
+                  <div className="col-md-4 cart-remove-btn">
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => removeCartItem(p._id)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
             <div className="col-md-5 cart-summary ">
               <h2>Cart Summary</h2>
@@ -239,7 +168,7 @@ const CartPage = () => {
                 </div>
               )}
               <div className="mt-2">
-                {!clientToken || !auth?.token || getCartLength() === 0 ? (
+                {!clientToken || !auth?.token || !cart?.length ? (
                   ""
                 ) : (
                   <>

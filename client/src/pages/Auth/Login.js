@@ -18,7 +18,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/api/v1/auth/login", {
+      const res = await axios.post(`/api/v1/auth/login`, {
         email,
         password,
       });
@@ -43,7 +43,51 @@ const Login = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong");
+      if (error.response) {
+        const { status, data } = error.response;
+        
+        if (status === 401) {
+          toast.error("Incorrect password. Please try again.", {
+            duration: 5000,
+            style: {
+              background: "#ff4d4f",
+              color: "white",
+            },
+          });
+        } else if (status === 404) {
+          toast.error("Email not registered. Please check your email or register a new account.", {
+            duration: 5000,
+            style: {
+              background: "#ff4d4f",
+              color: "white",
+            },
+          });
+        } else if (status === 400) {
+          toast.error(data.message || "Please provide both email and password.", {
+            duration: 5000,
+            style: {
+              background: "#ff4d4f",
+              color: "white",
+            },
+          });
+        } else {
+          toast.error("Something went wrong. Please try again later.", {
+            duration: 5000,
+            style: {
+              background: "#ff4d4f",
+              color: "white",
+            },
+          });
+        }
+      } else {
+        toast.error("Something went wrong. Please try again later.", {
+          duration: 5000,
+          style: {
+            background: "#ff4d4f",
+            color: "white",
+          },
+        });
+      }
     }
   };
   return (
