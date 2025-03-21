@@ -14,7 +14,7 @@ dotenv.config();
 //database config
 connectDB();
 
-const app = express();
+export const app = express();
 
 //middlewares
 app.use(cors());
@@ -34,6 +34,6 @@ app.get('/', (req,res) => {
 
 const PORT = process.env.PORT || 6060;
 
-app.listen(PORT, () => {
+export const server = app.listen(PORT, () => {
     console.log(`Server running on ${process.env.DEV_MODE} mode on ${PORT}`.bgCyan.white);
 });

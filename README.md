@@ -27,3 +27,15 @@ Below are the commands to run the tests independently:
 npm run test:frontend
 npm run test:backend
 ```
+
+Below are the commands to run the integration tests independently:
+
+```bash
+npm run test:frontend-integration
+npm run test:backend-integration
+```
+
+Below are the commands to run the playwright tests:
+```bash
+npx playwright test
+```

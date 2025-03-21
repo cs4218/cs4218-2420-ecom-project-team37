@@ -10,7 +10,12 @@ dotenv.config();
 
 async function globalSetup() {
   try {
-    await mongoose.connect(process.env.MONGO_URL);
+    // Connect using the modified URL from connectDB
+    process.env.TEST_MODE = 'true';
+    await mongoose.connect(process.env.MONGO_URL.replace(/\/[^/]*$/, '/e2e_test'));
+    
+    // Clear any existing test data
+    await mongoose.connection.dropDatabase();
 
     // Create users
     const testUsers = [
@@ -67,6 +72,7 @@ async function globalSetup() {
     await mongoose.connection.close();
   } catch (error) {
     console.error("Error in global setup:", error);
+    throw error;
   }
 }
 
