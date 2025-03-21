@@ -205,12 +205,12 @@ const HomePage = () => {
                   setPage(page + 1);
                 }}
               >
-               {loading ? (
+                {loading ? (
                   "Loading ..."
                 ) : (
                   <>
                     {" "}
-                    Loadmore 
+                    Loadmore
                     {/* <AiOutlineReload /> */}
                   </>
                 )}
