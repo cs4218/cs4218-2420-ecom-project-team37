@@ -114,6 +114,14 @@ export const getSingleProductController = async (req, res) => {
       .findOne({ slug: req.params.slug })
       .select("-photo")
       .populate("category");
+    
+    if (!product) {
+      return res.status(404).send({
+        success: false,
+        message: "Product not found"
+      });
+    }
+
     res.status(200).send({
       success: true,
       message: "Single Product Fetched",
