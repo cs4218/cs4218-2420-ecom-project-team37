@@ -153,7 +153,16 @@ describe("Login Component", () => {
     fireEvent.click(getByText("LOGIN"));
 
     await waitFor(() => expect(axios.post).toHaveBeenCalled());
-    expect(toast.error).toHaveBeenCalledWith("Something went wrong");
+    expect(toast.error).toHaveBeenCalledWith(
+      "Something went wrong. Please try again later.",
+      {
+        duration: 5000,
+        style: {
+          background: "#ff4d4f",
+          color: "white",
+        },
+      },
+    );
   });
 
   it("should display toast message when login fails with API response", async () => {
