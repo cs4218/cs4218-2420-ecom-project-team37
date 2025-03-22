@@ -12,11 +12,11 @@ import userModel from "../models/userModel";
 import orderModel from "../models/orderModel";
 import productModel from "../models/productModel";
 import { comparePassword, hashPassword } from "../helpers/authHelper";
-import JWT from "jsonwebtoken";
 import connectDB from "../config/db";
 import mongoose, { Types } from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
+require("dotenv").config();
 jest.spyOn(console, "log").mockImplementation(() => {});
 jest.spyOn(userModel, "findByIdAndUpdate");
 
@@ -35,6 +35,347 @@ describe("authController integration tests", () => {
     await mongoose.connection.dropDatabase();
     await mongoose.connection.close();
     await mongoServer.stop();
+  });
+
+  describe("Register controller", () => {
+    let req, res;
+
+    beforeEach(async () => {
+      req = {
+        body: {
+          name: "John Doe",
+          email: "john@example.com",
+          password: "password123",
+          phone: "12344000",
+          address: "123 Street",
+          answer: "Football",
+        },
+      };
+
+      res = {
+        status: jest.fn().mockReturnThis(),
+        send: jest.fn(),
+      };
+    });
+
+    afterEach(async () => {
+      // clear all collections before each test
+      const collections = mongoose.connection.collections;
+      for (const key in collections) {
+        await collections[key].deleteMany({});
+      }
+      jest.clearAllMocks();
+    });
+
+    test("should successfully register a new user with valid fields", async () => {
+      const hashedPassword = await hashPassword(req.body.password);
+      req.body.password = hashedPassword;
+
+      await registerController(req, res);
+
+      const user = await userModel.findOne({ email: req.body.email });
+
+      const responseData = res.send.mock.calls[0][0];
+
+      expect(user).not.toBeNull();
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(responseData.success).toBe(true);
+      expect(responseData.message).toBe("User Register Successfully");
+      expect(responseData.user.name).toBe(req.body.name);
+      expect(responseData.user.email).toBe(req.body.email);
+      expect(responseData.user.phone).toBe(req.body.phone);
+      expect(responseData.user.address).toBe(req.body.address);
+      expect(responseData.user.answer).toBe(req.body.answer);
+      const isPasswordValid = await comparePassword(
+        req.body.password,
+        responseData.user.password
+      );
+      expect(isPasswordValid).toBe(true);
+    });
+
+    test("should not create user if email is missing", async () => {
+      delete req.body.email;
+
+      await registerController(req, res);
+
+      const user = await userModel.findOne({ name: req.body.name });
+
+      const responseData = res.send.mock.calls[0][0];
+
+      expect(user).toBeNull();
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(responseData.message).toBe("Email is Required");
+    });
+
+    test("should not create user if name is missing", async () => {
+      delete req.body.name;
+
+      await registerController(req, res);
+
+      const user = await userModel.findOne({ email: req.body.email });
+
+      const responseData = res.send.mock.calls[0][0];
+
+      expect(user).toBeNull();
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(responseData.message).toBe("Name is Required");
+    });
+
+    test("should not create user if password is missing", async () => {
+      delete req.body.password;
+
+      await registerController(req, res);
+
+      const user = await userModel.findOne({ email: req.body.email });
+
+      const responseData = res.send.mock.calls[0][0];
+
+      expect(user).toBeNull();
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(responseData.message).toBe("Password is Required");
+    });
+
+    test("should not create user if phone number is missing", async () => {
+      delete req.body.phone;
+
+      await registerController(req, res);
+
+      const user = await userModel.findOne({ email: req.body.email });
+
+      const responseData = res.send.mock.calls[0][0];
+
+      expect(user).toBeNull();
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(responseData.message).toBe("Phone no is Required");
+    });
+
+    test("should not create user if address is missing", async () => {
+      delete req.body.address;
+
+      await registerController(req, res);
+
+      const user = await userModel.findOne({ email: req.body.email });
+
+      const responseData = res.send.mock.calls[0][0];
+
+      expect(user).toBeNull();
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(responseData.message).toBe("Address is Required");
+    });
+
+    test("should not create user if answer is missing", async () => {
+      delete req.body.answer;
+
+      await registerController(req, res);
+
+      const user = await userModel.findOne({ email: req.body.email });
+
+      const responseData = res.send.mock.calls[0][0];
+
+      expect(user).toBeNull();
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(responseData.message).toBe("Answer is Required");
+    });
+
+    test("should not create user if user already exists", async () => {
+      const hashedPassword = await hashPassword("password123");
+      await userModel.create({
+        name: "John Doe",
+        email: "john@example.com",
+        password: hashedPassword,
+        phone: "12344000",
+        address: "123 Street",
+        answer: "Football",
+      });
+
+      await registerController(req, res);
+
+      const users = await userModel.find({ email: "john@example.com" });
+      const responseData = res.send.mock.calls[0][0];
+
+      expect(users.length).toBe(1);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(responseData.success).toBe(false);
+      expect(responseData.message).toBe("Already registered please login");
+    });
+  });
+
+  describe("Login controller", () => {
+    let req, res;
+    let user;
+    let originalPassword;
+
+    beforeEach(async () => {
+      originalPassword = "testpassword";
+      const hashedPassword = await hashPassword(originalPassword);
+
+      user = new userModel({
+        _id: new mongoose.Types.ObjectId(),
+        name: "testuser",
+        email: "testuser@gmail.com",
+        password: hashedPassword,
+        phone: "123456789",
+        address: "test address",
+        answer: "test answer",
+        role: 0,
+      });
+      await user.save();
+
+      req = {
+        body: {
+          email: "testuser@gmail.com",
+          password: "testpassword",
+        },
+      };
+
+      res = {
+        status: jest.fn().mockReturnThis(),
+        send: jest.fn(),
+        json: jest.fn(),
+      };
+    });
+
+    afterEach(async () => {
+      // clear all collections before each test
+      const collections = mongoose.connection.collections;
+      for (const key in collections) {
+        await collections[key].deleteMany({});
+      }
+      jest.clearAllMocks();
+    });
+
+    test("should login successfully with correct credentials", async () => {
+      await loginController(req, res);
+      const responseData = res.send.mock.calls[0][0];
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(responseData.success).toBe(true);
+      expect(responseData.message).toBe("login successfully");
+      expect(responseData.user.name).toBe(user.name);
+      expect(responseData.user.email).toBe(user.email);
+      expect(responseData.user.phone).toBe(user.phone);
+      expect(responseData.user.address).toBe(user.address);
+    });
+
+    test("should fail if email is missing", async () => {
+      req.body.email = "";
+      await loginController(req, res);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Invalid email or password",
+      });
+    });
+
+    test("should fail if password is missing", async () => {
+      req.body.password = "";
+      await loginController(req, res);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Invalid email or password",
+      });
+    });
+
+    test("should return 404 if email is not registered", async () => {
+      req.body.email = "notregistered@example.com";
+      await loginController(req, res);
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Email is not registered",
+      });
+    });
+
+    test("should return 401 if passwords do not match", async () => {
+      req.body.password = "wrongpassword";
+      await loginController(req, res);
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Invalid email or password",
+      });
+    });
+  });
+
+  describe("Forgot password controller", () => {
+    let req, res;
+    let user;
+    let originalPassword;
+
+    beforeEach(async () => {
+      originalPassword = "testpassword";
+      const hashedPassword = await hashPassword(originalPassword);
+
+      user = new userModel({
+        _id: new mongoose.Types.ObjectId(),
+        name: "testuser",
+        email: "testuser@gmail.com",
+        password: hashedPassword,
+        phone: "123456789",
+        address: "test address",
+        answer: "test answer",
+        role: 0,
+      });
+      await user.save();
+
+      req = {
+        body: {
+          email: "testuser@gmail.com",
+          answer: "test answer",
+          newPassword: "newPassword",
+        },
+      };
+
+      res = {
+        status: jest.fn().mockReturnThis(),
+        send: jest.fn(),
+        json: jest.fn(),
+      };
+    });
+
+    afterEach(async () => {
+      // clear all collections before each test
+      const collections = mongoose.connection.collections;
+      for (const key in collections) {
+        await collections[key].deleteMany({});
+      }
+      jest.clearAllMocks();
+    });
+
+    test("all fields are correct and password successfully resetted", async () => {
+      await forgotPasswordController(req, res);
+      const updatedUser = await userModel.findById(user._id);
+      const isPasswordUpdated = await comparePassword(
+        req.body.newPassword,
+        updatedUser.password
+      );
+      expect(isPasswordUpdated).toBe(true);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.send).toHaveBeenCalledWith({
+        success: true,
+        message: "Password Reset Successfully",
+      });
+    });
+
+    test("email provided does not exist", async () => {
+      req.body.email = "wrongemail@example.com";
+      await forgotPasswordController(req, res);
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Invalid email or answer",
+      });
+    });
+
+    test("answer provided is incorrect", async () => {
+      req.body.answer = "wrong answer";
+      await forgotPasswordController(req, res);
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.send).toHaveBeenCalledWith({
+        success: false,
+        message: "Invalid email or answer",
+      });
+    });
   });
 
   // Bypass middleware and mock req, res
@@ -110,7 +451,7 @@ describe("authController integration tests", () => {
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
       expect(responseData.updatedUser.address).toBe(
-        expectedUpdatedUser.address,
+        expectedUpdatedUser.address
       );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
@@ -119,7 +460,7 @@ describe("authController integration tests", () => {
       // Check password is updated
       const isPasswordValid = await comparePassword(
         req.body.password,
-        responseData.updatedUser.password,
+        responseData.updatedUser.password
       );
       expect(isPasswordValid).toBe(true);
     });
@@ -146,7 +487,7 @@ describe("authController integration tests", () => {
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
       expect(responseData.updatedUser.address).toBe(
-        expectedUpdatedUser.address,
+        expectedUpdatedUser.address
       );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
@@ -155,7 +496,7 @@ describe("authController integration tests", () => {
       // Check password is updated
       const isPasswordValid = await comparePassword(
         req.body.password,
-        responseData.updatedUser.password,
+        responseData.updatedUser.password
       );
       expect(isPasswordValid).toBe(true);
     });
@@ -182,7 +523,7 @@ describe("authController integration tests", () => {
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
       expect(responseData.updatedUser.address).toBe(
-        expectedUpdatedUser.address,
+        expectedUpdatedUser.address
       );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
@@ -191,7 +532,7 @@ describe("authController integration tests", () => {
       // Check password is the same as old password
       const isPasswordValid = await comparePassword(
         originalPassword,
-        responseData.updatedUser.password,
+        responseData.updatedUser.password
       );
       expect(isPasswordValid).toBe(true);
     });
@@ -218,7 +559,7 @@ describe("authController integration tests", () => {
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
       expect(responseData.updatedUser.address).toBe(
-        expectedUpdatedUser.address,
+        expectedUpdatedUser.address
       );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
@@ -227,7 +568,7 @@ describe("authController integration tests", () => {
       // Check password is updated
       const isPasswordValid = await comparePassword(
         req.body.password,
-        responseData.updatedUser.password,
+        responseData.updatedUser.password
       );
       expect(isPasswordValid).toBe(true);
     });
@@ -254,7 +595,7 @@ describe("authController integration tests", () => {
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
       expect(responseData.updatedUser.address).toBe(
-        expectedUpdatedUser.address,
+        expectedUpdatedUser.address
       );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
@@ -263,7 +604,7 @@ describe("authController integration tests", () => {
       // Check password is updated
       const isPasswordValid = await comparePassword(
         req.body.password,
-        responseData.updatedUser.password,
+        responseData.updatedUser.password
       );
       expect(isPasswordValid).toBe(true);
     });
@@ -290,7 +631,7 @@ describe("authController integration tests", () => {
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
       expect(responseData.updatedUser.address).toBe(
-        expectedUpdatedUser.address,
+        expectedUpdatedUser.address
       );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
@@ -299,7 +640,7 @@ describe("authController integration tests", () => {
       // Check password is updated
       const isPasswordValid = await comparePassword(
         req.body.password,
-        responseData.updatedUser.password,
+        responseData.updatedUser.password
       );
       expect(isPasswordValid).toBe(true);
     });
@@ -314,7 +655,7 @@ describe("authController integration tests", () => {
       const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBe(false);
       expect(responseData.message).toBe(
-        "Password is required and at least 6 characters long",
+        "Password is required and at least 6 characters long"
       );
       expect(userModel.findByIdAndUpdate).not.toHaveBeenCalled();
     });
@@ -329,7 +670,7 @@ describe("authController integration tests", () => {
       const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBe(false);
       expect(responseData.message).toBe(
-        "Password is required and at least 6 characters long",
+        "Password is required and at least 6 characters long"
       );
       expect(userModel.findByIdAndUpdate).not.toHaveBeenCalled();
     });
@@ -510,10 +851,10 @@ describe("authController integration tests", () => {
 
       expect(firstOrder.products).toHaveLength(2);
       expect(firstOrder.products[0]._id.toString()).toBe(
-        product1._id.toString(),
+        product1._id.toString()
       );
       expect(firstOrder.products[1]._id.toString()).toBe(
-        product2._id.toString(),
+        product2._id.toString()
       );
       expect(firstOrder.products[0].photo).toBeUndefined();
       expect(firstOrder.products[1].photo).toBeUndefined();
@@ -527,7 +868,7 @@ describe("authController integration tests", () => {
 
       expect(secondOrder.products).toHaveLength(1);
       expect(secondOrder.products[0]._id.toString()).toBe(
-        product1._id.toString(),
+        product1._id.toString()
       );
       expect(firstOrder.products[1].photo).toBeUndefined();
     });
@@ -550,7 +891,7 @@ describe("authController integration tests", () => {
 
       expect(firstOrder.products).toHaveLength(1);
       expect(firstOrder.products[0]._id.toString()).toBe(
-        product2._id.toString(),
+        product2._id.toString()
       );
       expect(firstOrder.products[0].photo).toBeUndefined();
     });
@@ -700,10 +1041,10 @@ describe("authController integration tests", () => {
 
       // ensure time is sorted
       expect(new Date(firstOrder.createdAt).getTime()).toBeGreaterThan(
-        new Date(secondOrder.createdAt).getTime(),
+        new Date(secondOrder.createdAt).getTime()
       );
       expect(new Date(secondOrder.createdAt).getTime()).toBeGreaterThan(
-        new Date(thirdOrder.createdAt).getTime(),
+        new Date(thirdOrder.createdAt).getTime()
       );
     });
 
@@ -722,7 +1063,7 @@ describe("authController integration tests", () => {
       const firstOrderProducts = firstOrder.products;
       expect(firstOrderProducts).toHaveLength(1);
       expect(firstOrderProducts[0]._id.toString()).toBe(
-        product2._id.toString(),
+        product2._id.toString()
       );
       expect(firstOrderProducts[0].photo).toBeUndefined();
 
@@ -734,7 +1075,7 @@ describe("authController integration tests", () => {
       const secondOrderProducts = secondOrder.products;
       expect(secondOrderProducts).toHaveLength(1);
       expect(secondOrderProducts[0]._id.toString()).toBe(
-        product1._id.toString(),
+        product1._id.toString()
       );
       expect(secondOrderProducts[0].photo).toBeUndefined();
 
@@ -746,10 +1087,10 @@ describe("authController integration tests", () => {
       const thirdOrderProducts = thirdOrder.products;
       expect(thirdOrderProducts).toHaveLength(2);
       expect(thirdOrderProducts[0]._id.toString()).toBe(
-        product1._id.toString(),
+        product1._id.toString()
       );
       expect(thirdOrderProducts[1]._id.toString()).toBe(
-        product2._id.toString(),
+        product2._id.toString()
       );
       expect(thirdOrderProducts[0].photo).toBeUndefined();
       expect(thirdOrderProducts[1].photo).toBeUndefined();
