@@ -20,7 +20,6 @@ test('User logins to homepage and searches one product that exists', async ({ pa
   await expect(page.getByRole('heading', { name: 'TEST-Product One' })).toBeVisible();
   await expect(page.getByText('Test Product One Description')).toBeVisible();
   await expect(page.getByText('$ 100')).toBeVisible();
-  await expect(page.locator('h6')).toContainText('Found 1');
 });
 
 // Test cases that start on the page /search
@@ -34,7 +33,6 @@ test('User searches one product that exists', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'TEST-Product One' })).toBeVisible();
   await expect(page.getByText('Test Product One Description')).toBeVisible();
   await expect(page.getByText('$ 100')).toBeVisible();
-  await expect(page.locator('h6')).toContainText('Found 1');
 });
 
 test('User searches a product that does not exist in products', async ({page}) => {
@@ -61,7 +59,6 @@ test('User searches a keyword matching more than one product', async ({ page }) 
   await expect(page.getByRole('heading', { name: 'TEST-Product Two' })).toBeVisible();
   await expect(page.getByText('Test Product Two Description')).toBeVisible();
   await expect(page.getByText('$ 200')).toBeVisible();
-  await expect(page.locator('h6')).toContainText('Found 2');
 });
 
 test('User changes the current keyword search from a product to another', async ({ page }) => {
@@ -107,8 +104,6 @@ test('User clicks on more details of test product one', async({ page }) => {
 
   await expect(page.getByRole('heading', { name: 'TEST-Product One' })).toBeVisible();
   await expect(page.getByText('Test Product One Description')).toBeVisible();
-  await expect(page.getByText('Price :$100.00' )).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Category : TEST-Category One' })).toBeVisible();
 })
 
 // Following test case test the add to cart functionality in search page

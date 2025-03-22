@@ -67,6 +67,107 @@ async function globalSetup() {
       },
     ]);
 
+    const orders = await orderModel.insertMany([
+      {
+        "products": [ products[0]._id, products[1]._id ],
+        "payment": {
+          "errors": {
+            "validationErrors": {},
+            "errorCollections": {
+              "transaction": {
+                "validationErrors": {
+                  "amount": [
+                    {
+                      "attribute": "amount",
+                      "code": "81503",
+                      "message": "Amount is an invalid format."
+                    }
+                  ]
+                },
+                "errorCollections": {
+                  "creditCard": {
+                    "validationErrors": {
+                      "number": [
+                        {
+                          "attribute": "number",
+                          "code": "81717",
+                          "message": "Credit card number is not an accepted test number."
+                        }
+                      ]
+                    },
+                    "errorCollections": {}
+                  }
+                }
+              }
+            }
+          },
+          "params": {
+            "transaction": {
+              "amount": "3004.9700000000003",
+              "paymentMethodNonce": "tokencc_bh_c36kjx_t6mnd5_c2mzrt_7rdc6j_nb4",
+              "options": {
+                "submitForSettlement": "true"
+              },
+              "type": "sale"
+            }
+          },
+          "message": "Amount is an invalid format.\nCredit card number is not an accepted test number.",
+          "success": false
+        },
+        "buyer": createdUsers[0]._id,
+        "status": "Not Processed",
+      },
+      {
+        "products": [ products[0]._id],
+        "payment": {
+          "errors": {
+            "validationErrors": {},
+            "errorCollections": {
+              "transaction": {
+                "validationErrors": {
+                  "amount": [
+                    {
+                      "attribute": "amount",
+                      "code": "81503",
+                      "message": "Amount is an invalid format."
+                    }
+                  ]
+                },
+                "errorCollections": {
+                  "creditCard": {
+                    "validationErrors": {
+                      "number": [
+                        {
+                          "attribute": "number",
+                          "code": "81717",
+                          "message": "Credit card number is not an accepted test number."
+                        }
+                      ]
+                    },
+                    "errorCollections": {}
+                  }
+                }
+              }
+            }
+          },
+          "params": {
+            "transaction": {
+              "amount": "3004.9700000000003",
+              "paymentMethodNonce": "tokencc_bh_c36kjx_t6mnd5_c2mzrt_7rdc6j_nb4",
+              "options": {
+                "submitForSettlement": "true"
+              },
+              "type": "sale"
+            }
+          },
+          "message": "Amount is an invalid format.\nCredit card number is not an accepted test number.",
+          "success": false
+        },
+        "buyer": createdUsers[0]._id,
+        "status": "Cancelled",
+      }
+    ])
+
 
     console.log("Test data inserted.");
     await mongoose.connection.close();
