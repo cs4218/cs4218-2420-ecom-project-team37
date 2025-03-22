@@ -39,3 +39,10 @@ Below are the commands to run the playwright tests:
 ```bash
 npx playwright test
 ```
+
+Below are the commands to generate sonarqube coverage:
+```bash
+1. npm run test (This will generate frontend and backend lcov.info)
+2. npm run coverage (This will merge the frontend and backend coverage)
+3. npm run sonarqube (This will generate sonarqube coverage)
+```

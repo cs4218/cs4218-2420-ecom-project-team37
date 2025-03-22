@@ -10,6 +10,8 @@ export default {
 
   // jest code coverage
   collectCoverage: true,
+  coverageDirectory: "coverage/backend",
+  coverageReporters: ["lcov", "text"],
   collectCoverageFrom: [
     "controllers/**/*.js",
     "!controllers/**/*.test.js",
