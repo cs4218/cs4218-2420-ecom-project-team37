@@ -15,7 +15,7 @@
     "test:backend": "node node_modules/jest/bin/jest.js --config jest.backend.config.js",
     "test:frontend-integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.integration.frontend.config.js",
     "test:backend-integration": "node node_modules/jest/bin/jest.js --config jest.integration.backend.config.js",
-    "coverage": "lcov-result-merger 'coverage/**/lcov.info' 'coverage/lcov.info'",
+    "coverage": "lcov-result-merger 'coverage/**/lcov.info' 'coverage/merged.info'",
     "format": "prettier --write \"client/src/{components,pages}/**/*.{js,jsx}\" \"controllers/**/*.js\" \"middlewares/**/*.js\" \"helpers/**/*.js\" \"config/**/*.js\""
   },
   "keywords": [],
