@@ -11,6 +11,8 @@ import {
   productListController,
   productCategoryController,
   realtedProductController,
+  brainTreeTokenController,
+  brainTreePaymentController,
 } from "./productController.js";
 import mongoose, { Types } from "mongoose";
 import userModel from "../models/userModel.js";
@@ -20,10 +22,6 @@ import orderModel from "../models/orderModel.js";
 import fs from "fs";
 import slugify from "slugify";
 import braintree from "braintree";
-import {
-  brainTreeTokenController,
-  brainTreePaymentController,
-} from "./productController.js";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import connectDB from "../config/db";
 import request from "supertest";
@@ -351,6 +349,123 @@ describe("Product Controller Integration Tests", () => {
     });
   });
 
+  describe("Create Product Controller - Field Validation", () => {
+    it("should return error if category is missing", async () => {
+      const productData = {
+        name: "Test Product",
+        description: "Test Description",
+        price: "100",
+        quantity: "10",
+        shipping: "true",
+      };
+
+      const response = await request(app)
+        .post("/api/v1/product/create-product")
+        .set("Authorization", adminAuthToken)
+        .field(productData)
+        .attach("photo", testImageBuffer, "test-image.jpg");
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe("Category is required");
+    });
+
+    it("should return error if quantity is missing", async () => {
+      const productData = {
+        name: "Test Product",
+        description: "Test Description",
+        price: "100",
+        category: testCategory._id.toString(),
+        shipping: "true",
+      };
+
+      const response = await request(app)
+        .post("/api/v1/product/create-product")
+        .set("Authorization", adminAuthToken)
+        .field(productData)
+        .attach("photo", testImageBuffer, "test-image.jpg");
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe("Quantity is required");
+    });
+
+    it("should return error if description is missing", async () => {
+      const productData = {
+        name: "Test Product",
+        price: "100",
+        category: testCategory._id.toString(),
+        quantity: "10",
+        shipping: "true",
+      };
+
+      const response = await request(app)
+        .post("/api/v1/product/create-product")
+        .set("Authorization", adminAuthToken)
+        .field(productData)
+        .attach("photo", testImageBuffer, "test-image.jpg");
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe("Description is required");
+    });
+
+    it("should return error if price is missing", async () => {
+      const productData = {
+        name: "Test Product",
+        description: "Test Description",
+        category: testCategory._id.toString(),
+        quantity: "10",
+        shipping: "true",
+      };
+
+      const response = await request(app)
+        .post("/api/v1/product/create-product")
+        .set("Authorization", adminAuthToken)
+        .field(productData)
+        .attach("photo", testImageBuffer, "test-image.jpg");
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe("Price is required");
+    });
+
+    it("should return error if shipping option is undefined", async () => {
+      const productData = {
+        name: "Test Product",
+        description: "Test Description",
+        price: "100",
+        category: testCategory._id.toString(),
+        quantity: "10",
+        // Shipping is omitted
+      };
+
+      const response = await request(app)
+        .post("/api/v1/product/create-product")
+        .set("Authorization", adminAuthToken)
+        .field(productData)
+        .attach("photo", testImageBuffer, "test-image.jpg");
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe("Shipping option is required");
+    });
+
+    it("should return error if photo is missing", async () => {
+      const productData = {
+        name: "Test Product",
+        description: "Test Description",
+        price: "100",
+        category: testCategory._id.toString(),
+        quantity: "10",
+        shipping: "true",
+      };
+
+      const response = await request(app)
+        .post("/api/v1/product/create-product")
+        .set("Authorization", adminAuthToken)
+        .field(productData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe("Photo is required");
+    });
+  });
+
   describe("Get All Products Controller", () => {
     beforeEach(async () => {
       await productModel.create([
@@ -587,6 +702,142 @@ describe("Product Controller Integration Tests", () => {
 
       expect(response.status).toBe(404);
       expect(response.body).toHaveProperty("error", "Product not found");
+    });
+  });
+
+  describe("Update Product Controller - Field Validations", () => {
+    let testProduct;
+
+    beforeEach(async () => {
+      testProduct = await productModel.create({
+        name: "Original Product",
+        slug: "original-product",
+        description: "Original Description",
+        price: 100,
+        category: testCategory._id,
+        quantity: 10,
+        shipping: true,
+      });
+    });
+
+    it("should return error if description is missing", async () => {
+      const updateData = {
+        name: "Updated Product",
+        // description omitted
+        price: "150",
+        category: testCategory._id.toString(),
+        quantity: "15",
+        shipping: "false",
+      };
+
+      const response = await request(app)
+        .put(`/api/v1/product/update-product/${testProduct._id}`)
+        .set("Authorization", adminAuthToken)
+        .field(updateData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe("Description is required");
+    });
+
+    it("should return error if price is missing", async () => {
+      const updateData = {
+        name: "Updated Product",
+        description: "Updated Description",
+        // price omitted
+        category: testCategory._id.toString(),
+        quantity: "15",
+        shipping: "false",
+      };
+
+      const response = await request(app)
+        .put(`/api/v1/product/update-product/${testProduct._id}`)
+        .set("Authorization", adminAuthToken)
+        .field(updateData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe("Price is required");
+    });
+
+    it("should return error if category is missing", async () => {
+      const updateData = {
+        name: "Updated Product",
+        description: "Updated Description",
+        price: "150",
+        // category omitted
+        quantity: "15",
+        shipping: "false",
+      };
+
+      const response = await request(app)
+        .put(`/api/v1/product/update-product/${testProduct._id}`)
+        .set("Authorization", adminAuthToken)
+        .field(updateData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe("Category is required");
+    });
+
+    it("should return error if quantity is missing", async () => {
+      const updateData = {
+        name: "Updated Product",
+        description: "Updated Description",
+        price: "150",
+        category: testCategory._id.toString(),
+        // quantity omitted
+        shipping: "false",
+      };
+
+      const response = await request(app)
+        .put(`/api/v1/product/update-product/${testProduct._id}`)
+        .set("Authorization", adminAuthToken)
+        .field(updateData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe("Quantity is required");
+    });
+
+    it("should return error if shipping option is undefined", async () => {
+      const updateData = {
+        name: "Updated Product",
+        description: "Updated Description",
+        price: "150",
+        category: testCategory._id.toString(),
+        quantity: "15",
+        // shipping omitted on purpose
+      };
+
+      const response = await request(app)
+        .put(`/api/v1/product/update-product/${testProduct._id}`)
+        .set("Authorization", adminAuthToken)
+        .field(updateData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe("Shipping option is required");
+    });
+
+    it("should return error if photo size exceeds 1MB", async () => {
+      const updateData = {
+        name: "Updated Product",
+        description: "Updated Description",
+        price: "150",
+        category: testCategory._id.toString(),
+        quantity: "15",
+        shipping: "false",
+      };
+
+      // Create a fake file buffer larger than 1MB
+      const largeBuffer = Buffer.alloc(1000001); // 1,000,001 bytes
+
+      const response = await request(app)
+        .put(`/api/v1/product/update-product/${testProduct._id}`)
+        .set("Authorization", adminAuthToken)
+        .field(updateData)
+        .attach("photo", largeBuffer, "large-image.jpg");
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe(
+        "Photo is required and should be less than 1MB",
+      );
     });
   });
 

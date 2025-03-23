@@ -33,10 +33,14 @@ const Search = () => {
                     {p.description.substring(0, 30)}...
                   </p>
                   <p className="card-text"> $ {p.price}</p>
-                  <button className="btn btn-primary ms-1" onClick={() => navigate(`/product/${p.slug}`)}>
+                  <button
+                    className="btn btn-primary ms-1"
+                    onClick={() => navigate(`/product/${p.slug}`)}
+                  >
                     More Details
                   </button>
-                  <button className="btn btn-secondary ms-1" 
+                  <button
+                    className="btn btn-secondary ms-1"
                     onClick={() => {
                       setCart([...cart, p]);
                       localStorage.setItem(
@@ -44,7 +48,10 @@ const Search = () => {
                         JSON.stringify([...cart, p]),
                       );
                       toast.success("Item Added to cart");
-                    }}>ADD TO CART</button>
+                    }}
+                  >
+                    ADD TO CART
+                  </button>
                 </div>
               </div>
             ))}

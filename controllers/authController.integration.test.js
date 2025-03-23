@@ -88,7 +88,7 @@ describe("authController integration tests", () => {
       expect(responseData.user.answer).toBe(req.body.answer);
       const isPasswordValid = await comparePassword(
         req.body.password,
-        responseData.user.password
+        responseData.user.password,
       );
       expect(isPasswordValid).toBe(true);
     });
@@ -347,7 +347,7 @@ describe("authController integration tests", () => {
       const updatedUser = await userModel.findById(user._id);
       const isPasswordUpdated = await comparePassword(
         req.body.newPassword,
-        updatedUser.password
+        updatedUser.password,
       );
       expect(isPasswordUpdated).toBe(true);
       expect(res.status).toHaveBeenCalledWith(200);
@@ -451,7 +451,7 @@ describe("authController integration tests", () => {
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
       expect(responseData.updatedUser.address).toBe(
-        expectedUpdatedUser.address
+        expectedUpdatedUser.address,
       );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
@@ -460,7 +460,7 @@ describe("authController integration tests", () => {
       // Check password is updated
       const isPasswordValid = await comparePassword(
         req.body.password,
-        responseData.updatedUser.password
+        responseData.updatedUser.password,
       );
       expect(isPasswordValid).toBe(true);
     });
@@ -487,7 +487,7 @@ describe("authController integration tests", () => {
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
       expect(responseData.updatedUser.address).toBe(
-        expectedUpdatedUser.address
+        expectedUpdatedUser.address,
       );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
@@ -496,7 +496,7 @@ describe("authController integration tests", () => {
       // Check password is updated
       const isPasswordValid = await comparePassword(
         req.body.password,
-        responseData.updatedUser.password
+        responseData.updatedUser.password,
       );
       expect(isPasswordValid).toBe(true);
     });
@@ -523,7 +523,7 @@ describe("authController integration tests", () => {
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
       expect(responseData.updatedUser.address).toBe(
-        expectedUpdatedUser.address
+        expectedUpdatedUser.address,
       );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
@@ -532,7 +532,7 @@ describe("authController integration tests", () => {
       // Check password is the same as old password
       const isPasswordValid = await comparePassword(
         originalPassword,
-        responseData.updatedUser.password
+        responseData.updatedUser.password,
       );
       expect(isPasswordValid).toBe(true);
     });
@@ -559,7 +559,7 @@ describe("authController integration tests", () => {
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
       expect(responseData.updatedUser.address).toBe(
-        expectedUpdatedUser.address
+        expectedUpdatedUser.address,
       );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
@@ -568,7 +568,7 @@ describe("authController integration tests", () => {
       // Check password is updated
       const isPasswordValid = await comparePassword(
         req.body.password,
-        responseData.updatedUser.password
+        responseData.updatedUser.password,
       );
       expect(isPasswordValid).toBe(true);
     });
@@ -595,7 +595,7 @@ describe("authController integration tests", () => {
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
       expect(responseData.updatedUser.address).toBe(
-        expectedUpdatedUser.address
+        expectedUpdatedUser.address,
       );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
@@ -604,7 +604,7 @@ describe("authController integration tests", () => {
       // Check password is updated
       const isPasswordValid = await comparePassword(
         req.body.password,
-        responseData.updatedUser.password
+        responseData.updatedUser.password,
       );
       expect(isPasswordValid).toBe(true);
     });
@@ -631,7 +631,7 @@ describe("authController integration tests", () => {
       expect(responseData.updatedUser.name).toBe(expectedUpdatedUser.name);
       expect(responseData.updatedUser.phone).toBe(expectedUpdatedUser.phone);
       expect(responseData.updatedUser.address).toBe(
-        expectedUpdatedUser.address
+        expectedUpdatedUser.address,
       );
       expect(responseData.updatedUser.email).toBe(expectedUpdatedUser.email);
       expect(responseData.updatedUser.role).toBe(expectedUpdatedUser.role);
@@ -640,7 +640,7 @@ describe("authController integration tests", () => {
       // Check password is updated
       const isPasswordValid = await comparePassword(
         req.body.password,
-        responseData.updatedUser.password
+        responseData.updatedUser.password,
       );
       expect(isPasswordValid).toBe(true);
     });
@@ -655,7 +655,7 @@ describe("authController integration tests", () => {
       const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBe(false);
       expect(responseData.message).toBe(
-        "Password is required and at least 6 characters long"
+        "Password is required and at least 6 characters long",
       );
       expect(userModel.findByIdAndUpdate).not.toHaveBeenCalled();
     });
@@ -670,7 +670,7 @@ describe("authController integration tests", () => {
       const responseData = res.send.mock.calls[0][0];
       expect(responseData.success).toBe(false);
       expect(responseData.message).toBe(
-        "Password is required and at least 6 characters long"
+        "Password is required and at least 6 characters long",
       );
       expect(userModel.findByIdAndUpdate).not.toHaveBeenCalled();
     });
@@ -851,10 +851,10 @@ describe("authController integration tests", () => {
 
       expect(firstOrder.products).toHaveLength(2);
       expect(firstOrder.products[0]._id.toString()).toBe(
-        product1._id.toString()
+        product1._id.toString(),
       );
       expect(firstOrder.products[1]._id.toString()).toBe(
-        product2._id.toString()
+        product2._id.toString(),
       );
       expect(firstOrder.products[0].photo).toBeUndefined();
       expect(firstOrder.products[1].photo).toBeUndefined();
@@ -868,7 +868,7 @@ describe("authController integration tests", () => {
 
       expect(secondOrder.products).toHaveLength(1);
       expect(secondOrder.products[0]._id.toString()).toBe(
-        product1._id.toString()
+        product1._id.toString(),
       );
       expect(firstOrder.products[1].photo).toBeUndefined();
     });
@@ -891,7 +891,7 @@ describe("authController integration tests", () => {
 
       expect(firstOrder.products).toHaveLength(1);
       expect(firstOrder.products[0]._id.toString()).toBe(
-        product2._id.toString()
+        product2._id.toString(),
       );
       expect(firstOrder.products[0].photo).toBeUndefined();
     });
@@ -1041,10 +1041,10 @@ describe("authController integration tests", () => {
 
       // ensure time is sorted
       expect(new Date(firstOrder.createdAt).getTime()).toBeGreaterThan(
-        new Date(secondOrder.createdAt).getTime()
+        new Date(secondOrder.createdAt).getTime(),
       );
       expect(new Date(secondOrder.createdAt).getTime()).toBeGreaterThan(
-        new Date(thirdOrder.createdAt).getTime()
+        new Date(thirdOrder.createdAt).getTime(),
       );
     });
 
@@ -1063,7 +1063,7 @@ describe("authController integration tests", () => {
       const firstOrderProducts = firstOrder.products;
       expect(firstOrderProducts).toHaveLength(1);
       expect(firstOrderProducts[0]._id.toString()).toBe(
-        product2._id.toString()
+        product2._id.toString(),
       );
       expect(firstOrderProducts[0].photo).toBeUndefined();
 
@@ -1075,7 +1075,7 @@ describe("authController integration tests", () => {
       const secondOrderProducts = secondOrder.products;
       expect(secondOrderProducts).toHaveLength(1);
       expect(secondOrderProducts[0]._id.toString()).toBe(
-        product1._id.toString()
+        product1._id.toString(),
       );
       expect(secondOrderProducts[0].photo).toBeUndefined();
 
@@ -1087,10 +1087,10 @@ describe("authController integration tests", () => {
       const thirdOrderProducts = thirdOrder.products;
       expect(thirdOrderProducts).toHaveLength(2);
       expect(thirdOrderProducts[0]._id.toString()).toBe(
-        product1._id.toString()
+        product1._id.toString(),
       );
       expect(thirdOrderProducts[1]._id.toString()).toBe(
-        product2._id.toString()
+        product2._id.toString(),
       );
       expect(thirdOrderProducts[0].photo).toBeUndefined();
       expect(thirdOrderProducts[1].photo).toBeUndefined();

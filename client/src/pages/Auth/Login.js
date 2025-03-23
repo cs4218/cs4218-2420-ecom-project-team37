@@ -45,7 +45,7 @@ const Login = () => {
       console.log(error);
       if (error.response) {
         const { status, data } = error.response;
-        
+
         if (status === 401) {
           toast.error("Incorrect password. Please try again.", {
             duration: 5000,
@@ -55,21 +55,27 @@ const Login = () => {
             },
           });
         } else if (status === 404) {
-          toast.error("Email not registered. Please check your email or register a new account.", {
-            duration: 5000,
-            style: {
-              background: "#ff4d4f",
-              color: "white",
+          toast.error(
+            "Email not registered. Please check your email or register a new account.",
+            {
+              duration: 5000,
+              style: {
+                background: "#ff4d4f",
+                color: "white",
+              },
             },
-          });
+          );
         } else if (status === 400) {
-          toast.error(data.message || "Please provide both email and password.", {
-            duration: 5000,
-            style: {
-              background: "#ff4d4f",
-              color: "white",
+          toast.error(
+            data.message || "Please provide both email and password.",
+            {
+              duration: 5000,
+              style: {
+                background: "#ff4d4f",
+                color: "white",
+              },
             },
-          });
+          );
         } else {
           toast.error("Something went wrong. Please try again later.", {
             duration: 5000,

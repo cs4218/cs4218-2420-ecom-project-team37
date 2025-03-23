@@ -43,7 +43,7 @@ export const createProductController = async (req, res) => {
           .send({ error: "Quantity must be more than zero" });
       case shipping === undefined:
         return res.status(400).send({ error: "Shipping option is required" });
-      case !req.files || !req.files.photo:
+      case !req.files?.photo:
         return res.status(400).send({ error: "Photo is required" });
       case photo && photo.size > 1000000:
         return res
