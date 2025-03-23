@@ -135,11 +135,13 @@ const UpdateProduct = () => {
         toast.error("Product deletion cancelled");
         return;
       }
-      const { data } = await axios.delete(
-        `/api/v1/product/delete-product/${id}`,
-      );
+      await axios.delete(`/api/v1/product/delete-product/${id}`);
+    
       toast.success("Product deleted successfully");
-      navigate("/dashboard/admin/products");
+      // Delay navigation to let the toast be visible
+      setTimeout(() => {
+        navigate("/dashboard/admin/products");
+      }, 1000);
     } catch (error) {
       console.log(error);
       toast.error("Delete went wrong");
