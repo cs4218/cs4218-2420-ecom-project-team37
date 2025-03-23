@@ -20,12 +20,8 @@ const Contact = () => {
           <p className="mt-3">
             <a href="mailto:help@ecommerceapp.com">help@ecommerceapp.com</a>
           </p>
-          <p className="mt-3">
-            012-3456789
-          </p>
-          <p className="mt-3">
-            1800-0000-0000 (toll free)
-          </p>
+          <p className="mt-3">012-3456789</p>
+          <p className="mt-3">1800-0000-0000 (toll free)</p>
         </div>
       </div>
     </Layout>

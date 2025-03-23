@@ -20,7 +20,8 @@ const About = () => {
           </p>
           <h2>Our Team</h2>
           <p className="text-justify">
-            Our team consists of passionate individuals dedicated to find all the bugs in the code
+            Our team consists of passionate individuals dedicated to find all
+            the bugs in the code
           </p>
         </div>
       </div>

@@ -707,7 +707,7 @@ describe("Product Controller Integration Tests", () => {
 
   describe("Update Product Controller - Field Validations", () => {
     let testProduct;
-  
+
     beforeEach(async () => {
       testProduct = await productModel.create({
         name: "Original Product",
@@ -719,7 +719,7 @@ describe("Product Controller Integration Tests", () => {
         shipping: true,
       });
     });
-  
+
     it("should return error if description is missing", async () => {
       const updateData = {
         name: "Updated Product",
@@ -729,16 +729,16 @@ describe("Product Controller Integration Tests", () => {
         quantity: "15",
         shipping: "false",
       };
-  
+
       const response = await request(app)
         .put(`/api/v1/product/update-product/${testProduct._id}`)
         .set("Authorization", adminAuthToken)
         .field(updateData);
-  
+
       expect(response.status).toBe(400);
       expect(response.body.error).toBe("Description is required");
     });
-  
+
     it("should return error if price is missing", async () => {
       const updateData = {
         name: "Updated Product",
@@ -748,16 +748,16 @@ describe("Product Controller Integration Tests", () => {
         quantity: "15",
         shipping: "false",
       };
-  
+
       const response = await request(app)
         .put(`/api/v1/product/update-product/${testProduct._id}`)
         .set("Authorization", adminAuthToken)
         .field(updateData);
-  
+
       expect(response.status).toBe(400);
       expect(response.body.error).toBe("Price is required");
     });
-  
+
     it("should return error if category is missing", async () => {
       const updateData = {
         name: "Updated Product",
@@ -767,16 +767,16 @@ describe("Product Controller Integration Tests", () => {
         quantity: "15",
         shipping: "false",
       };
-  
+
       const response = await request(app)
         .put(`/api/v1/product/update-product/${testProduct._id}`)
         .set("Authorization", adminAuthToken)
         .field(updateData);
-  
+
       expect(response.status).toBe(400);
       expect(response.body.error).toBe("Category is required");
     });
-  
+
     it("should return error if quantity is missing", async () => {
       const updateData = {
         name: "Updated Product",
@@ -786,16 +786,16 @@ describe("Product Controller Integration Tests", () => {
         // quantity omitted
         shipping: "false",
       };
-  
+
       const response = await request(app)
         .put(`/api/v1/product/update-product/${testProduct._id}`)
         .set("Authorization", adminAuthToken)
         .field(updateData);
-  
+
       expect(response.status).toBe(400);
       expect(response.body.error).toBe("Quantity is required");
     });
-  
+
     it("should return error if shipping option is undefined", async () => {
       const updateData = {
         name: "Updated Product",
@@ -805,16 +805,16 @@ describe("Product Controller Integration Tests", () => {
         quantity: "15",
         // shipping omitted on purpose
       };
-  
+
       const response = await request(app)
         .put(`/api/v1/product/update-product/${testProduct._id}`)
         .set("Authorization", adminAuthToken)
         .field(updateData);
-  
+
       expect(response.status).toBe(400);
       expect(response.body.error).toBe("Shipping option is required");
     });
-  
+
     it("should return error if photo size exceeds 1MB", async () => {
       const updateData = {
         name: "Updated Product",
@@ -824,19 +824,19 @@ describe("Product Controller Integration Tests", () => {
         quantity: "15",
         shipping: "false",
       };
-  
+
       // Create a fake file buffer larger than 1MB
       const largeBuffer = Buffer.alloc(1000001); // 1,000,001 bytes
-  
+
       const response = await request(app)
         .put(`/api/v1/product/update-product/${testProduct._id}`)
         .set("Authorization", adminAuthToken)
         .field(updateData)
         .attach("photo", largeBuffer, "large-image.jpg");
-  
+
       expect(response.status).toBe(400);
       expect(response.body.error).toBe(
-        "Photo is required and should be less than 1MB"
+        "Photo is required and should be less than 1MB",
       );
     });
   });
