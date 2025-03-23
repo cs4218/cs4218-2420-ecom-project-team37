@@ -602,6 +602,101 @@ describe("Product Controller Integration Tests", () => {
     });
   });
 
+  describe("Product List Controller", () => {
+    beforeEach(async () => {
+      // Create multiple products for pagination testing
+      await productModel.create([
+        {
+          name: "Product 1",
+          slug: "product-1",
+          description: "Description 1",
+          price: 100,
+          category: testCategory._id,
+          quantity: 10,
+          shipping: true,
+        },
+        {
+          name: "Product 2",
+          slug: "product-2",
+          description: "Description 2",
+          price: 200,
+          category: testCategory._id,
+          quantity: 20,
+          shipping: false,
+        },
+        {
+          name: "Product 3",
+          slug: "product-3",
+          description: "Description 3",
+          price: 300,
+          category: testCategory._id,
+          quantity: 30,
+          shipping: true,
+        },
+        {
+          name: "Product 4",
+          slug: "product-4",
+          description: "Description 4",
+          price: 400,
+          category: testCategory._id,
+          quantity: 40,
+          shipping: false,
+        },
+        {
+          name: "Product 5",
+          slug: "product-5",
+          description: "Description 5",
+          price: 500,
+          category: testCategory._id,
+          quantity: 50,
+          shipping: true,
+        },
+        {
+          name: "Product 6",
+          slug: "product-6",
+          description: "Description 6",
+          price: 600,
+          category: testCategory._id,
+          quantity: 60,
+          shipping: false,
+        },
+        {
+          name: "Product 7",
+          slug: "product-7",
+          description: "Description 7",
+          price: 700,
+          category: testCategory._id,
+          quantity: 70,
+          shipping: true,
+        },
+      ]);
+    });
+  
+    it("should return the first page of products with 6 items per page", async () => {
+      const response = await request(app).get("/api/v1/product/product-list/1");
+  
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("success", true);
+      expect(response.body.products).toHaveLength(6);
+    });
+  
+    it("should return the second page of products with 1 item", async () => {
+      const response = await request(app).get("/api/v1/product/product-list/2");
+  
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("success", true);
+      expect(response.body.products).toHaveLength(1);
+    });
+  
+    it("should return an empty array if the page is out of range", async () => {
+      const response = await request(app).get("/api/v1/product/product-list/3");
+  
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("success", true);
+      expect(response.body.products).toHaveLength(0);
+    });
+  });
+
   describe("Update Product Controller", () => {
     let testProduct;
 
@@ -838,6 +933,214 @@ describe("Product Controller Integration Tests", () => {
       expect(response.body.error).toBe(
         "Photo is required and should be less than 1MB",
       );
+    });
+  });
+
+  describe("Product Filters Controller", () => {
+    let testCategory1, testCategory2;
+    const testImageBuffer = Buffer.from("fake-image-data");
+  
+    beforeEach(async () => {
+      // Create test categories
+      testCategory1 = await categoryModel.create({
+        name: "Test Category 1",
+        slug: "test-category-1",
+      });
+  
+      testCategory2 = await categoryModel.create({
+        name: "Test Category 2",
+        slug: "test-category-2",
+      });
+  
+      // Create test products
+      await productModel.create([
+        {
+          name: "Product 1",
+          slug: "product-1",
+          description: "Description 1",
+          price: 100,
+          category: testCategory1._id,
+          quantity: 10,
+          shipping: true,
+        },
+        {
+          name: "Product 2",
+          slug: "product-2",
+          description: "Description 2",
+          price: 200,
+          category: testCategory1._id,
+          quantity: 20,
+          shipping: false,
+        },
+        {
+          name: "Product 3",
+          slug: "product-3",
+          description: "Description 3",
+          price: 300,
+          category: testCategory2._id,
+          quantity: 30,
+          shipping: true,
+        },
+        {
+          name: "Product 4",
+          slug: "product-4",
+          description: "Description 4",
+          price: 400,
+          category: testCategory2._id,
+          quantity: 40,
+          shipping: false,
+        },
+      ]);
+    });
+  
+
+    it("should filter products by category", async () => {
+      const response = await request(app)
+        .post("/api/v1/product/product-filters")
+        .send({
+          checked: [testCategory1._id], // Filter by category 1
+          radio: [], // No price filter
+        });
+  
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("success", true);
+      expect(response.body.products).toHaveLength(2); // 2 products in category 1
+      expect(response.body.products[0].category.toString()).toBe(
+        testCategory1._id.toString()
+      );
+    });
+
+  });
+
+  describe("Search Product Controller", () => {
+    let testProduct1, testProduct2;
+  
+    beforeAll(async () => {
+      // Create test products
+      testProduct1 = await productModel.create({
+        name: "Test Product 1",
+        slug: "test-product-1",
+        description: "This is a test product",
+        price: 100,
+        category: new mongoose.Types.ObjectId(),
+        quantity: 10,
+        shipping: true,
+      });
+  
+      testProduct2 = await productModel.create({
+        name: "Another Product",
+        slug: "another-product",
+        description: "Another product for search",
+        price: 200,
+        category: new mongoose.Types.ObjectId(),
+        quantity: 20,
+        shipping: false,
+      });
+    });
+  
+    afterAll(async () => {
+      // Clean up the database
+      await productModel.deleteMany({});
+    });
+  
+    it("should search products by name", async () => {
+      const response = await request(app).get(
+        `/api/v1/product/search/Test`
+      );
+  
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveLength(1);
+      expect(response.body[0].name).toBe("Test Product 1");
+    });
+  
+    it("should return an empty array if no products match the keyword", async () => {
+      const response = await request(app).get(
+        `/api/v1/product/search/nonexistent`
+      );
+  
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveLength(0);
+    });
+  });
+
+  describe("Related Products Controller", () => {
+    let testCategory;
+    let testProduct1, testProduct2, testProduct3;
+  
+    beforeAll(async () => {
+      // Create a test category
+      testCategory = await categoryModel.create({
+        name: "Test Category",
+        slug: "test-category",
+      });
+  
+      // Create test products
+      testProduct1 = await productModel.create({
+        name: "Test Product 1",
+        slug: "test-product-1",
+        description: "This is a test product",
+        price: 100,
+        category: testCategory._id,
+        quantity: 10,
+        shipping: true,
+      });
+  
+      testProduct2 = await productModel.create({
+        name: "Test Product 2",
+        slug: "test-product-2",
+        description: "Another test product",
+        price: 200,
+        category: testCategory._id,
+        quantity: 20,
+        shipping: false,
+      });
+  
+      testProduct3 = await productModel.create({
+        name: "Test Product 3",
+        slug: "test-product-3",
+        description: "Yet another test product",
+        price: 300,
+        category: new mongoose.Types.ObjectId(), // Different category
+        quantity: 30,
+        shipping: true,
+      });
+    });
+  
+    afterAll(async () => {
+      // Clean up the database
+      await productModel.deleteMany({});
+      await categoryModel.deleteMany({});
+    });
+  
+    it("should return related products in the same category", async () => {
+      const response = await request(app).get(
+        `/api/v1/product/related-product/${testProduct1._id}/${testCategory._id}`
+      );
+  
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("success", true);
+      expect(response.body.products).toHaveLength(1); // Only one related product (excluding the current product)
+      expect(response.body.products[0].name).toBe("Test Product 2");
+    });
+  
+    it("should exclude the current product from related products", async () => {
+      const response = await request(app).get(
+        `/api/v1/product/related-product/${testProduct1._id}/${testCategory._id}`
+      );
+  
+      expect(response.status).toBe(200);
+      expect(response.body.products).not.toContainEqual(
+        expect.objectContaining({ name: "Test Product 1" })
+      );
+    });
+  
+    it("should return an empty array if no related products exist", async () => {
+      const response = await request(app).get(
+        `/api/v1/product/related-product/${testProduct3._id}/${testProduct3.category}`
+      );
+  
+      expect(response.status).toBe(200);
+      expect(response.body.products).toHaveLength(0);
     });
   });
 
