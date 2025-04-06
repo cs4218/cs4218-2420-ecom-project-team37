@@ -205,7 +205,15 @@ const HomePage = () => {
                   setPage(page + 1);
                 }}
               >
-                {loading ? "Loading ..." : ""}
+                {loading ? (
+                  "Loading ..."
+                ) : (
+                  <>
+                    {" "}
+                    Loadmore
+                    {/* <AiOutlineReload /> */}
+                  </>
+                )}{" "}
               </button>
             )}
           </div>
