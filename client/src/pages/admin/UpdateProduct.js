@@ -136,7 +136,7 @@ const UpdateProduct = () => {
         return;
       }
       await axios.delete(`/api/v1/product/delete-product/${id}`);
-    
+
       toast.success("Product deleted successfully");
       // Delay navigation to let the toast be visible
       setTimeout(() => {

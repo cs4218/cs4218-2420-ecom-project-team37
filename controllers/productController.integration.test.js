@@ -671,26 +671,26 @@ describe("Product Controller Integration Tests", () => {
         },
       ]);
     });
-  
+
     it("should return the first page of products with 6 items per page", async () => {
       const response = await request(app).get("/api/v1/product/product-list/1");
-  
+
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty("success", true);
       expect(response.body.products).toHaveLength(6);
     });
-  
+
     it("should return the second page of products with 1 item", async () => {
       const response = await request(app).get("/api/v1/product/product-list/2");
-  
+
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty("success", true);
       expect(response.body.products).toHaveLength(1);
     });
-  
+
     it("should return an empty array if the page is out of range", async () => {
       const response = await request(app).get("/api/v1/product/product-list/3");
-  
+
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty("success", true);
       expect(response.body.products).toHaveLength(0);
@@ -939,19 +939,19 @@ describe("Product Controller Integration Tests", () => {
   describe("Product Filters Controller", () => {
     let testCategory1, testCategory2;
     const testImageBuffer = Buffer.from("fake-image-data");
-  
+
     beforeEach(async () => {
       // Create test categories
       testCategory1 = await categoryModel.create({
         name: "Test Category 1",
         slug: "test-category-1",
       });
-  
+
       testCategory2 = await categoryModel.create({
         name: "Test Category 2",
         slug: "test-category-2",
       });
-  
+
       // Create test products
       await productModel.create([
         {
@@ -992,7 +992,6 @@ describe("Product Controller Integration Tests", () => {
         },
       ]);
     });
-  
 
     it("should filter products by category", async () => {
       const response = await request(app)
@@ -1001,20 +1000,19 @@ describe("Product Controller Integration Tests", () => {
           checked: [testCategory1._id], // Filter by category 1
           radio: [], // No price filter
         });
-  
+
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty("success", true);
       expect(response.body.products).toHaveLength(2); // 2 products in category 1
       expect(response.body.products[0].category.toString()).toBe(
-        testCategory1._id.toString()
+        testCategory1._id.toString(),
       );
     });
-
   });
 
   describe("Search Product Controller", () => {
     let testProduct1, testProduct2;
-  
+
     beforeAll(async () => {
       // Create test products
       testProduct1 = await productModel.create({
@@ -1026,7 +1024,7 @@ describe("Product Controller Integration Tests", () => {
         quantity: 10,
         shipping: true,
       });
-  
+
       testProduct2 = await productModel.create({
         name: "Another Product",
         slug: "another-product",
@@ -1037,27 +1035,25 @@ describe("Product Controller Integration Tests", () => {
         shipping: false,
       });
     });
-  
+
     afterAll(async () => {
       // Clean up the database
       await productModel.deleteMany({});
     });
-  
+
     it("should search products by name", async () => {
-      const response = await request(app).get(
-        `/api/v1/product/search/Test`
-      );
-  
+      const response = await request(app).get(`/api/v1/product/search/Test`);
+
       expect(response.status).toBe(200);
       expect(response.body).toHaveLength(1);
       expect(response.body[0].name).toBe("Test Product 1");
     });
-  
+
     it("should return an empty array if no products match the keyword", async () => {
       const response = await request(app).get(
-        `/api/v1/product/search/nonexistent`
+        `/api/v1/product/search/nonexistent`,
       );
-  
+
       expect(response.status).toBe(200);
       expect(response.body).toHaveLength(0);
     });
@@ -1066,14 +1062,14 @@ describe("Product Controller Integration Tests", () => {
   describe("Related Products Controller", () => {
     let testCategory;
     let testProduct1, testProduct2, testProduct3;
-  
+
     beforeAll(async () => {
       // Create a test category
       testCategory = await categoryModel.create({
         name: "Test Category",
         slug: "test-category",
       });
-  
+
       // Create test products
       testProduct1 = await productModel.create({
         name: "Test Product 1",
@@ -1084,7 +1080,7 @@ describe("Product Controller Integration Tests", () => {
         quantity: 10,
         shipping: true,
       });
-  
+
       testProduct2 = await productModel.create({
         name: "Test Product 2",
         slug: "test-product-2",
@@ -1094,7 +1090,7 @@ describe("Product Controller Integration Tests", () => {
         quantity: 20,
         shipping: false,
       });
-  
+
       testProduct3 = await productModel.create({
         name: "Test Product 3",
         slug: "test-product-3",
@@ -1105,40 +1101,40 @@ describe("Product Controller Integration Tests", () => {
         shipping: true,
       });
     });
-  
+
     afterAll(async () => {
       // Clean up the database
       await productModel.deleteMany({});
       await categoryModel.deleteMany({});
     });
-  
+
     it("should return related products in the same category", async () => {
       const response = await request(app).get(
-        `/api/v1/product/related-product/${testProduct1._id}/${testCategory._id}`
+        `/api/v1/product/related-product/${testProduct1._id}/${testCategory._id}`,
       );
-  
+
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty("success", true);
       expect(response.body.products).toHaveLength(1); // Only one related product (excluding the current product)
       expect(response.body.products[0].name).toBe("Test Product 2");
     });
-  
+
     it("should exclude the current product from related products", async () => {
       const response = await request(app).get(
-        `/api/v1/product/related-product/${testProduct1._id}/${testCategory._id}`
+        `/api/v1/product/related-product/${testProduct1._id}/${testCategory._id}`,
       );
-  
+
       expect(response.status).toBe(200);
       expect(response.body.products).not.toContainEqual(
-        expect.objectContaining({ name: "Test Product 1" })
+        expect.objectContaining({ name: "Test Product 1" }),
       );
     });
-  
+
     it("should return an empty array if no related products exist", async () => {
       const response = await request(app).get(
-        `/api/v1/product/related-product/${testProduct3._id}/${testProduct3.category}`
+        `/api/v1/product/related-product/${testProduct3._id}/${testProduct3.category}`,
       );
-  
+
       expect(response.status).toBe(200);
       expect(response.body.products).toHaveLength(0);
     });
