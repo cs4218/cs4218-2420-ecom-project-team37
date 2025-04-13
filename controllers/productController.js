@@ -420,7 +420,20 @@ export const brainTreePaymentController = async (req, res) => {
     }
 
     let total = 0;
-    cart.map((i) => {
+    cart.map(async (i) => {
+      const product = await productModel.getById(i._id);
+      if (!product) {
+        return res.status(404).send({
+          success: false,
+          message: "Product not found",
+        });
+      }
+      if (product.quantity < i.count) {
+        return res.status(400).send({
+          success: false,
+          message: "Product quantity is not enough",
+        });
+      }
       total += i.price;
     });
     let newTransaction = gateway.transaction.sale(
@@ -433,6 +446,10 @@ export const brainTreePaymentController = async (req, res) => {
       },
       function (error, result) {
         if (result) {
+          // update product quantity left
+          cart.map(async (i) => {
+            await productModel.findOneAndUpdate(i._id, {quantity: i.quantity - i.count}, {new: true});
+          });
           const order = new orderModel({
             products: cart,
             payment: result,
