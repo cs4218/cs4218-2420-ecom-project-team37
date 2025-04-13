@@ -3,6 +3,8 @@ import orderModel from "../models/orderModel.js";
 import { comparePassword, hashPassword } from "../helpers/authHelper.js";
 
 import JWT from "jsonwebtoken";
+import categoryModel from "../models/categoryModel.js";
+import productModel from "../models/productModel.js";
 
 export const registerController = async (req, res) => {
   try {
@@ -304,6 +306,35 @@ export const orderStatusController = async (req, res) => {
     res.status(500).send({
       success: false,
       message: "Error While Updating Order",
+      error,
+    });
+  }
+};
+
+// Reset the database (for testing purposes)
+export const resetDBController = async (req, res) => {
+  try {
+    if (process.env.DEV_MODE !== "development") {
+      return res.status(403).send({
+        success: false,
+        message: "Resetting DB is only allowed in development or test environments",
+      });
+    }
+
+    // Delete all orders, categories, and products
+    await orderModel.deleteMany({});
+    await categoryModel.deleteMany({});
+    await productModel.deleteMany({});
+
+    res.status(200).send({
+      success: true,
+      message: "Database reset successfully. All users and orders have been deleted.",
+    });
+  } catch (error) {
+    console.log("Error in resetDBController:", error);
+    res.status(500).send({
+      success: false,
+      message: "Error resetting database",
       error,
     });
   }

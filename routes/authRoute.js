@@ -8,6 +8,7 @@ import {
   getOrdersController,
   getAllOrdersController,
   orderStatusController,
+  resetDBController
 } from "../controllers/authController.js";
 import { isAdmin, requireSignIn } from "../middlewares/authMiddleware.js";
 
@@ -52,5 +53,7 @@ router.put(
   isAdmin,
   orderStatusController
 );
+
+router.get("/reset-db", requireSignIn, resetDBController);
 
 export default router;
